@@ -52,8 +52,7 @@ if [[ $# -gt 0  ]]; then
             ;;
 
         cfn|cloudformation )
-            ${DOCKER_COMPOSE} run --rm troposphere > aws/${CFN_TEMPLATE}.json
-            cat aws/${CFN_TEMPLATE}.json
+            ${DOCKER_COMPOSE} run --rm troposphere
             ;;
 
         * ) ${DOCKER_COMPOSE} "$@"; ;;
