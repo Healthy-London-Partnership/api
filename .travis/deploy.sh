@@ -4,6 +4,8 @@
 # $TRAVIS_BRANCH = The name of the git branch that the build is running on.
 # $REPO_URI = The URI of the ECR repo to push to.
 # $CLUSTER = The name of the ECS cluster to deploy to.
+# $BLACKFIRE_SERVER_ID = The Blackfire server ID.
+# $BLACKFIRE_SERVER_TOKEN = The Blackfire server token.
 
 # Bail out on first error.
 set -e
