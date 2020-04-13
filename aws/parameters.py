@@ -1,7 +1,7 @@
 from troposphere import Parameter
 
 
-def get_uuid_parameter(template, uuid):
+def create_uuid_parameter(template, uuid):
     return template.add_parameter(
         Parameter(
             'Uuid',
@@ -14,7 +14,7 @@ def get_uuid_parameter(template, uuid):
     )
 
 
-def get_environment_parameter(template):
+def create_environment_parameter(template):
     return template.add_parameter(
         Parameter(
             'Environment',
@@ -25,7 +25,7 @@ def get_environment_parameter(template):
     )
 
 
-def get_certificate_arn_parameter(template):
+def create_certificate_arn_parameter(template):
     return template.add_parameter(
         Parameter(
             'CertificateArn',
@@ -35,7 +35,7 @@ def get_certificate_arn_parameter(template):
     )
 
 
-def get_vpc_parameter(template):
+def create_vpc_parameter(template):
     return template.add_parameter(
         Parameter(
             'Vpc',
@@ -45,7 +45,7 @@ def get_vpc_parameter(template):
     )
 
 
-def get_subnets_parameter(template):
+def create_subnets_parameter(template):
     return template.add_parameter(
         Parameter(
             'Subnets',
@@ -55,7 +55,7 @@ def get_subnets_parameter(template):
     )
 
 
-def get_database_password_parameter(template):
+def create_database_password_parameter(template):
     return template.add_parameter(
         Parameter(
             'DatabasePassword',
@@ -70,7 +70,7 @@ def get_database_password_parameter(template):
     )
 
 
-def get_database_class_parameter(template):
+def create_database_class_parameter(template):
     return template.add_parameter(
         Parameter(
             'DatabaseClass',
@@ -90,7 +90,7 @@ def get_database_class_parameter(template):
     )
 
 
-def get_database_allocated_storage_parameter(template):
+def create_database_allocated_storage_parameter(template):
     return template.add_parameter(
         Parameter(
             'DatabaseAllocatedStorage',
@@ -104,7 +104,7 @@ def get_database_allocated_storage_parameter(template):
     )
 
 
-def get_redis_node_class_parameter(template):
+def create_redis_node_class_parameter(template):
     return template.add_parameter(
         Parameter(
             'RedisNodeClass',
@@ -121,7 +121,7 @@ def get_redis_node_class_parameter(template):
     )
 
 
-def get_redis_nodes_count_parameter(template):
+def create_redis_nodes_count_parameter(template):
     template.add_parameter(
         Parameter(
             'RedisNodesCount',
@@ -134,7 +134,7 @@ def get_redis_nodes_count_parameter(template):
     )
 
 
-def get_api_instance_class_parameter(template):
+def create_api_instance_class_parameter(template):
     return template.add_parameter(
         Parameter(
             'ApiInstanceClass',
@@ -155,7 +155,7 @@ def get_api_instance_class_parameter(template):
     )
 
 
-def get_api_instance_count_parameter(template):
+def create_api_instance_count_parameter(template):
     return template.add_parameter(
         Parameter(
             'ApiInstanceCount',
@@ -168,7 +168,7 @@ def get_api_instance_count_parameter(template):
     )
 
 
-def get_api_task_count_parameter(template):
+def create_api_task_count_parameter(template):
     return template.add_parameter(
         Parameter(
             'ApiTaskCount',
@@ -181,7 +181,7 @@ def get_api_task_count_parameter(template):
     )
 
 
-def get_scheduler_task_count_parameter(template):
+def create_scheduler_task_count_parameter(template):
     return template.add_parameter(
         Parameter(
             'SchedulerTaskCount',
@@ -195,7 +195,7 @@ def get_scheduler_task_count_parameter(template):
     )
 
 
-def get_queue_worker_task_count_parameter(template):
+def create_queue_worker_task_count_parameter(template):
     return template.add_parameter(
         Parameter(
             'QueueWorkerTaskCount',
@@ -208,7 +208,7 @@ def get_queue_worker_task_count_parameter(template):
     )
 
 
-def get_elasticsearch_instance_class_parameter(template):
+def create_elasticsearch_instance_class_parameter(template):
     return template.add_parameter(
         Parameter(
             'ElasticsearchInstanceClass',
@@ -225,7 +225,7 @@ def get_elasticsearch_instance_class_parameter(template):
     )
 
 
-def get_elasticsearch_instance_count_parameter(template):
+def create_elasticsearch_instance_count_parameter(template):
     return template.add_parameter(
         Parameter(
             'ElasticsearchInstanceCount',

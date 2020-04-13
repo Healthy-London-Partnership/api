@@ -1,7 +1,7 @@
 from troposphere import Output, Ref, GetAtt, Sub
 
 
-def get_database_name_output(template, database_username_variable):
+def create_database_name_output(template, database_username_variable):
     return template.add_output(
         Output(
             'DatabaseName',
@@ -11,7 +11,7 @@ def get_database_name_output(template, database_username_variable):
     )
 
 
-def get_database_username_output(template, database_username_variable):
+def create_database_username_output(template, database_username_variable):
     return template.add_output(
         Output(
             'DatabaseUsername',
@@ -21,7 +21,7 @@ def get_database_username_output(template, database_username_variable):
     )
 
 
-def get_database_host_output(template, database_resource):
+def create_database_host_output(template, database_resource):
     return template.add_output(
         Output(
             'DatabaseHost',
@@ -31,7 +31,7 @@ def get_database_host_output(template, database_resource):
     )
 
 
-def get_database_port_output(template, database_resource):
+def create_database_port_output(template, database_resource):
     return template.add_output(
         Output(
             'DatabasePort',
@@ -41,7 +41,7 @@ def get_database_port_output(template, database_resource):
     )
 
 
-def get_redis_host_output(template, redis_resource):
+def create_redis_host_output(template, redis_resource):
     return template.add_output(
         Output(
             'RedisHost',
@@ -51,7 +51,7 @@ def get_redis_host_output(template, redis_resource):
     )
 
 
-def get_redis_port_output(template, redis_resource):
+def create_redis_port_output(template, redis_resource):
     return template.add_output(
         Output(
             'RedisPort',
@@ -61,7 +61,7 @@ def get_redis_port_output(template, redis_resource):
     )
 
 
-def get_default_queue_output(template, default_queue_name_variable):
+def create_default_queue_output(template, default_queue_name_variable):
     return template.add_output(
         Output(
             'DefaultQueue',
@@ -71,7 +71,7 @@ def get_default_queue_output(template, default_queue_name_variable):
     )
 
 
-def get_notifications_queue_output(template, notifications_queue_name_variable):
+def create_notifications_queue_output(template, notifications_queue_name_variable):
     return template.add_output(
         Output(
             'NotificationsQueue',
@@ -81,7 +81,7 @@ def get_notifications_queue_output(template, notifications_queue_name_variable):
     )
 
 
-def get_load_balancer_domain_output(template, load_balancer_resource):
+def create_load_balancer_domain_output(template, load_balancer_resource):
     return template.add_output(
         Output(
             'LoadBalancerDomain',
@@ -91,7 +91,7 @@ def get_load_balancer_domain_output(template, load_balancer_resource):
     )
 
 
-def get_elasticsearch_host_output(template, elasticsearch_resource):
+def create_elasticsearch_host_output(template, elasticsearch_resource):
     return template.add_output(
         Output(
             'ElasticsearchHost',
@@ -101,7 +101,7 @@ def get_elasticsearch_host_output(template, elasticsearch_resource):
     )
 
 
-def get_docker_repository_uri_output(template, docker_repository_resource):
+def create_docker_repository_uri_output(template, docker_repository_resource):
     return template.add_output(
         Output(
             'DockerRepositoryUri',
@@ -112,7 +112,7 @@ def get_docker_repository_uri_output(template, docker_repository_resource):
     )
 
 
-def get_docker_cluster_name_output(template, ecs_cluster_resource):
+def create_docker_cluster_name_output(template, ecs_cluster_resource):
     return template.add_output(
         Output(
             'DockerClusterName',

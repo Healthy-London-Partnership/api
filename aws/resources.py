@@ -13,7 +13,7 @@ import troposphere.autoscaling as autoscaling
 import troposphere.elasticsearch as elasticsearch
 
 
-def get_load_balancer_security_group_resource(template):
+def create_load_balancer_security_group_resource(template):
     return template.add_resource(
         ec2.SecurityGroup(
             'LoadBalancerSecurityGroup',
@@ -38,7 +38,7 @@ def get_load_balancer_security_group_resource(template):
     )
 
 
-def get_api_security_group_resource(template, load_balancer_security_group_resource):
+def create_api_security_group_resource(template, load_balancer_security_group_resource):
     return template.add_resource(
         ec2.SecurityGroup(
             'ApiSecurityGroup',
@@ -56,7 +56,7 @@ def get_api_security_group_resource(template, load_balancer_security_group_resou
     )
 
 
-def get_database_security_group_resource(template, api_security_group_resource):
+def create_database_security_group_resource(template, api_security_group_resource):
     return template.add_resource(
         ec2.SecurityGroup(
             'DatabaseSecurityGroup',
@@ -74,7 +74,7 @@ def get_database_security_group_resource(template, api_security_group_resource):
     )
 
 
-def get_redis_security_group_resource(template, api_security_group_resource):
+def create_redis_security_group_resource(template, api_security_group_resource):
     return template.add_resource(
         ec2.SecurityGroup(
             'RedisSecurityGroup',
@@ -92,7 +92,7 @@ def get_redis_security_group_resource(template, api_security_group_resource):
     )
 
 
-def get_database_subnet_group_resource(template, subnets_parameter):
+def create_database_subnet_group_resource(template, subnets_parameter):
     return template.add_resource(
         rds.DBSubnetGroup(
             'DatabaseSubnetGroup',
@@ -102,7 +102,7 @@ def get_database_subnet_group_resource(template, subnets_parameter):
     )
 
 
-def get_database_resource(template, database_name_variable, database_allocated_storage_parameter,
+def create_database_resource(template, database_name_variable, database_allocated_storage_parameter,
                           database_class_parameter, database_username_variable, database_password_parameter,
                           database_security_group_resource, database_subnet_group_resource):
     return template.add_resource(
@@ -122,7 +122,7 @@ def get_database_resource(template, database_name_variable, database_allocated_s
     )
 
 
-def get_redis_subnet_group_resource(template, subnets_parameter):
+def create_redis_subnet_group_resource(template, subnets_parameter):
     return template.add_resource(
         elasticache.SubnetGroup(
             'RedisSubnetGroup',
@@ -132,7 +132,7 @@ def get_redis_subnet_group_resource(template, subnets_parameter):
     )
 
 
-def get_redis_resource(template, redis_node_class_parameter, redis_nodes_count_parameter, redis_security_group_resource,
+def create_redis_resource(template, redis_node_class_parameter, redis_nodes_count_parameter, redis_security_group_resource,
                        redis_subnet_group_resource):
     return template.add_resource(
         elasticache.CacheCluster(
@@ -147,7 +147,7 @@ def get_redis_resource(template, redis_node_class_parameter, redis_nodes_count_p
     )
 
 
-def get_default_queue_resource(template, default_queue_name_variable):
+def create_default_queue_resource(template, default_queue_name_variable):
     return template.add_resource(
         sqs.Queue(
             'DefaultQueue',
@@ -156,7 +156,7 @@ def get_default_queue_resource(template, default_queue_name_variable):
     )
 
 
-def get_notifications_queue_resource(template, notifications_queue_name_variable):
+def create_notifications_queue_resource(template, notifications_queue_name_variable):
     return template.add_resource(
         sqs.Queue(
             'NotificationsQueue',
@@ -165,7 +165,7 @@ def get_notifications_queue_resource(template, notifications_queue_name_variable
     )
 
 
-def get_search_queue_resource(template, search_queue_name_variable):
+def create_search_queue_resource(template, search_queue_name_variable):
     return template.add_resource(
         sqs.Queue(
             'SearchQueue',
@@ -174,7 +174,7 @@ def get_search_queue_resource(template, search_queue_name_variable):
     )
 
 
-def get_uploads_bucket_resource(template, uploads_bucket_name_variable):
+def create_uploads_bucket_resource(template, uploads_bucket_name_variable):
     return template.add_resource(
         s3.Bucket(
             'UploadsBucket',
@@ -184,7 +184,7 @@ def get_uploads_bucket_resource(template, uploads_bucket_name_variable):
     )
 
 
-def get_ecs_cluster_role_resource(template):
+def create_ecs_cluster_role_resource(template):
     return template.add_resource(
         iam.Role(
             'ECSClusterRole',
@@ -205,7 +205,7 @@ def get_ecs_cluster_role_resource(template):
     )
 
 
-def get_ec2_instance_profile_resource(template, ecs_cluster_role_resource):
+def create_ec2_instance_profile_resource(template, ecs_cluster_role_resource):
     return template.add_resource(
         iam.InstanceProfile(
             'EC2InstanceProfile',
@@ -214,7 +214,7 @@ def get_ec2_instance_profile_resource(template, ecs_cluster_role_resource):
     )
 
 
-def get_ecs_cluster_resource(template):
+def create_ecs_cluster_resource(template):
     return template.add_resource(
         ecs.Cluster(
             'ApiCluster'
@@ -222,7 +222,7 @@ def get_ecs_cluster_resource(template):
     )
 
 
-def get_launch_template_resource(template, api_launch_template_name_variable, api_instance_class_parameter,
+def create_launch_template_resource(template, api_launch_template_name_variable, api_instance_class_parameter,
                                  ec2_instance_profile_resource, api_security_group_resource, ecs_cluster_resource):
     return template.add_resource(
         ec2.LaunchTemplate(
@@ -260,7 +260,7 @@ def get_launch_template_resource(template, api_launch_template_name_variable, ap
     )
 
 
-def get_docker_repository_resource(template, docker_repository_name_variable):
+def create_docker_repository_resource(template, docker_repository_name_variable):
     return template.add_resource(
         ecr.Repository(
             'DockerRepository',
@@ -272,7 +272,7 @@ def get_docker_repository_resource(template, docker_repository_name_variable):
     )
 
 
-def get_api_log_group_resource(template, api_log_group_name_variable):
+def create_api_log_group_resource(template, api_log_group_name_variable):
     return template.add_resource(
         logs.LogGroup(
             'ApiLogGroup',
@@ -282,7 +282,7 @@ def get_api_log_group_resource(template, api_log_group_name_variable):
     )
 
 
-def get_queue_worker_log_group_resource(template, queue_worker_log_group_name_variable):
+def create_queue_worker_log_group_resource(template, queue_worker_log_group_name_variable):
     return template.add_resource(
         logs.LogGroup(
             'QueueWorkerLogGroup',
@@ -292,7 +292,7 @@ def get_queue_worker_log_group_resource(template, queue_worker_log_group_name_va
     )
 
 
-def get_scheduler_log_group_resource(template, scheduler_log_group_name_variable):
+def create_scheduler_log_group_resource(template, scheduler_log_group_name_variable):
     return template.add_resource(
         logs.LogGroup(
             'SchedulerLogGroup',
@@ -302,7 +302,7 @@ def get_scheduler_log_group_resource(template, scheduler_log_group_name_variable
     )
 
 
-def get_api_task_definition_resource(template, api_task_definition_family_variable, docker_repository_resource,
+def create_api_task_definition_resource(template, api_task_definition_family_variable, docker_repository_resource,
                                      api_log_group_resource):
     return template.add_resource(
         ecs.TaskDefinition(
@@ -341,7 +341,7 @@ def get_api_task_definition_resource(template, api_task_definition_family_variab
     )
 
 
-def get_queue_worker_task_definition_resource(template, queue_worker_task_definition_family_variable,
+def create_queue_worker_task_definition_resource(template, queue_worker_task_definition_family_variable,
                                               docker_repository_resource, queue_worker_log_group_resource,
                                               default_queue_name_variable, notifications_queue_name_variable):
     return template.add_resource(
@@ -393,7 +393,7 @@ def get_queue_worker_task_definition_resource(template, queue_worker_task_defini
     )
 
 
-def get_scheduler_task_definition_resource(template, scheduler_task_definition_family_variable,
+def create_scheduler_task_definition_resource(template, scheduler_task_definition_family_variable,
                                            docker_repository_name_variable, scheduler_log_group_resource):
     return template.add_resource(
         ecs.TaskDefinition(
@@ -442,7 +442,7 @@ def get_scheduler_task_definition_resource(template, scheduler_task_definition_f
     )
 
 
-def get_load_balancer_resource(template, load_balancer_security_group_resource, subnets_parameter):
+def create_load_balancer_resource(template, load_balancer_security_group_resource, subnets_parameter):
     return template.add_resource(
         elb.LoadBalancer(
             'LoadBalancer',
@@ -453,7 +453,7 @@ def get_load_balancer_resource(template, load_balancer_security_group_resource, 
     )
 
 
-def get_api_target_group_resource(template, vpc_parameter, load_balancer_resource):
+def create_api_tarcreate_group_resource(template, vpc_parameter, load_balancer_resource):
     return template.add_resource(
         elb.TargetGroup(
             'ApiTargetGroup',
@@ -473,7 +473,7 @@ def get_api_target_group_resource(template, vpc_parameter, load_balancer_resourc
     )
 
 
-def get_load_balancer_listener_resource(template, load_balancer_resource, api_target_group_resource,
+def create_load_balancer_listener_resource(template, load_balancer_resource, api_tarcreate_group_resource,
                                         certificate_arn_parameter):
     return template.add_resource(
         elb.Listener(
@@ -483,7 +483,7 @@ def get_load_balancer_listener_resource(template, load_balancer_resource, api_ta
             Protocol='HTTPS',
             DefaultActions=[elb.Action(
                 Type='forward',
-                TargetGroupArn=Ref(api_target_group_resource)
+                TargetGroupArn=Ref(api_tarcreate_group_resource)
             )],
             Certificates=[
                 elb.Certificate(
@@ -494,7 +494,7 @@ def get_load_balancer_listener_resource(template, load_balancer_resource, api_ta
     )
 
 
-def get_ecs_service_role_resource(template):
+def create_ecs_service_role_resource(template):
     return template.add_resource(
         iam.Role(
             'ECSServiceRole',
@@ -559,8 +559,8 @@ def get_ecs_service_role_resource(template):
     )
 
 
-def get_api_service_resource(template, ecs_cluster_resource, api_task_definition_resource, api_task_count_parameter,
-                             api_target_group_resource, ecs_service_role_resource, load_balancer_listener_resource):
+def create_api_service_resource(template, ecs_cluster_resource, api_task_definition_resource, api_task_count_parameter,
+                             api_tarcreate_group_resource, ecs_service_role_resource, load_balancer_listener_resource):
     return template.add_resource(
         ecs.Service(
             'ApiService',
@@ -576,7 +576,7 @@ def get_api_service_resource(template, ecs_cluster_resource, api_task_definition
             LoadBalancers=[ecs.LoadBalancer(
                 ContainerName='api',
                 ContainerPort=80,
-                TargetGroupArn=Ref(api_target_group_resource)
+                TargetGroupArn=Ref(api_tarcreate_group_resource)
             )],
             Role=Ref(ecs_service_role_resource),
             DependsOn=[load_balancer_listener_resource]
@@ -584,7 +584,7 @@ def get_api_service_resource(template, ecs_cluster_resource, api_task_definition
     )
 
 
-def get_queue_worker_service_resource(template, ecs_cluster_resource, queue_worker_task_definition_resource,
+def create_queue_worker_service_resource(template, ecs_cluster_resource, queue_worker_task_definition_resource,
                                       queue_worker_task_count_parameter):
     return template.add_resource(
         ecs.Service(
@@ -602,7 +602,7 @@ def get_queue_worker_service_resource(template, ecs_cluster_resource, queue_work
     )
 
 
-def get_scheduler_service_resource(template, ecs_cluster_resource, scheduler_task_definition_resource,
+def create_scheduler_service_resource(template, ecs_cluster_resource, scheduler_task_definition_resource,
                                    scheduler_task_count_parameter):
     return template.add_resource(
         ecs.Service(
@@ -620,7 +620,7 @@ def get_scheduler_service_resource(template, ecs_cluster_resource, scheduler_tas
     )
 
 
-def get_autoscaling_group_resource(template, api_instance_count_parameter, launch_template_resource):
+def create_autoscaling_group_resource(template, api_instance_count_parameter, launch_template_resource):
     return template.add_resource(
         autoscaling.AutoScalingGroup(
             'AutoScalingGroup',
@@ -636,7 +636,7 @@ def get_autoscaling_group_resource(template, api_instance_count_parameter, launc
     )
 
 
-def get_api_user_resource(template, api_user_name_variable, uploads_bucket_resource, default_queue_resource,
+def create_api_user_resource(template, api_user_name_variable, uploads_bucket_resource, default_queue_resource,
                           notifications_queue_resource, search_queue_resource):
     return template.add_resource(
         iam.User(
@@ -679,7 +679,7 @@ def get_api_user_resource(template, api_user_name_variable, uploads_bucket_resou
     )
 
 
-def get_ci_user_resource(template, ci_user_name_variable):
+def create_ci_user_resource(template, ci_user_name_variable):
     return template.add_resource(
         iam.User(
             'CiUser',
@@ -713,7 +713,7 @@ def get_ci_user_resource(template, ci_user_name_variable):
     )
 
 
-def get_elasticsearch_resource(template, api_user_resource, elasticsearch_domain_name_variable,
+def create_elasticsearch_resource(template, api_user_resource, elasticsearch_domain_name_variable,
                                elasticsearch_instance_count_parameter, elasticsearch_instance_class_parameter):
     return template.add_resource(
         elasticsearch.Domain(
