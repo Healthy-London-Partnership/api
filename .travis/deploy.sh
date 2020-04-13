@@ -25,7 +25,9 @@ echo "Setting deployment configuration for ${DEPLOYMENT}..."
 export ENV_SECRET_ID=".env.api.${ENVIRONMENT}"
 
 # Build the image.
-./docker/build.sh
+./docker/build.sh \
+  --build-arg BLACKFIRE_SERVER_ID=$BLACKFIRE_SERVER_ID \
+  --build-arg BLACKFIRE_SERVER_TOKEN=$BLACKFIRE_SERVER_TOKEN
 
 # Deploy the update to the services.
 SERVICE="api" ./docker/deploy
