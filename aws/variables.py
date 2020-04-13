@@ -58,11 +58,11 @@ def create_ci_user_name_variable(environment_parameter):
 
 
 def create_database_name_variable():
-    return 'the_leeds_repo'
+    return 'healthy_london_partnership'
 
 
 def create_database_username_variable():
-    return 'the_leeds_repo'
+    return 'healthy_london_partnership'
 
 
 def create_elasticsearch_domain_name_variable(environment_parameter):

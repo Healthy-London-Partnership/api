@@ -425,7 +425,7 @@ def create_scheduler_task_definition_resource(template, scheduler_task_definitio
                 Command=[
                     'php',
                     'artisan',
-                    'tlr:run-scheduler'
+                    'hlp:run-scheduler'
                 ],
                 WorkingDirectory='/var/www/html',
                 HealthCheck=ecs.HealthCheck(
