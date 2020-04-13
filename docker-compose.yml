@@ -93,7 +93,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./aws:/tmp
-    command: "python ${CFN_TEMPLATE}.py > ${CFN_TEMPLATE}.json"
+    command: python ${CFN_TEMPLATE}.py
 
 networks:
   app-net:
