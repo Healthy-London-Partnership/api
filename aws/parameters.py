@@ -122,7 +122,7 @@ def create_redis_node_class_parameter(template):
 
 
 def create_redis_nodes_count_parameter(template):
-    template.add_parameter(
+    return template.add_parameter(
         Parameter(
             'RedisNodesCount',
             Description='The number of Redis nodes to have in the cluster.',
@@ -216,7 +216,6 @@ def create_elasticsearch_instance_class_parameter(template):
             Type='String',
             Default='t2.small.elasticsearch',
             AllowedValues=[
-                't2.micro.elasticsearch',
                 't2.small.elasticsearch',
                 't2.medium.elasticsearch'
             ],
