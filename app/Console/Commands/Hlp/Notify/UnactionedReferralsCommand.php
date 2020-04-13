@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands\Ck\Notify;
+namespace App\Console\Commands\Hlp\Notify;
 
 use App\Emails\ReferralUnactioned\NotifyServiceEmail;
 use App\Models\Referral;
@@ -17,7 +17,7 @@ class UnactionedReferralsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'ck:notify:unactioned-referrals
+    protected $signature = 'hlp:notify:unactioned-referrals
                             {--working-days=6 : The number of working days to wait for}';
 
     /**

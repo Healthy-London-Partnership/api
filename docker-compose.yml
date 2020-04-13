@@ -31,7 +31,7 @@ services:
       - .:/var/www/html
     networks:
       - app-net
-    command: php artisan ck:run-scheduler
+    command: php artisan hlp:run-scheduler
 
   node:
     image: healthy-london-partnership/api/node
