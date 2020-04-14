@@ -15,26 +15,18 @@ class NotifyGlobalAdminEmail extends Email
     }
 
     /**
-     * @return string|null
-     */
-    protected function getReference(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function getReplyTo(): ?string
-    {
-        return null;
-    }
-
-    /**
      * @return string
      */
     public function getContent(): string
     {
         return 'Pending to be sent. Content will be filled once sent.';
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubject(): string
+    {
+        // TODO: Implement getSubject() method.
     }
 }
