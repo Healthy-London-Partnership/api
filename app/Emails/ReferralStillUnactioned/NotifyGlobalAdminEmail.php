@@ -19,7 +19,25 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+((REFERRAL_SERVICE_NAME)) has a referral about to expire. The details are as follows:
+
+Referral made: ((REFERRAL_CREATED_AT))
+((REFERRAL_TYPE))
+Client initials: ((REFERRAL_INITIALS))
+Referral ID: ((REFERRAL_ID))
+Referral email address: ((SERVICE_REFERRAL_EMAIL))
+Users attached to this service are as follows:
+
+Service Worker(s):
+((SERVICE_WORKERS))
+
+Service Admin(s):
+((SERVICE_ADMINS))
+
+Organisation Admin(s):
+((ORGANISATION_ADMINS))
+EOT;
     }
 
     /**
@@ -27,6 +45,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return '((REFERRAL_SERVICE_NAME)) has a referral about to expire';
     }
 }

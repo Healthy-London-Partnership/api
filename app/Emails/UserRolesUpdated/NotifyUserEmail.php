@@ -19,7 +19,23 @@ class NotifyUserEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hi ((NAME)),
+
+Your account has had its permissions updated.
+
+Old permissions:
+((OLD_PERMISSIONS))
+
+New permissions:
+((PERMISSIONS))
+
+If you have any questions, please contact us at info@connectedkingston.uk.
+
+Many thanks,
+
+The Connected Kingston team.
+EOT;
     }
 
     /**
@@ -27,6 +43,6 @@ class NotifyUserEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Permissions Updated';
     }
 }

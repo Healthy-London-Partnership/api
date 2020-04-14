@@ -19,7 +19,20 @@ class NotifyUserEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hi ((NAME)),
+
+An account has been created for you using this email address. You can log in to the Connected Kingston admin portal at:
+http://admin.connectedkingston.uk
+
+Permissions:
+((PERMISSIONS))
+
+If you have any questions, you can email us at info@connectedkingston.uk
+
+Many thanks,
+The Connected Kingston team
+EOT;
     }
 
     /**
@@ -27,6 +40,6 @@ class NotifyUserEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Account Created';
     }
 }

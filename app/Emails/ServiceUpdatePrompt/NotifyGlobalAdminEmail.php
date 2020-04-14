@@ -19,7 +19,23 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+((SERVICE_NAME)) on Connected Kingston has not been updated in over 12 months.
+
+View the page on Connected Kingston:
+((SERVICE_URL))
+
+Reminders have been sent monthly to the following:
+((SERVICE_ADMIN_NAMES))
+
+Page already up to date?
+Reset the clock:
+((SERVICE_STILL_UP_TO_DATE_URL))
+
+Disable page?
+You can disable the page in the backend:
+((SERVICE_URL))
+EOT;
     }
 
     /**
@@ -27,6 +43,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return '((SERVICE_NAME)) page on Connected Kingston – Inactive for 1 year';
     }
 }

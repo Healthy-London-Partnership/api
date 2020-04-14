@@ -19,7 +19,17 @@ class NotifySubmitterEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hi ((SUBMITTER_NAME)),
+
+Your update to ((RESOURCE_NAME)) (((RESOURCE_TYPE))) has been submitted and received. A member of the admin team will review it shortly.
+
+If you have any questions, please get in touch at info@connectedkingston.uk.
+
+Many thanks,
+
+The Connected Kingston team
+EOT;
     }
 
     /**
@@ -27,6 +37,6 @@ class NotifySubmitterEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Update Request Submitted';
     }
 }

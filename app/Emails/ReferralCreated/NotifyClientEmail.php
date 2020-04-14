@@ -19,7 +19,24 @@ class NotifyClientEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hello,
+
+You’ve successfully connected to ((REFERRAL_SERVICE_NAME))!
+
+They should be in touch with you via ((REFERRAL_CONTACT_METHOD)) within 10 working days.
+
+Your referral ID is ((REFERRAL_ID)).
+
+If you have any feedback regarding this connection, or have not heard back within 10 working days, please contact the admin team via info@connectedkingston.uk.
+
+Alternatively, you can complete the referral feedback form:
+https://docs.google.com/forms/d/e/1FAIpQLSe38Oe0vsqLRQbcBjYrGzMooBJKkYqFWAlHy4dcgwJnMFg9dQ/viewform?usp=pp_url&entry.400427747=((REFERRAL_ID)).
+
+Many thanks,
+
+The Connected Kingston team
+EOT;
     }
 
     /**
@@ -27,6 +44,6 @@ class NotifyClientEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Confirmation of referral';
     }
 }

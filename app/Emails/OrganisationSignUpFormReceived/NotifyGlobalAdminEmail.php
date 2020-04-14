@@ -19,7 +19,17 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hello,
+
+An organisation sign up form has been submitted for ((ORGANISATION_NAME)).
+
+Please review the request below before approving/rejecting:
+((REQUEST_URL))
+
+Regards,
+Connected Kingston.
+EOT;
     }
 
     /**
@@ -27,6 +37,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Organisation Sign Up Form Submitted';
     }
 }

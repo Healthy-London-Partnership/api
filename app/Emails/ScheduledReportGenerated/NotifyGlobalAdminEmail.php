@@ -19,7 +19,13 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hello,
+
+A ((REPORT_FREQUENCY)) ((REPORT_TYPE)) report has been generated.
+
+Please login to the admin system to view the report.
+EOT;
     }
 
     /**
@@ -27,6 +33,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Scheduled report generated';
     }
 }

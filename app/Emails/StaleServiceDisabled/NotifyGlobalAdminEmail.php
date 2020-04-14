@@ -19,7 +19,9 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+((SERVICE_NAME)) on Connected Kingston has been marked as disabled after not being updated for over a year.
+EOT;
     }
 
     /**
@@ -27,6 +29,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Disabled ((SERVICE_NAME)) page on Connected Kingston';
     }
 }

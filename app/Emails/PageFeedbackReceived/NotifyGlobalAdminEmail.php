@@ -19,7 +19,18 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Hello,
+
+A site feedback form has been submitted for the page:
+((FEEDBACK_URL))
+
+Here are the details:
+
+”((FEEDBACK_CONTENT))”
+
+((CONTACT_DETAILS_PROVIDED??The user has left contact details if you wish to contact them back. You can view them on the admin system.))
+EOT;
     }
 
     /**
@@ -27,6 +38,6 @@ class NotifyGlobalAdminEmail extends Email
      */
     public function getSubject(): string
     {
-        // TODO: Implement getSubject() method.
+        return 'Feedback received on the site';
     }
 }
