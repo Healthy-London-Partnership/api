@@ -1,4 +1,4 @@
-# Connected Kingston
+# Connected Together
 
 A scheme run by RBK to help residents take control of their own health 
 by connecting them with services and events in their local area. This 
