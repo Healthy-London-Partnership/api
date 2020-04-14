@@ -15,22 +15,6 @@ class NotifyClientSms extends Sms
     }
 
     /**
-     * @return string|null
-     */
-    protected function getReference(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function getSenderId(): ?string
-    {
-        return null;
-    }
-
-    /**
      * @return string
      */
     public function getContent(): string
