@@ -35,6 +35,8 @@ class NotifyClientSms extends Sms
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Connected Together: You've made a connection on Connected Together ((REFERRAL_ID)). The service should contact you within 10 working days. Any feedback contact info@connectedtogether.org.uk
+EOT;
     }
 }

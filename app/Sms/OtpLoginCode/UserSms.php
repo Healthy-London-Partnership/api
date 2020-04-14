@@ -35,6 +35,8 @@ class UserSms extends Sms
      */
     public function getContent(): string
     {
-        return 'Pending to be sent. Content will be filled once sent.';
+        return <<<'EOT'
+Connected Together: ((OTP_CODE)) is your authentication code
+EOT;
     }
 }
