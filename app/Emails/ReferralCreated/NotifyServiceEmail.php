@@ -34,13 +34,13 @@ This is a ((REFERRAL_TYPE))
 Please contact the client via ((REFERRAL_CONTACT_METHOD)) within the next 10 working days.
 
 You can see further details of the referral, and mark as completed:
-http://admin.connectedkingston.uk/referrals
+http://admin.connectedtogether.org.uk/referrals
 
-If you have any questions, please contact us at info@connectedkingston.uk.
+If you have any questions, please contact us at info@connectedtogether.org.uk.
 
 Many thanks,
 
-The Connected Kingston team
+The Connected Together team
 EOT;
     }
 

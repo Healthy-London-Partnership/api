@@ -22,17 +22,17 @@ class NotifySubmitterEmail extends Email
         return <<<'EOT'
 Hi ((SUBMITTER_NAME)),
 
-Thank you for submitting your request to have ((ORGANISATION_NAME)) listed on Connected Kingston.
+Thank you for submitting your request to have ((ORGANISATION_NAME)) listed on Connected Together.
 
-Unfortunately, your request to list ((ORGANISATION_NAME)) on Connected Kingston on ((REQUEST_DATE)) has been rejected. This is due to the organisation/service not meeting the terms and conditions of being listed on Connected Kingston.
+Unfortunately, your request to list ((ORGANISATION_NAME)) on Connected Together on ((REQUEST_DATE)) has been rejected. This is due to the organisation/service not meeting the terms and conditions of being listed on Connected Together.
 
-You can read more about our terms and conditions: https://www.connectedkingston.uk/terms-and-conditions
+You can read more about our terms and conditions: https://www.connectedtogether.org.uk/terms-and-conditions
 
-If you have any questions, please contact us at info@connectedkingston.uk.
+If you have any questions, please contact us at info@connectedtogether.org.uk.
 
 Many thanks,
 
-The Connected Kingston team
+The Connected Together team
 EOT;
     }
 
@@ -41,6 +41,6 @@ EOT;
      */
     public function getSubject(): string
     {
-        return 'Connected Kingston – New Organisation not approved';
+        return 'Connected Together – New Organisation not approved';
     }
 }

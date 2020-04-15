@@ -22,13 +22,13 @@ class NotifySubmitterEmail extends Email
         return <<<'EOT'
 Hi ((SUBMITTER_NAME)),
 
-Your request to register ((ORGANISATION_NAME)) on Connected Kingston has been submitted and received. A member of the admin team will review it shortly.
+Your request to register ((ORGANISATION_NAME)) on Connected Together has been submitted and received. A member of the admin team will review it shortly.
 
-If you have any questions, please get in touch at info@connectedkingston.uk.
+If you have any questions, please get in touch at info@connectedtogether.org.uk.
 
 Many thanks,
 
-The Connected Kingston team
+The Connected Together team
 EOT;
     }
 
@@ -37,6 +37,6 @@ EOT;
      */
     public function getSubject(): string
     {
-        return 'Connected Kingston – Organisation Sign Up Form Submitted';
+        return 'Connected Together – Organisation Sign Up Form Submitted';
     }
 }

@@ -22,16 +22,16 @@ class NotifyUserEmail extends Email
         return <<<'EOT'
 Hi ((NAME)),
 
-An account has been created for you using this email address. You can log in to the Connected Kingston admin portal at:
-http://admin.connectedkingston.uk
+An account has been created for you using this email address. You can log in to the Connected Together admin portal at:
+http://admin.connectedtogether.org.uk
 
 Permissions:
 ((PERMISSIONS))
 
-If you have any questions, you can email us at info@connectedkingston.uk
+If you have any questions, you can email us at info@connectedtogether.org.uk
 
 Many thanks,
-The Connected Kingston team
+The Connected Together team
 EOT;
     }
 

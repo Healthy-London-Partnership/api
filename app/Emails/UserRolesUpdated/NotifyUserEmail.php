@@ -30,11 +30,11 @@ Old permissions:
 New permissions:
 ((PERMISSIONS))
 
-If you have any questions, please contact us at info@connectedkingston.uk.
+If you have any questions, please contact us at info@connectedtogether.org.uk.
 
 Many thanks,
 
-The Connected Kingston team.
+The Connected Together team.
 EOT;
     }
 
