@@ -26,7 +26,7 @@ class TwilioSmsSender implements SmsSender
         $client = resolve(Client::class);
 
         $message = $client->messages->create($sms->to, [
-            'from' => $sms->senderId,
+            'from' => config('hlp.twilio.from'),
             'body' => $content,
         ]);
 
