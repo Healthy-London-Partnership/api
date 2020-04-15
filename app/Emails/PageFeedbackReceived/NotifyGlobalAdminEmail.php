@@ -28,8 +28,6 @@ A site feedback form has been submitted for the page:
 Here are the details:
 
 ”((FEEDBACK_CONTENT))”
-
-((CONTACT_DETAILS_PROVIDED??The user has left contact details if you wish to contact them back. You can view them on the admin system.))
 EOT;
     }
 
