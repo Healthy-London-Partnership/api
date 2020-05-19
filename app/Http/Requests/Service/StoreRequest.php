@@ -57,7 +57,7 @@ class StoreRequest extends FormRequest
                     Service::TYPE_GROUP,
                     Service::TYPE_HELPLINE,
                     Service::TYPE_INFORMATION,
-                    Service::TYPE_APP
+                    Service::TYPE_APP,
                 ]),
             ],
             'status' => [
