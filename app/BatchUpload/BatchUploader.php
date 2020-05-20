@@ -112,7 +112,7 @@ class BatchUploader
     {
         return (new EloquentCollection($services))
             ->map(function (array $service): Service {
-                $service = Service::create([
+                $serviceModel = Service::create([
                     'organisation_id' => $service['organisation_id'],
                     'slug' => $service['slug'],
                     'name' => $service['name'],
@@ -138,7 +138,7 @@ class BatchUploader
                 ]);
 
                 // Create the service criterion record.
-                $service->serviceCriterion()->create([
+                $serviceModel->serviceCriterion()->create([
                     'age_group' => null,
                     'disability' => null,
                     'employment' => null,
@@ -151,7 +151,7 @@ class BatchUploader
 
                 foreach (range(1, 7) as $topicNumber) {
                     if ($service["topic_id_{$topicNumber}"] !== null) {
-                        $service->serviceTaxonomies()->create([
+                        $serviceModel->serviceTaxonomies()->create([
                             'taxonomy_id' => Taxonomy::query()
                                 ->where('name', '=', $service["topic_id_{$topicNumber}"])
                                 ->firstOrFail()
@@ -160,7 +160,7 @@ class BatchUploader
                     }
                 }
 
-                return $service;
+                return $serviceModel;
             });
     }
 
