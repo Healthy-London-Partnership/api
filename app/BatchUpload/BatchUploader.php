@@ -137,6 +137,18 @@ class BatchUploader
                     'last_modified_at' => Date::now(),
                 ]);
 
+                // Create the service criterion record.
+                $service->serviceCriterion()->create([
+                    'age_group' => null,
+                    'disability' => null,
+                    'employment' => null,
+                    'gender' => null,
+                    'housing' => null,
+                    'income' => null,
+                    'language' => null,
+                    'other' => null,
+                ]);
+
                 foreach (range(1, 7) as $topicNumber) {
                     if ($service["topic_id_{$topicNumber}"] !== null) {
                         $service->serviceTaxonomies()->create([
