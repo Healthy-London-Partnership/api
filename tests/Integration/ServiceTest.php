@@ -46,6 +46,6 @@ class ServiceTest extends TestCase
     {
         $service = factory(\App\Models\Service::class)->states('social')->create();
 
-        $this->assertInstanceOf(\App\Models\SocialMedia::class, $service->social->first());
+        $this->assertInstanceOf(\App\Models\SocialMedia::class, $service->socialMedias->first());
     }
 }

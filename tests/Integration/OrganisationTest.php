@@ -36,6 +36,16 @@ class OrganisationTest extends TestCase
     {
         $organisation = factory(\App\Models\Organisation::class)->states('social')->create();
 
-        $this->assertInstanceOf(\App\Models\SocialMedia::class, $organisation->social->first());
+        $this->assertInstanceOf(\App\Models\SocialMedia::class, $organisation->socialMedias->first());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_have_an_associated_location()
+    {
+        $organisation = factory(\App\Models\Organisation::class)->states('location')->create();
+
+        $this->assertInstanceOf(\App\Models\Location::class, $organisation->location);
     }
 }
