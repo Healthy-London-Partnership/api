@@ -42,3 +42,28 @@ $factory->afterCreating(Service::class, function (Service $service, Faker $faker
         'other' => null,
     ]);
 });
+
+$factory->state(Service::class, 'logo', function (Faker $faker) {
+    return [
+        'logo_file_id' => function () {
+            return factory(\App\Models\File::class)->create()->id;
+        },
+    ];
+});
+
+$factory->state(Service::class, 'social', function (Faker $faker) use ($factory) {
+    $factory->afterCreating(Service::class, function (Service $service, Faker $faker) {
+        \App\Models\SocialMedia::create([
+            'relatable_id' => $service->id,
+            'relatable_type' => 'App\Models\Service',
+        ]);
+        \App\Models\SocialMedia::states('twitter')->create([
+            'relatable_id' => $service->id,
+            'relatable_type' => 'App\Models\Service',
+        ]);
+        \App\Models\SocialMedia::states('instagram')->create([
+            'relatable_id' => $service->id,
+            'relatable_type' => 'App\Models\Service',
+        ]);
+    });
+});
