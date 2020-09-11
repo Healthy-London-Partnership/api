@@ -40,14 +40,14 @@ class OrganisationController extends Controller
         $baseQuery = Organisation::query();
 
         $organisations = QueryBuilder::for($baseQuery)
-            ->allowedFilters([
-                Filter::exact('id'),
-                'name',
-                Filter::custom('has_permission', HasPermissionFilter::class),
-            ])
-            ->allowedSorts('name')
-            ->defaultSort('name')
-            ->paginate(per_page($request->per_page));
+                ->allowedFilters([
+                    Filter::exact('id'),
+                    'name',
+                    Filter::custom('has_permission', HasPermissionFilter::class),
+                ])
+                ->allowedSorts('name')
+                ->defaultSort('name')
+                ->paginate(per_page($request->per_page));
 
         event(EndpointHit::onRead($request, 'Viewed all organisations'));
 
@@ -84,6 +84,18 @@ class OrganisationController extends Controller
                 }
             }
 
+            if ($request->filled('social_medias')) {
+                // Create the social media records.
+                $social = [];
+                foreach ($request->social_medias as $socialMedia) {
+                    $social[] = [
+                        'type' => $socialMedia['type'],
+                        'url' => $socialMedia['url'],
+                    ];
+                }
+                $organisation->socialMedias()->createMany($social);
+            }
+
             event(EndpointHit::onCreate($request, "Created organisation [{$organisation->id}]", $organisation));
 
             return new OrganisationResource($organisation);
@@ -103,7 +115,7 @@ class OrganisationController extends Controller
             ->where('id', $organisation->id);
 
         $organisation = QueryBuilder::for($baseQuery)
-            ->firstOrFail();
+                ->firstOrFail();
 
         event(EndpointHit::onRead($request, "Viewed organisation [{$organisation->id}]", $organisation));
 
@@ -133,6 +145,7 @@ class OrganisationController extends Controller
                     'email' => $request->missing('email'),
                     'phone' => $request->missing('phone'),
                     'logo_file_id' => $request->missing('logo_file_id'),
+                    'social_medias' => $request->missing('social_medias'),
                 ]),
             ]);
 

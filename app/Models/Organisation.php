@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use App\Http\Requests\Organisation\UpdateRequest as UpdateOrganisationRequest;
-use App\Models\Mutators\OrganisationMutators;
-use App\Models\Relationships\OrganisationRelationships;
-use App\Models\Scopes\OrganisationScopes;
+use App\Models\UpdateRequest;
 use App\Rules\FileIsMimeType;
-use App\UpdateRequest\AppliesUpdateRequests;
-use App\UpdateRequest\UpdateRequests;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
+use App\UpdateRequest\UpdateRequests;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Scopes\OrganisationScopes;
+use App\UpdateRequest\AppliesUpdateRequests;
+use App\Models\Mutators\OrganisationMutators;
+use Illuminate\Contracts\Validation\Validator;
+use App\Models\Relationships\OrganisationRelationships;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use App\Http\Requests\Organisation\UpdateRequest as UpdateOrganisationRequest;
 
 class Organisation extends Model implements AppliesUpdateRequests
 {
@@ -64,6 +65,23 @@ class Organisation extends Model implements AppliesUpdateRequests
             ? $data['logo_file_id']
             : $this->logo_file_id,
         ]);
+
+        if (!empty($data['social_medias'])) {
+            // Remove exisiting Social media relationships
+            SocialMedia::where([
+                ['sociable_type', '=', UpdateRequest::EXISTING_TYPE_ORGANISATION],
+                ['sociable_id', '=', $this->id],
+            ])->delete();
+            // Create the new relationships
+            $this->socialMedias()->createMany(
+                array_map(function ($social) {
+                    return [
+                        'type' => $social['type'],
+                        'url' => $social['url'],
+                    ];
+                }, $data['social_medias'])
+            );
+        }
 
         return $updateRequest;
     }

@@ -39,8 +39,6 @@ class OrganisationTest extends TestCase
     {
         $organisation = factory(Organisation::class)->states('social')->create();
 
-        $social = factory(SocialMedia::class)->states('organisation')->create();
-
         $this->assertInstanceOf(SocialMedia::class, $organisation->socialMedias->first());
     }
 
