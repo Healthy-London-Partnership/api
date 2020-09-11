@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Service;
+use App\Models\SocialMedia;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -51,19 +52,11 @@ $factory->state(Service::class, 'logo', function (Faker $faker) {
     ];
 });
 
-$factory->state(Service::class, 'social', function (Faker $faker) use ($factory) {
-    $factory->afterCreating(Service::class, function (Service $service, Faker $faker) {
-        \App\Models\SocialMedia::create([
-            'relatable_id' => $service->id,
-            'relatable_type' => 'App\Models\Service',
-        ]);
-        \App\Models\SocialMedia::states('twitter')->create([
-            'relatable_id' => $service->id,
-            'relatable_type' => 'App\Models\Service',
-        ]);
-        \App\Models\SocialMedia::states('instagram')->create([
-            'relatable_id' => $service->id,
-            'relatable_type' => 'App\Models\Service',
-        ]);
-    });
+$factory->state(Service::class, 'social', []);
+$factory->afterCreatingState(Service::class, 'social', function (Service $service, Faker $faker) {
+    $service->socialMedias()->saveMany([
+        factory(SocialMedia::class)->create(),
+        factory(SocialMedia::class)->states('twitter')->create(),
+        factory(SocialMedia::class)->states('instagram')->create(),
+    ]);
 });

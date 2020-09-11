@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Organisation;
+use App\Models\Service;
 use App\Models\SocialMedia;
 use Faker\Generator as Faker;
 
@@ -31,20 +33,12 @@ $factory->state(SocialMedia::class, 'youtube', function (Faker $faker) {
     ];
 });
 
-$factory->state(SocialMedia::class, 'service', function (Faker $faker) {
-    return [
-        'relatable_id' => function () {
-            return factory(\App\Models\Service::class)->create()->id;
-        },
-        'relatable_type' => 'App\Models\Service',
-    ];
+$factory->state(SocialMedia::class, 'service', []);
+$factory->afterCreatingState(SocialMedia::class, 'service', function (SocialMedia $social, Faker $faker) {
+    factory(Service::class)->create()->socialMedias()->save($social);
 });
 
-$factory->state(SocialMedia::class, 'organisation', function (Faker $faker) {
-    return [
-        'relatable_id' => function () {
-            return factory(\App\Models\Organisation::class)->create()->id;
-        },
-        'relatable_type' => 'App\Models\Organisation',
-    ];
+$factory->state(SocialMedia::class, 'organisation', []);
+$factory->afterCreatingState(SocialMedia::class, 'organisation', function (SocialMedia $social, Faker $faker) {
+    factory(Organisation::class)->create()->socialMedias()->save($social);
 });

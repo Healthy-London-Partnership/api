@@ -1,7 +1,9 @@
 <?php
 
-namespace Tests\Integration\Models;
+namespace Tests\Integration;
 
+use App\Models\Organisation;
+use App\Models\Service;
 use App\Models\SocialMedia;
 use Tests\TestCase;
 
@@ -24,9 +26,9 @@ class SocialMediaTest extends TestCase
      */
     public function it_can_have_an_associated_service()
     {
-        $social_media = factory(\App\Models\SocialMedia::class)->states('service')->create();
+        $social_media = factory(SocialMedia::class)->states('service')->create();
 
-        $this->assertInstanceOf(\App\Service::class, $social_media->service);
+        $this->assertInstanceOf(Service::class, $social_media->sociable);
     }
 
     /**
@@ -34,8 +36,8 @@ class SocialMediaTest extends TestCase
      */
     public function it_can_have_an_associated_organisation()
     {
-        $social_media = factory(\App\Models\SocialMedia::class)->states('organisation')->create();
+        $social_media = factory(SocialMedia::class)->states('organisation')->create();
 
-        $this->assertInstanceOf(\App\Organisation::class, $social_media->organisation);
+        $this->assertInstanceOf(Organisation::class, $social_media->sociable);
     }
 }

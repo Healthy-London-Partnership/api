@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\File;
+use App\Models\Location;
 use App\Models\Organisation;
+use App\Models\SocialMedia;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 
@@ -35,7 +38,7 @@ $factory->state(Organisation::class, 'phone', function (Faker $faker) {
 $factory->state(Organisation::class, 'location', function (Faker $faker) {
     return [
         'location_id' => function () {
-            return factory(\App\Models\Location::class)->create()->id;
+            return factory(Location::class)->create()->id;
         },
     ];
 });
@@ -43,24 +46,16 @@ $factory->state(Organisation::class, 'location', function (Faker $faker) {
 $factory->state(Organisation::class, 'logo', function (Faker $faker) {
     return [
         'logo_file_id' => function () {
-            return factory(\App\Models\File::class)->create()->id;
+            return factory(File::class)->create()->id;
         },
     ];
 });
 
-$factory->state(Organisation::class, 'social', function (Faker $faker) use ($factory) {
-    $factory->afterCreating(Organisation::class, function (Organisation $organisation, Faker $faker) {
-        \App\Models\SocialMedia::create([
-            'relatable_id' => $organisation->id,
-            'relatable_type' => 'App\Models\Organisation',
-        ]);
-        \App\Models\SocialMedia::states('twitter')->create([
-            'relatable_id' => $organisation->id,
-            'relatable_type' => 'App\Models\Organisation',
-        ]);
-        \App\Models\SocialMedia::states('instagram')->create([
-            'relatable_id' => $organisation->id,
-            'relatable_type' => 'App\Models\Organisation',
-        ]);
-    });
+$factory->state(Organisation::class, 'social', []);
+$factory->afterCreatingState(Organisation::class, 'social', function (Organisation $organisation, Faker $faker) {
+    $organisation->socialMedias()->saveMany([
+        factory(SocialMedia::class)->create(),
+        factory(SocialMedia::class)->states('twitter')->create(),
+        factory(SocialMedia::class)->states('instagram')->create(),
+    ]);
 });

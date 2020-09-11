@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Models;
+namespace Tests\Integration;
 
 use App\Models\Service;
 use Tests\TestCase;
@@ -36,7 +36,7 @@ class ServiceTest extends TestCase
     {
         $service = factory(\App\Models\Service::class)->states('logo')->create();
 
-        $this->assertInstanceOf(\App\Models\File::class, $service->logo);
+        $this->assertInstanceOf(\App\Models\File::class, $service->logoFile);
     }
 
     /**

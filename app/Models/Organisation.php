@@ -61,8 +61,8 @@ class Organisation extends Model implements AppliesUpdateRequests
             'email' => $data['email'] ?? $this->email,
             'phone' => $data['phone'] ?? $this->phone,
             'logo_file_id' => array_key_exists('logo_file_id', $data)
-                ? $data['logo_file_id']
-                : $this->logo_file_id,
+            ? $data['logo_file_id']
+            : $this->logo_file_id,
         ]);
 
         return $updateRequest;

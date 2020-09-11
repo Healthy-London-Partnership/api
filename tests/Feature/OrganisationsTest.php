@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Events\EndpointHit;
 use App\Models\Audit;
-use App\Models\File;
 use App\Models\Organisation;
 use App\Models\Service;
 use App\Models\UpdateRequest;
@@ -625,7 +624,6 @@ class OrganisationsTest extends TestCase
      * Upload a specific organisation's logo.
      */
 
-
     public function test_organisation_admin_can_upload_logo()
     {
         /**
@@ -675,9 +673,7 @@ class OrganisationsTest extends TestCase
          */
         $user = factory(User::class)->create();
         $user->makeGlobalAdmin();
-        $organisation = factory(Organisation::class)->create([
-            'logo_file_id' => factory(File::class)->create()->id,
-        ]);
+        $organisation = factory(Organisation::class)->states('web', 'email', 'phone', 'logo')->create();
         $payload = [
             'slug' => $organisation->slug,
             'name' => $organisation->name,
@@ -691,7 +687,6 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
-
         $response->assertStatus(Response::HTTP_OK);
         $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
         $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();

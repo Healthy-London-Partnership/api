@@ -1,8 +1,11 @@
 <?php
 
-namespace Tests\Integration\Models;
+namespace Tests\Integration;
 
+use App\Models\File;
+use App\Models\Location;
 use App\Models\Organisation;
+use App\Models\SocialMedia;
 use Tests\TestCase;
 
 class OrganisationTest extends TestCase
@@ -24,9 +27,9 @@ class OrganisationTest extends TestCase
      */
     public function it_can_have_an_associated_logo()
     {
-        $organisation = factory(\App\Models\Organisation::class)->states('logo')->create();
+        $organisation = factory(Organisation::class)->states('logo')->create();
 
-        $this->assertInstanceOf(\App\Models\File::class, $organisation->logo);
+        $this->assertInstanceOf(File::class, $organisation->logoFile);
     }
 
     /**
@@ -34,9 +37,11 @@ class OrganisationTest extends TestCase
      */
     public function it_can_have_associated_social_media()
     {
-        $organisation = factory(\App\Models\Organisation::class)->states('social')->create();
+        $organisation = factory(Organisation::class)->states('social')->create();
 
-        $this->assertInstanceOf(\App\Models\SocialMedia::class, $organisation->socialMedias->first());
+        $social = factory(SocialMedia::class)->states('organisation')->create();
+
+        $this->assertInstanceOf(SocialMedia::class, $organisation->socialMedias->first());
     }
 
     /**
@@ -44,8 +49,8 @@ class OrganisationTest extends TestCase
      */
     public function it_can_have_an_associated_location()
     {
-        $organisation = factory(\App\Models\Organisation::class)->states('location')->create();
+        $organisation = factory(Organisation::class)->states('location')->create();
 
-        $this->assertInstanceOf(\App\Models\Location::class, $organisation->location);
+        $this->assertInstanceOf(Location::class, $organisation->location);
     }
 }

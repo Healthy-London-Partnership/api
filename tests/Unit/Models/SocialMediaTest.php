@@ -29,18 +29,9 @@ class SocialMediaTest extends TestCase
     /**
      * @test
      */
-    public function it_should_have_a_service_method()
+    public function it_should_have_a_sociable_method()
     {
         $social_media = factory(SocialMedia::class)->create();
-        $this->assertTrue(method_exists($social_media, 'service'));
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_have_an_organisation_method()
-    {
-        $social_media = factory(SocialMedia::class)->create();
-        $this->assertTrue(method_exists($social_media, 'organisation'));
+        $this->assertTrue(method_exists($social_media, 'sociable'));
     }
 }
