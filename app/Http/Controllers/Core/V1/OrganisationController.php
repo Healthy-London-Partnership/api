@@ -72,6 +72,7 @@ class OrganisationController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'logo_file_id' => $request->logo_file_id,
+                'location_id' => $request->location_id
             ]);
 
             if ($request->filled('logo_file_id')) {
@@ -146,6 +147,7 @@ class OrganisationController extends Controller
                     'phone' => $request->missing('phone'),
                     'logo_file_id' => $request->missing('logo_file_id'),
                     'social_medias' => $request->missing('social_medias'),
+                    'location_id' => $request->missing('location_id')
                 ]),
             ]);
 

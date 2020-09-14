@@ -64,6 +64,9 @@ class Organisation extends Model implements AppliesUpdateRequests
             'logo_file_id' => array_key_exists('logo_file_id', $data)
             ? $data['logo_file_id']
             : $this->logo_file_id,
+            'location_id' => array_key_exists('location_id', $data)
+            ? $data['location_id']
+            : $this->location_id
         ]);
 
         if (!empty($data['social_medias'])) {

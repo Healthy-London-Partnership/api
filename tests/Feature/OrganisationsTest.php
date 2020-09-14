@@ -2,19 +2,21 @@
 
 namespace Tests\Feature;
 
-use App\Events\EndpointHit;
-use App\Models\Audit;
-use App\Models\Organisation;
-use App\Models\Service;
-use App\Models\SocialMedia;
-use App\Models\UpdateRequest;
+use Tests\TestCase;
 use App\Models\User;
+use App\Models\Audit;
+use App\Models\Service;
+use App\Models\Location;
+use App\Events\EndpointHit;
+use App\Models\SocialMedia;
 use Carbon\CarbonImmutable;
+use Faker\Factory as Faker;
+use App\Models\Organisation;
+use App\Models\UpdateRequest;
 use Illuminate\Http\Response;
+use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Passport\Passport;
-use Tests\TestCase;
 
 class OrganisationsTest extends TestCase
 {
@@ -39,6 +41,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -255,6 +259,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -278,6 +284,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -348,6 +356,7 @@ class OrganisationsTest extends TestCase
             'url' => 'http://test-org.example.com',
             'email' => 'info@test-org.example.com',
             'phone' => '07700000000',
+            'location_id' => null
         ];
 
         Passport::actingAs($user);
@@ -379,6 +388,7 @@ class OrganisationsTest extends TestCase
             'url' => null,
             'email' => null,
             'phone' => null,
+            'location_id' => null
         ];
 
         Passport::actingAs($user);
@@ -785,6 +795,112 @@ class OrganisationsTest extends TestCase
             'sociable_id' => $organisation->id,
             'sociable_type' => UpdateRequest::EXISTING_TYPE_ORGANISATION,
             'url' => $social[0]->url,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_add_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->create();
+        $address = factory(Location::class)->create();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => $address->id
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($address->id, $updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => $address->id
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_update_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->states('location')->create();
+        $address1 = $organisation->location;
+        $address2 = factory(Location::class)->create();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => $address2->id
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($address2->id, $updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => $address2->id,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_delete_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->states('location')->create();
+        $address = $organisation->location;
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => null
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEmpty($updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseMissing(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => $address->id,
         ]);
     }
 }
