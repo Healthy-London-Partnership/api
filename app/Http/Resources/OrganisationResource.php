@@ -25,7 +25,7 @@ class OrganisationResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'social_medias' => SocialMediaResource::collection($this->socialMedias),
-            'location' => $this->location_id? new LocationResource($this->location) : null,
+            'location' => $this->location_id ? new LocationResource($this->location) : null,
             'created_at' => $this->created_at->format(CarbonImmutable::ISO8601),
             'updated_at' => $this->updated_at->format(CarbonImmutable::ISO8601),
         ];

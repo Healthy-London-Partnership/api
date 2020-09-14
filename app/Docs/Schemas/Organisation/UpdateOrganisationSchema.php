@@ -2,8 +2,9 @@
 
 namespace App\Docs\Schemas\Organisation;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
+use App\Docs\Schemas\Service\SocialMediaSchema;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 
 class UpdateOrganisationSchema extends Schema
 {
@@ -34,7 +35,16 @@ class UpdateOrganisationSchema extends Schema
                 Schema::string('logo_file_id')
                     ->format(Schema::FORMAT_UUID)
                     ->description('The ID of the file uploaded')
-                    ->nullable()
+                    ->nullable(),
+                Schema::string('location_id')
+                    ->format(Schema::FORMAT_UUID)
+                    ->description('The ID of a existing Location')
+                    ->nullable(),
+                Schema::array('social_medias')
+                    ->items(
+                        SocialMediaSchema::create()
+                            ->required('type', 'url')
+                    ),
             );
     }
 }

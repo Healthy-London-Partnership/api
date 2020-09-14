@@ -40,14 +40,14 @@ class OrganisationController extends Controller
         $baseQuery = Organisation::query();
 
         $organisations = QueryBuilder::for($baseQuery)
-                ->allowedFilters([
-                    Filter::exact('id'),
-                    'name',
-                    Filter::custom('has_permission', HasPermissionFilter::class),
-                ])
-                ->allowedSorts('name')
-                ->defaultSort('name')
-                ->paginate(per_page($request->per_page));
+            ->allowedFilters([
+                Filter::exact('id'),
+                'name',
+                Filter::custom('has_permission', HasPermissionFilter::class),
+            ])
+            ->allowedSorts('name')
+            ->defaultSort('name')
+            ->paginate(per_page($request->per_page));
 
         event(EndpointHit::onRead($request, 'Viewed all organisations'));
 
@@ -72,7 +72,7 @@ class OrganisationController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'logo_file_id' => $request->logo_file_id,
-                'location_id' => $request->location_id
+                'location_id' => $request->location_id,
             ]);
 
             if ($request->filled('logo_file_id')) {
@@ -116,7 +116,7 @@ class OrganisationController extends Controller
             ->where('id', $organisation->id);
 
         $organisation = QueryBuilder::for($baseQuery)
-                ->firstOrFail();
+            ->firstOrFail();
 
         event(EndpointHit::onRead($request, "Viewed organisation [{$organisation->id}]", $organisation));
 
@@ -147,7 +147,7 @@ class OrganisationController extends Controller
                     'phone' => $request->missing('phone'),
                     'logo_file_id' => $request->missing('logo_file_id'),
                     'social_medias' => $request->missing('social_medias'),
-                    'location_id' => $request->missing('location_id')
+                    'location_id' => $request->missing('location_id'),
                 ]),
             ]);
 

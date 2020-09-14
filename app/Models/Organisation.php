@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\UpdateRequest;
-use App\Rules\FileIsMimeType;
-use Illuminate\Http\Response;
-use App\UpdateRequest\UpdateRequests;
-use Illuminate\Support\Facades\Storage;
-use App\Models\Scopes\OrganisationScopes;
-use App\UpdateRequest\AppliesUpdateRequests;
-use App\Models\Mutators\OrganisationMutators;
-use Illuminate\Contracts\Validation\Validator;
-use App\Models\Relationships\OrganisationRelationships;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use App\Http\Requests\Organisation\UpdateRequest as UpdateOrganisationRequest;
+use App\Models\Mutators\OrganisationMutators;
+use App\Models\Relationships\OrganisationRelationships;
+use App\Models\Scopes\OrganisationScopes;
+use App\Rules\FileIsMimeType;
+use App\UpdateRequest\AppliesUpdateRequests;
+use App\UpdateRequest\UpdateRequests;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 class Organisation extends Model implements AppliesUpdateRequests
 {
@@ -66,7 +65,7 @@ class Organisation extends Model implements AppliesUpdateRequests
             : $this->logo_file_id,
             'location_id' => array_key_exists('location_id', $data)
             ? $data['location_id']
-            : $this->location_id
+            : $this->location_id,
         ]);
 
         if (!empty($data['social_medias'])) {

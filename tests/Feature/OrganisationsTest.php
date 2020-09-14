@@ -2,21 +2,21 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Audit;
-use App\Models\Service;
-use App\Models\Location;
 use App\Events\EndpointHit;
+use App\Models\Audit;
+use App\Models\Location;
+use App\Models\Organisation;
+use App\Models\Service;
 use App\Models\SocialMedia;
+use App\Models\UpdateRequest;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Faker\Factory as Faker;
-use App\Models\Organisation;
-use App\Models\UpdateRequest;
 use Illuminate\Http\Response;
-use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Passport\Passport;
+use Tests\TestCase;
 
 class OrganisationsTest extends TestCase
 {
@@ -356,7 +356,7 @@ class OrganisationsTest extends TestCase
             'url' => 'http://test-org.example.com',
             'email' => 'info@test-org.example.com',
             'phone' => '07700000000',
-            'location_id' => null
+            'location_id' => null,
         ];
 
         Passport::actingAs($user);
@@ -388,7 +388,7 @@ class OrganisationsTest extends TestCase
             'url' => null,
             'email' => null,
             'phone' => null,
-            'location_id' => null
+            'location_id' => null,
         ];
 
         Passport::actingAs($user);
@@ -815,7 +815,7 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $payload = [
-            'location_id' => $address->id
+            'location_id' => $address->id,
         ];
 
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
@@ -829,7 +829,7 @@ class OrganisationsTest extends TestCase
 
         $this->assertDatabaseHas(table(Organisation::class), [
             'id' => $organisation->id,
-            'location_id' => $address->id
+            'location_id' => $address->id,
         ]);
     }
 
@@ -851,7 +851,7 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $payload = [
-            'location_id' => $address2->id
+            'location_id' => $address2->id,
         ];
 
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
@@ -886,7 +886,7 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $payload = [
-            'location_id' => null
+            'location_id' => null,
         ];
 
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);

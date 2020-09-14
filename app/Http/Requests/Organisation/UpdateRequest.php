@@ -79,7 +79,7 @@ class UpdateRequest extends FormRequest
                 ]),
             ],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
-            'location_id' => ['nullable', 'exists:locations,id']
+            'location_id' => ['nullable', 'exists:locations,id'],
         ];
     }
 }

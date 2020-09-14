@@ -16,9 +16,9 @@ class SocialMediaTest extends TestCase
     {
         factory(SocialMedia::class, 10)->create();
 
-        $social_medias = SocialMedia::all();
+        $socialMedias = SocialMedia::all();
 
-        $this->assertCount(10, $social_medias);
+        $this->assertCount(10, $socialMedias);
     }
 
     /**
@@ -26,9 +26,9 @@ class SocialMediaTest extends TestCase
      */
     public function it_can_have_an_associated_service()
     {
-        $social_media = factory(SocialMedia::class)->states('service')->create();
+        $socialMedia = factory(SocialMedia::class)->states('service')->create();
 
-        $this->assertInstanceOf(Service::class, $social_media->sociable);
+        $this->assertInstanceOf(Service::class, $socialMedia->sociable);
     }
 
     /**
@@ -36,8 +36,8 @@ class SocialMediaTest extends TestCase
      */
     public function it_can_have_an_associated_organisation()
     {
-        $social_media = factory(SocialMedia::class)->states('organisation')->create();
+        $socialMedia = factory(SocialMedia::class)->states('organisation')->create();
 
-        $this->assertInstanceOf(Organisation::class, $social_media->sociable);
+        $this->assertInstanceOf(Organisation::class, $socialMedia->sociable);
     }
 }

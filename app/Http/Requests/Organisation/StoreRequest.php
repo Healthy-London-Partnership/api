@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Organisation;
 
-use App\Rules\Slug;
 use App\Models\File;
-use App\Models\SocialMedia;
 use App\Models\Organisation;
+use App\Models\SocialMedia;
 use App\Rules\FileIsMimeType;
-use Illuminate\Validation\Rule;
 use App\Rules\FileIsPendingAssignment;
+use App\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -70,7 +70,7 @@ class StoreRequest extends FormRequest
                 SocialMedia::TYPE_OTHER,
             ])],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
-            'location_id' => ['sometimes', 'exists:locations,id']
+            'location_id' => ['sometimes', 'exists:locations,id'],
         ];
     }
 }

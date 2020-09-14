@@ -13,8 +13,8 @@ class SocialMediaTest extends TestCase
      */
     public function it_should_have_a_type_property()
     {
-        $social_media = factory(SocialMedia::class)->create();
-        $this->assertEquals(SocialMedia::TYPE_FACEBOOK, $social_media->type);
+        $socialMedia = factory(SocialMedia::class)->create();
+        $this->assertEquals(SocialMedia::TYPE_FACEBOOK, $socialMedia->type);
     }
 
     /**
@@ -22,8 +22,8 @@ class SocialMediaTest extends TestCase
      */
     public function it_should_have_a_url_property()
     {
-        $social_media = factory(SocialMedia::class)->create();
-        $this->assertNotEmpty($social_media->url);
+        $socialMedia = factory(SocialMedia::class)->create();
+        $this->assertNotEmpty($socialMedia->url);
     }
 
     /**
@@ -31,7 +31,7 @@ class SocialMediaTest extends TestCase
      */
     public function it_should_have_a_sociable_method()
     {
-        $social_media = factory(SocialMedia::class)->create();
-        $this->assertTrue(method_exists($social_media, 'sociable'));
+        $socialMedia = factory(SocialMedia::class)->create();
+        $this->assertTrue(method_exists($socialMedia, 'sociable'));
     }
 }
