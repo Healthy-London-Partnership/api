@@ -12,25 +12,25 @@ class VideoEmbedTest extends TestCase
      */
     public function it_passes_video_hosting_urls()
     {
-        $bad_urls = [
+        $badUrls = [
             'https://youtube.com',
             'https://player.vimeo.com',
             'https://badmovie.com',
         ];
 
-        $good_urls = [
+        $goodUrls = [
             'https://www.youtube.com',
             'https://vimeo.com',
         ];
 
-        $video_embed_rule = new VideoEmbed();
+        $videoEmbedRule = new VideoEmbed();
 
-        foreach ($bad_urls as $bad_url) {
-            $this->assertFalse($video_embed_rule->passes('video_embed', $bad_url));
+        foreach ($badUrls as $badUrl) {
+            $this->assertFalse($videoEmbedRule->passes('video_embed', $badUrl));
         }
 
-        foreach ($good_urls as $good_url) {
-            $this->assertTrue($video_embed_rule->passes('video_embed', $good_url));
+        foreach ($goodUrls as $goodUrl) {
+            $this->assertTrue($videoEmbedRule->passes('video_embed', $goodUrl));
         }
     }
 }

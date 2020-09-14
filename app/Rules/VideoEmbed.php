@@ -23,6 +23,7 @@ class VideoEmbed implements Rule
 
         $validDomains = [
             'https://www.youtube.com',
+            'https://player.vimeo.com',
             'https://vimeo.com',
         ];
 
