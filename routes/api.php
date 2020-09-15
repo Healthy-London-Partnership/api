@@ -66,6 +66,10 @@ Route::prefix('core/v1')
             Route::apiResource('/notifications', 'NotificationController')
                 ->only('index', 'show');
 
+            // Organisation Admin Invites.
+            Route::apiResource('/organisation-admin-invites', 'OrganisationAdminInviteController')
+                ->only('store', 'show');
+
             // Organisations.
             Route::match(['GET', 'POST'], '/organisations/index', 'OrganisationController@index');
             Route::apiResource('/organisations', 'OrganisationController');
