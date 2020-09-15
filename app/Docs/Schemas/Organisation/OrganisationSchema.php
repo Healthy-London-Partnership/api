@@ -2,8 +2,10 @@
 
 namespace App\Docs\Schemas\Organisation;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
+use App\Docs\Schemas\Location\LocationSchema;
+use App\Docs\Schemas\Service\SocialMediaSchema;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 
 class OrganisationSchema extends Schema
 {
@@ -27,6 +29,9 @@ class OrganisationSchema extends Schema
                     ->nullable(),
                 Schema::string('phone')
                     ->nullable(),
+                Schema::array('social_medias')
+                    ->items(SocialMediaSchema::create()),
+                LocationSchema::create('location'),
                 Schema::string('created_at')
                     ->format(Schema::FORMAT_DATE_TIME)
                     ->nullable(),

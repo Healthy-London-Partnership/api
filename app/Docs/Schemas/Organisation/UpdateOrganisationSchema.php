@@ -44,7 +44,7 @@ class UpdateOrganisationSchema extends Schema
                     ->items(
                         SocialMediaSchema::create()
                             ->required('type', 'url')
-                    ),
+                    )
             );
     }
 }
