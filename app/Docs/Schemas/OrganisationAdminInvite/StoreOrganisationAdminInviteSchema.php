@@ -5,7 +5,7 @@ namespace App\Docs\Schemas\OrganisationAdminInvite;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 
-class SubmitOrganisationAdminInvite extends Schema
+class StoreOrganisationAdminInviteSchema extends Schema
 {
     /**
      * @inheritDoc
@@ -14,14 +14,15 @@ class SubmitOrganisationAdminInvite extends Schema
     {
         return parent::create($objectId)
             ->type(static::TYPE_OBJECT)
-            ->required('first_name', 'last_name', 'email', 'phone', 'password')
+            ->required(
+                'organisation_id',
+                'email'
+            )
             ->properties(
-                Schema::string('first_name'),
-                Schema::string('last_name'),
-                Schema::string('email'),
-                Schema::string('phone')
-                    ->nullable(),
-                Schema::string('password')
+                Schema::string('organisation_id')
+                    ->format(Schema::FORMAT_UUID),
+                Schema::string('email')
+                    ->nullable()
             );
     }
 }
