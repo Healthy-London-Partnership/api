@@ -5,7 +5,6 @@ namespace App\Docs\Operations\OrganisationAdminInvites;
 use App\Docs\Schemas\AllSchema;
 use App\Docs\Schemas\OrganisationAdminInvite\OrganisationAdminInviteSchema;
 use App\Docs\Schemas\OrganisationAdminInvite\StoreOrganisationAdminInviteSchema;
-use App\Docs\Schemas\ResourceSchema;
 use App\Docs\Tags\OrganisationAdminInvitesTag;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;

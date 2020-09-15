@@ -2,17 +2,12 @@
 
 namespace App\Docs\Operations\PendingOrganisationAdmins;
 
-use App\Docs\Operations\Referrals\StoreReferralOperation;
-use App\Docs\Schemas\Referral\ReferralSchema;
-use App\Docs\Schemas\Referral\StoreReferralSchema;
 use App\Docs\Schemas\ResourceSchema;
 use App\Docs\Schemas\User\UserSchema;
 use App\Docs\Tags\PendingOrganisationAdminTag;
-use App\Docs\Tags\ReferralsTag;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
 
 class ConfirmPendingOrganisationAdminOperation extends Operation

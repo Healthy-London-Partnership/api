@@ -2,9 +2,7 @@
 
 namespace App\Docs\Paths\PendingOrganisationAdmins;
 
-use App\Docs\Operations\OrganisationAdminInvites\SubmitOrganisationAdminInviteOperation;
 use App\Docs\Operations\PendingOrganisationAdmins\ConfirmPendingOrganisationAdminOperation;
-use App\Docs\Paths\OrganisationAdminInvites\OrganisationAdminInvitesSubmitPath;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
