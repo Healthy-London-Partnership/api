@@ -8,7 +8,8 @@ use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 class OrganisationAdminInviteSchema extends Schema
 {
     /**
-     * @inheritDoc
+     * @param string|null $objectId
+     * @return static
      */
     public static function create(string $objectId = null): BaseObject
     {

@@ -17,15 +17,18 @@ use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
 class SubmitOrganisationAdminInviteOperation extends Operation
 {
     /**
-     * @inheritDoc
+     * @param string|null $objectId
+     * @throws \GoldSpecDigital\ObjectOrientedOAS\Exceptions\InvalidArgumentException
+     * @return static
      */
     public static function create(string $objectId = null): BaseObject
     {
         return parent::create($objectId)
-            ->action(static::ACTION_GET)
+            ->action(static::ACTION_POST)
             ->tags(OrganisationAdminInvitesTag::create())
             ->summary('Submit an organisation admin invite')
             ->description('**Permission:** `Open`')
+            ->noSecurity()
             ->requestBody(
                 RequestBody::create()
                     ->required()
