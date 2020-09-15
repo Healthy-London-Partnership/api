@@ -37,9 +37,9 @@ class SubmitOrganisationAdminInviteOperation extends Operation
             ->responses(
                 Response::ok()->content(
                     MediaType::json()->schema(
-                        ResourceSchema::create(null, Schema::object()->properties(
+                        Schema::object()->properties(
                             Schema::string('message')
-                        ))
+                        )
                     )
                 )
             );
