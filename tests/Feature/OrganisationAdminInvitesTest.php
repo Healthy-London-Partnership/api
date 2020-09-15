@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Events\EndpointHit;
+use App\Models\Audit;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
 use App\Models\Service;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -247,6 +250,30 @@ class OrganisationAdminInvitesTest extends TestCase
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
+    public function test_create_creates_audit()
+    {
+        $this->fakeEvents();
+
+        $organisation = factory(Organisation::class)->create();
+
+        Passport::actingAs(
+            $user = factory(User::class)->create()->makeSuperAdmin()
+        );
+
+        $this->postJson('/core/v1/organisation-admin-invites', [
+            'organisations' => [
+                [
+                    'organisation_id' => $organisation->id,
+                    'use_email' => false,
+                ],
+            ],
+        ]);
+
+        Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) {
+            return ($event->getAction() === Audit::ACTION_CREATE);
+        });
+    }
+
     /*
      * View an organisation admin invite.
      */
@@ -265,6 +292,20 @@ class OrganisationAdminInvitesTest extends TestCase
             'created_at' => $organisationAdminInvite->created_at->format(CarbonImmutable::ISO8601),
             'updated_at' => $organisationAdminInvite->updated_at->format(CarbonImmutable::ISO8601),
         ]);
+    }
+
+    public function test_view_creates_audit()
+    {
+        $this->fakeEvents();
+
+        $organisationAdminInvite = factory(OrganisationAdminInvite::class)->create();
+
+        $this->getJson("/core/v1/organisation-admin-invites/{$organisationAdminInvite->id}");
+
+        Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) use ($organisationAdminInvite) {
+            return ($event->getAction() === Audit::ACTION_READ) &&
+                ($event->getModel()->is($organisationAdminInvite));
+        });
     }
 
     /*
@@ -287,5 +328,24 @@ class OrganisationAdminInvitesTest extends TestCase
         $response->assertJson([
             'message' => 'A confirmation email will be sent shortly.',
         ]);
+    }
+
+    public function test_submit_creates_audit()
+    {
+        $this->fakeEvents();
+
+        $organisationAdminInvite = factory(OrganisationAdminInvite::class)->create();
+
+        $this->postJson("/core/v1/organisation-admin-invites/{$organisationAdminInvite->id}/submit", [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'phone' => null,
+            'password' => 'Pa$$w0rd',
+        ]);
+
+        Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) use ($organisationAdminInvite) {
+            return ($event->getAction() === Audit::ACTION_CREATE);
+        });
     }
 }
