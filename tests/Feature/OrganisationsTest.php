@@ -158,7 +158,6 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('POST', '/core/v1/organisations', $payload);
-        // dd($response);
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonFragment($payload);
     }
@@ -898,9 +897,9 @@ class OrganisationsTest extends TestCase
 
         $updateRequest->apply($user);
 
-        $this->assertDatabaseMissing(table(Organisation::class), [
+        $this->assertDatabaseHas(table(Organisation::class), [
             'id' => $organisation->id,
-            'location_id' => $address->id,
+            'location_id' => null,
         ]);
     }
 }
