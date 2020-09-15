@@ -2,6 +2,7 @@
 
 namespace App\Docs\Operations\OrganisationAdminInvites;
 
+use App\Docs\Schemas\AllSchema;
 use App\Docs\Schemas\OrganisationAdminInvite\OrganisationAdminInviteSchema;
 use App\Docs\Schemas\OrganisationAdminInvite\StoreOrganisationAdminInviteSchema;
 use App\Docs\Schemas\ResourceSchema;
@@ -24,7 +25,7 @@ class StoreOrganisationAdminInviteOperation extends Operation
         return parent::create($objectId)
             ->action(static::ACTION_POST)
             ->tags(OrganisationAdminInvitesTag::create())
-            ->summary('Create an organisation admin invite')
+            ->summary('Create multiple organisation admin invites')
             ->description('**Permission:** `Super Admin`')
             ->requestBody(
                 RequestBody::create()
@@ -36,7 +37,7 @@ class StoreOrganisationAdminInviteOperation extends Operation
             ->responses(
                 Response::ok()->content(
                     MediaType::json()->schema(
-                        ResourceSchema::create(null, OrganisationAdminInviteSchema::create())
+                        AllSchema::create(null, OrganisationAdminInviteSchema::create())
                     )
                 )
             );
