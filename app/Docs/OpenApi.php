@@ -100,6 +100,7 @@ class OpenApi extends BaseOpenApi implements Responsable
                 Tags\FilesTag::create(),
                 Tags\LocationsTag::create(),
                 Tags\NotificationsTag::create(),
+                Tags\OrganisationAdminInvitesTag::create(),
                 Tags\OrganisationSignUpFormsTag::create(),
                 Tags\OrganisationsTag::create(),
                 Tags\PageFeedbacksTag::create(),
