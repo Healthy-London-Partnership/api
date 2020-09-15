@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Core\V1;
 
 use App\Events\EndpointHit;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OrganisationAdminInvite\ShowRequest;
+use App\Http\Requests\OrganisationAdminInvite\StoreRequest;
 use App\Http\Resources\OrganisationAdminInviteResource;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
@@ -24,10 +26,10 @@ class OrganisationAdminInviteController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\OrganisationAdminInvite\StoreRequest $request
      * @return mixed
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         return DB::transaction(function () use ($request) {
             $organisations = Organisation::query()
@@ -83,11 +85,11 @@ class OrganisationAdminInviteController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\OrganisationAdminInvite\ShowRequest $request
      * @param \App\Models\OrganisationAdminInvite $organisationAdminInvite
      * @return \App\Http\Resources\OrganisationAdminInviteResource
      */
-    public function show(Request $request, OrganisationAdminInvite $organisationAdminInvite)
+    public function show(ShowRequest $request, OrganisationAdminInvite $organisationAdminInvite)
     {
         $baseQuery = OrganisationAdminInvite::query()
             ->where('id', $organisationAdminInvite->id);
