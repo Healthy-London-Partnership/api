@@ -17,14 +17,17 @@ class StoreOrganisationAdminInviteSchema extends Schema
         return parent::create($objectId)
             ->type(static::TYPE_OBJECT)
             ->required(
-                'organisation_ids',
-                'email'
+                'organisations'
             )
             ->properties(
-                Schema::array('organisation_ids')->items(
-                    Schema::string()->format(Schema::FORMAT_UUID)
-                ),
-                Schema::string('email')->nullable()
+                Schema::array('organisations')->items(
+                    Schema::object()
+                        ->required('organisation_id')
+                        ->properties(
+                            Schema::string('organisation_id')->format(Schema::FORMAT_UUID),
+                            Schema::boolean('use_email')
+                        )
+                )
             );
     }
 }
