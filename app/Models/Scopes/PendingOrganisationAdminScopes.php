@@ -2,7 +2,7 @@
 
 namespace App\Models\Scopes;
 
-trait PendingOrganisationAdminUserScopes
+trait PendingOrganisationAdminScopes
 {
     //
 }

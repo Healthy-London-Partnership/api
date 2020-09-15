@@ -4,7 +4,7 @@ namespace App\Models\Relationships;
 
 use App\Models\File;
 use App\Models\OrganisationAdminInvite;
-use App\Models\PendingOrganisationAdminUser;
+use App\Models\PendingOrganisationAdmin;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
@@ -68,8 +68,8 @@ trait OrganisationRelationships
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function pendingOrganisationAdminUsers()
+    public function pendingOrganisationAdmins()
     {
-        return $this->hasMany(PendingOrganisationAdminUser::class);
+        return $this->hasMany(PendingOrganisationAdmin::class);
     }
 }

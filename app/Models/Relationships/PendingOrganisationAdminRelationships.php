@@ -4,7 +4,7 @@ namespace App\Models\Relationships;
 
 use App\Models\Organisation;
 
-trait PendingOrganisationAdminUserRelationships
+trait PendingOrganisationAdminRelationships
 {
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

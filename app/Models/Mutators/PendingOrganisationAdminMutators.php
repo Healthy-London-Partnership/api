@@ -2,7 +2,7 @@
 
 namespace App\Models\Mutators;
 
-trait PendingOrganisationAdminUserMutators
+trait PendingOrganisationAdminMutators
 {
     //
 }
