@@ -14,13 +14,13 @@ class VideoEmbedTest extends TestCase
     {
         $badUrls = [
             'https://youtube.com',
-            'https://player.vimeo.com',
             'https://badmovie.com',
         ];
 
         $goodUrls = [
             'https://www.youtube.com',
             'https://vimeo.com',
+            'https://player.vimeo.com',
         ];
 
         $videoEmbedRule = new VideoEmbed();
