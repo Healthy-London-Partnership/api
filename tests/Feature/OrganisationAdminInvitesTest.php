@@ -283,9 +283,9 @@ class OrganisationAdminInvitesTest extends TestCase
             'password' => 'Pa$$w0rd',
         ]);
 
-        $response->assertOk();
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
-            'message' => 'An email confirmation has been sent.',
+            'message' => 'A confirmation email will be sent shortly.',
         ]);
     }
 }

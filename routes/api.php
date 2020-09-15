@@ -69,6 +69,8 @@ Route::prefix('core/v1')
             // Organisation Admin Invites.
             Route::apiResource('/organisation-admin-invites', 'OrganisationAdminInviteController')
                 ->only('store', 'show');
+            Route::post('/organisation-admin-invites/{organisation_admin_invite}/submit', 'OrganisationAdminInvite\\SubmitController@store')
+                ->name('organisation-admin-invites.submit');
 
             // Organisations.
             Route::match(['GET', 'POST'], '/organisations/index', 'OrganisationController@index');
