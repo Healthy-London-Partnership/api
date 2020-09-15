@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Organisation;
+use App\Models\OrganisationAdminInvite;
 use App\Models\Service;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -243,5 +245,47 @@ class OrganisationAdminInvitesTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /*
+     * View an organisation admin invite.
+     */
+
+    public function test_guest_can_view_invite()
+    {
+        $organisationAdminInvite = factory(OrganisationAdminInvite::class)->create();
+
+        $response = $this->getJson("/core/v1/organisation-admin-invites/{$organisationAdminInvite->id}");
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $organisationAdminInvite->id,
+            'organisation_id' => $organisationAdminInvite->organisation_id,
+            'email' => $organisationAdminInvite->email,
+            'created_at' => $organisationAdminInvite->created_at->format(CarbonImmutable::ISO8601),
+            'updated_at' => $organisationAdminInvite->updated_at->format(CarbonImmutable::ISO8601),
+        ]);
+    }
+
+    /*
+     * Submit an organisation admin invite.
+     */
+
+    public function test_guest_can_submit_invite()
+    {
+        $organisationAdminInvite = factory(OrganisationAdminInvite::class)->create();
+
+        $response = $this->postJson("/core/v1/organisation-admin-invites/{$organisationAdminInvite->id}/submit", [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'phone' => null,
+            'password' => 'Pa$$w0rd',
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'message' => 'An email confirmation has been sent.',
+        ]);
     }
 }
