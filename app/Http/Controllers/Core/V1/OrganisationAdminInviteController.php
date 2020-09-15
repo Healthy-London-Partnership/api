@@ -9,7 +9,6 @@ use App\Http\Requests\OrganisationAdminInvite\StoreRequest;
 use App\Http\Resources\OrganisationAdminInviteResource;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
