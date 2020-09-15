@@ -2,8 +2,6 @@
 
 namespace App\Docs\Operations\OrganisationAdminInvites;
 
-use App\Docs\Schemas\OrganisationAdminInvite\OrganisationAdminInviteSchema;
-use App\Docs\Schemas\OrganisationAdminInvite\StoreOrganisationAdminInviteSchema;
 use App\Docs\Schemas\OrganisationAdminInvite\SubmitOrganisationAdminInviteSchema;
 use App\Docs\Schemas\ResourceSchema;
 use App\Docs\Schemas\User\UserSchema;
