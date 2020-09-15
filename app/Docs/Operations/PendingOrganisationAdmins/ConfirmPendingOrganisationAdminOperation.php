@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Docs\Operations\OrganisationAdminInvites;
+namespace App\Docs\Operations\PendingOrganisationAdmins;
 
-use App\Docs\Schemas\OrganisationAdminInvite\SubmitOrganisationAdminInviteSchema;
+use App\Docs\Operations\Referrals\StoreReferralOperation;
+use App\Docs\Schemas\Referral\ReferralSchema;
+use App\Docs\Schemas\Referral\StoreReferralSchema;
 use App\Docs\Schemas\ResourceSchema;
 use App\Docs\Schemas\User\UserSchema;
-use App\Docs\Tags\OrganisationAdminInvitesTag;
+use App\Docs\Tags\PendingOrganisationAdminTag;
+use App\Docs\Tags\ReferralsTag;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 
-class SubmitOrganisationAdminInviteOperation extends Operation
+class ConfirmPendingOrganisationAdminOperation extends Operation
 {
     /**
      * @param string|null $objectId
@@ -24,23 +26,14 @@ class SubmitOrganisationAdminInviteOperation extends Operation
     {
         return parent::create($objectId)
             ->action(static::ACTION_POST)
-            ->tags(OrganisationAdminInvitesTag::create())
-            ->summary('Submit an organisation admin invite')
+            ->tags(PendingOrganisationAdminTag::create())
+            ->summary('Confirm a pending organisation admin email address')
             ->description('**Permission:** `Open`')
             ->noSecurity()
-            ->requestBody(
-                RequestBody::create()
-                    ->required()
-                    ->content(
-                        MediaType::json()->schema(SubmitOrganisationAdminInviteSchema::create())
-                    )
-            )
             ->responses(
-                Response::ok()->content(
+                Response::created()->content(
                     MediaType::json()->schema(
-                        ResourceSchema::create(null, Schema::object()->properties(
-                            Schema::string('message')
-                        ))
+                        ResourceSchema::create(null, UserSchema::create())
                     )
                 )
             );
