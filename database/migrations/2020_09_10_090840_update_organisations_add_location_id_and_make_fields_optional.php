@@ -13,9 +13,8 @@ class UpdateOrganisationsAddLocationIdAndMakeFieldsOptional extends Migration
     {
         Schema::table('organisations', function (Blueprint $table) {
             $table->string('url')->nullable()->change();
-            $table->string('email')->nullable()->change();
-            $table->string('phone')->nullable()->change();
-            $table->nullableForeignUuid('location_id', 'locations');
+            $table->uuid('location_id')->after('logo_file_id')->nullable(true);
+            $table->foreign('location_id')->references('id')->on('locations');
         });
     }
 
@@ -25,15 +24,11 @@ class UpdateOrganisationsAddLocationIdAndMakeFieldsOptional extends Migration
     public function down()
     {
         Schema::table('organisations', function (Blueprint $table) {
-            $table->string('url');
-            $table->string('email');
-            $table->string('phone');
+            $table->string('url')->nullable(false)->change();
         });
 
         Schema::table('organisations', function (Blueprint $table) {
             $table->dropForeign(['location_id']);
-        });
-        Schema::table('organisations', function (Blueprint $table) {
             $table->dropColumn('location_id');
         });
     }

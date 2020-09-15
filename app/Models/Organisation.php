@@ -68,21 +68,15 @@ class Organisation extends Model implements AppliesUpdateRequests
             : $this->location_id,
         ]);
 
-        if (!empty($data['social_medias'])) {
-            // Remove exisiting Social media relationships
-            SocialMedia::where([
-                ['sociable_type', '=', UpdateRequest::EXISTING_TYPE_ORGANISATION],
-                ['sociable_id', '=', $this->id],
-            ])->delete();
-            // Create the new relationships
-            $this->socialMedias()->createMany(
-                array_map(function ($social) {
-                    return [
-                        'type' => $social['type'],
-                        'url' => $social['url'],
-                    ];
-                }, $data['social_medias'])
-            );
+        // Update the social media records.
+        if (array_key_exists('social_medias', $data)) {
+            $this->socialMedias()->delete();
+            foreach ($data['social_medias'] as $socialMedia) {
+                $this->socialMedias()->create([
+                    'type' => $socialMedia['type'],
+                    'url' => $socialMedia['url'],
+                ]);
+            }
         }
 
         return $updateRequest;
