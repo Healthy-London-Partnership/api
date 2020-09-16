@@ -28,6 +28,7 @@ class ConfirmController extends Controller
                 'phone' => $pendingOrganisationAdmin->phone,
                 'password' => $pendingOrganisationAdmin->password,
             ]);
+            $user = $user->makeOrganisationAdmin($pendingOrganisationAdmin->organisation);
 
             $pendingOrganisationAdmin->delete();
 
@@ -37,7 +38,7 @@ class ConfirmController extends Controller
                 $user
             ));
 
-            return new UserResource($user);
+            return new UserResource($user->load('userRoles'));
         });
     }
 }

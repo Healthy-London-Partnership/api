@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Events\EndpointHit;
 use App\Models\Audit;
 use App\Models\PendingOrganisationAdmin;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
@@ -22,12 +23,38 @@ class PendingOrganisationAdminsTest extends TestCase
 
         $this->assertEquals(1, PendingOrganisationAdmin::query()->count());
         $this->assertEquals(0, User::query()->count());
+        $this->assertDatabaseMissing('user_roles', [
+            'role_id' => Role::organisationAdmin()->id,
+            'organisation_id' => $pendingOrganisationAdmin->organisation_id,
+        ]);
 
         $response = $this->postJson("/core/v1/pending-organisation-admins/{$pendingOrganisationAdmin->id}/confirm");
 
         $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertJsonStructure([
+            'data' => [
+                'id',
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'roles' => [
+                    [
+                        'role',
+                        'organisation_id',
+                    ],
+                ],
+                'created_at',
+                'updated_at',
+            ],
+        ]);
+
         $this->assertEquals(0, PendingOrganisationAdmin::query()->count());
         $this->assertEquals(1, User::query()->count());
+        $this->assertDatabaseHas('user_roles', [
+            'role_id' => Role::organisationAdmin()->id,
+            'organisation_id' => $pendingOrganisationAdmin->organisation_id,
+        ]);
     }
 
     public function test_confirm_created_audit()
