@@ -20,7 +20,16 @@ class NotifyPendingOrganisationAdminEmail extends Email
     public function getContent(): string
     {
         return <<<'EOT'
-TODO
+Dear ((ORGANISATION_NAME)),
+In order to complete the process, please click the confirmation link.
+You then will be able to review and change your organisation’s details. 
+
+Confirm your email:
+((CONFIRM_EMAIL_URL))
+
+Many thanks,
+NHS Connect Team
+
 EOT;
     }
 
@@ -29,6 +38,6 @@ EOT;
      */
     public function getSubject(): string
     {
-        return 'TODO';
+        return 'Please confirm your email address';
     }
 }
