@@ -30,9 +30,6 @@ class UserSchema extends Schema
                     ->nullable(),
                 Schema::string('updated_at')
                     ->format(Schema::FORMAT_DATE_TIME)
-                    ->nullable(),
-                Schema::string('deleted_at')
-                    ->format(Schema::FORMAT_DATE_TIME)
                     ->nullable()
             );
     }
