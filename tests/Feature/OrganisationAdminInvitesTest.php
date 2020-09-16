@@ -344,7 +344,7 @@ class OrganisationAdminInvitesTest extends TestCase
             'password' => 'Pa$$w0rd',
         ]);
 
-        Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) use ($organisationAdminInvite) {
+        Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) {
             return ($event->getAction() === Audit::ACTION_CREATE);
         });
     }
