@@ -4,8 +4,8 @@ namespace App\Docs\Schemas\Organisation;
 
 use App\Docs\Schemas\Location\LocationSchema;
 use App\Docs\Schemas\Service\SocialMediaSchema;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 
 class OrganisationSchema extends Schema
 {

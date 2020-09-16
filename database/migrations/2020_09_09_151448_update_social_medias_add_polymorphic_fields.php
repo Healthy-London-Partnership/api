@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\UpdateRequest;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class UpdateSocialMediasAddPolymorphicFields extends Migration
 {
@@ -13,9 +13,9 @@ class UpdateSocialMediasAddPolymorphicFields extends Migration
     public function up()
     {
         Schema::table('social_medias', function (Blueprint $table) {
-            $table->uuid("sociable_id")->after('id')->nullable();
-            $table->string("sociable_type")->after('sociable_id')->nullable();
-            $table->index(["sociable_type", "sociable_id"]);
+            $table->uuid('sociable_id')->after('id')->nullable();
+            $table->string('sociable_type')->after('sociable_id')->nullable();
+            $table->index(['sociable_type', 'sociable_id']);
         });
 
         \DB::transaction(function () {
