@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Core\V1\PendingOrganisationAdmin;
 
 use App\Events\EndpointHit;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PendingOrganisationAdmin\ConfirmRequest;
 use App\Http\Resources\UserResource;
 use App\Models\PendingOrganisationAdmin;
 use App\Models\User;
@@ -14,10 +15,10 @@ class ConfirmController extends Controller
 {
     /**
      * @param \App\Models\PendingOrganisationAdmin $pendingOrganisationAdmin
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\PendingOrganisationAdmin\ConfirmRequest $request
      * @return mixed
      */
-    public function store(PendingOrganisationAdmin $pendingOrganisationAdmin, Request $request)
+    public function store(PendingOrganisationAdmin $pendingOrganisationAdmin, ConfirmRequest $request)
     {
         return DB::transaction(function () use ($pendingOrganisationAdmin, $request) {
             $user = User::create([
