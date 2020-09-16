@@ -11,6 +11,7 @@ use App\Models\UpdateRequest;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\Passport;
@@ -625,7 +626,6 @@ class OrganisationsTest extends TestCase
      * Upload a specific organisation's logo.
      */
 
-
     public function test_organisation_admin_can_upload_logo()
     {
         /**
@@ -696,5 +696,138 @@ class OrganisationsTest extends TestCase
         $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
         $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
         $this->assertEquals(null, $updateRequest->data['logo_file_id']);
+    }
+
+    /**
+     * Bulk import organisations
+     */
+
+    public function test_guest_cannot_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function test_service_worker_cannot_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+
+        $service = factory(Service::class)->create();
+        $user = factory(User::class)->create()->makeServiceWorker($service);
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_service_admin_cannot_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+
+        $service = factory(Service::class)->create();
+        $user = factory(User::class)->create()->makeServiceAdmin($service);
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_organisation_admin_cannot_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+        $organisation = factory(Organisation::class)->create();
+        $user = factory(User::class)->create()->makeOrganisationAdmin($organisation);
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_global_admin_cannot_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+        $user = factory(User::class)->create()->makeGlobalAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_super_admin_can_bulk_import()
+    {
+        Storage::fake('uploads');
+
+        $data = [
+            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+        ];
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    public function test_validate_file_import_field()
+    {
+        Storage::fake('uploads');
+
+        $invalidFieldTypes = [
+            ['spreadsheet' => 'This is a string'],
+            ['spreadsheet' => 1],
+            ['spreadsheet' => ['foo' => 'bar']],
+            ['spreadsheet' => UploadedFile::fake()->create('dummy.doc', 3000)],
+            ['spreadsheet' => UploadedFile::fake()->create('dummy.txt', 3000)],
+            ['spreadsheet' => UploadedFile::fake()->create('dummy.csv', 3000)],
+        ];
+        $validFieldTypes = [
+            ['spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000)],
+            ['spreadsheet' => UploadedFile::fake()->create('dummy.xlsx', 3000)],
+        ];
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        foreach ($invalidFieldTypes as $data) {
+            $response = $this->json('POST', "/core/v1/organisations/import", $data);
+            $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        foreach ($validFieldTypes as $data) {
+            $response = $this->json('POST', "/core/v1/organisations/import", $data);
+
+            $response->assertStatus(Response::HTTP_OK);
+        }
     }
 }
