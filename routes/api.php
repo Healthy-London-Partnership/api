@@ -87,6 +87,10 @@ Route::prefix('core/v1')
             Route::apiResource('/page-feedbacks', 'PageFeedbackController')
                 ->only('index', 'store', 'show');
 
+            // Pending Organisation Admins.
+            Route::post('/pending-organisation-admins/{pending_organisation_admin}/confirm', 'PendingOrganisationAdmin\\ConfirmController@store')
+                ->name('pending-organisation-admins.confirm');
+
             // Referrals.
             Route::match(['GET', 'POST'], '/referrals/index', 'ReferralController@index');
             Route::apiResource('/referrals', 'ReferralController');
