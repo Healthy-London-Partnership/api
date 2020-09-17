@@ -70,8 +70,6 @@ class OrganisationAdminInvitesTest extends TestCase
             'organisation_id' => $organisation->id,
             'email' => 'john.doe@example.com',
         ]);
-
-        // TODO: Assert email job queued.
     }
 
     public function test_can_create_multiple_invites()
@@ -165,8 +163,6 @@ class OrganisationAdminInvitesTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonCount(0, 'data');
-
-        // TODO: Assert email job not queued.
     }
 
     public function test_can_create_no_invites()
