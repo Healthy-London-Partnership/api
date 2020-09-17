@@ -3,7 +3,7 @@
 namespace Tests\Unit\Console\Commands\Hlp\Notify\OrganisationAdminInvitee;
 
 use App\Console\Commands\Hlp\Notify\OrganisationAdminInvitee\SecondFollowUpsCommand;
-use App\Emails\OrganisationAdminInviteFirstFollowUps\NotifyInviteeEmail;
+use App\Emails\OrganisationAdminInviteSecondFollowUps\NotifyInviteeEmail;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
 use Illuminate\Support\Facades\Artisan;
