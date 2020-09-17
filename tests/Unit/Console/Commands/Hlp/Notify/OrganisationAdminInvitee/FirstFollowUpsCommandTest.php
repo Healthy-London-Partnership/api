@@ -30,9 +30,10 @@ class FirstFollowUpsCommandTest extends TestCase
         ]);
 
         factory(OrganisationAdminInvite::class)->create([
+            'id' => 'test-id',
             'organisation_id' => $organisation->id,
             'email' => 'foo.org@example.com',
-            'created_at' => Date::today()->addWeeks($week),
+            'created_at' => Date::today()->subWeeks($week),
         ]);
 
         Artisan::call(FirstFollowUpsCommand::class);
@@ -47,7 +48,7 @@ class FirstFollowUpsCommandTest extends TestCase
                 'ORGANISATION_PHONE' => '011300000000',
                 'ORGANISATION_SOCIAL_MEDIA' => 'N/A', // TODO: Blocked until social media work is finished.
                 'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
-                'INVITE_URL' => 'test-invite-url',
+                'INVITE_URL' => config('hlp.backend_uri') . '/organisation-admin-invites/test-id',
             ];
 
             return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
@@ -65,7 +66,7 @@ class FirstFollowUpsCommandTest extends TestCase
         Queue::fake();
 
         factory(OrganisationAdminInvite::class)->create([
-            'created_at' => Date::today()->addWeeks($week),
+            'created_at' => Date::today()->subWeeks($week),
         ]);
 
         Artisan::call(FirstFollowUpsCommand::class);
