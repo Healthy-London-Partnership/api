@@ -3,6 +3,7 @@
 namespace App\Generators;
 
 use App\Models\OrganisationAdminInvite;
+use App\Models\PendingOrganisationAdmin;
 
 class AdminUrlGenerator
 {
@@ -28,5 +29,15 @@ class AdminUrlGenerator
     public function generateOrganisationAdminInviteUrl(OrganisationAdminInvite $organisationAdminInvite): string
     {
         return "{$this->adminUrl}/organisation-admin-invites/{$organisationAdminInvite->id}";
+    }
+
+    /**
+     * @param \App\Models\PendingOrganisationAdmin $pendingOrganisationAdmin
+     * @return string
+     */
+    public function generatePendingOrganisationAdminConfirmationUrl(
+        PendingOrganisationAdmin $pendingOrganisationAdmin
+    ): string {
+        return "{$this->adminUrl}/pending-organisation-admins/{$pendingOrganisationAdmin->id}/confirm";
     }
 }
