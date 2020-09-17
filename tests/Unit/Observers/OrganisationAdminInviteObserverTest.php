@@ -29,7 +29,7 @@ class OrganisationAdminInviteObserverTest extends TestCase
         $organisationAdminInviteMock->expects($this->any())
             ->method('__get')
             ->will($this->returnValueMap([
-                ['email', 'acme.org@example.com'],
+                ['email', 'foo.org@example.com'],
                 ['organisation', $organisationMock],
             ]));
 
@@ -44,16 +44,18 @@ class OrganisationAdminInviteObserverTest extends TestCase
 
         Queue::assertPushedOn('notifications', NotifyInviteeEmail ::class);
         Queue::assertPushed(NotifyInviteeEmail ::class, function (NotifyInviteeEmail $email): bool {
-            return $email->values == [
-                    'ORGANISATION_NAME' => 'Acme Org',
-                    'ORGANISATION_ADDRESS' => 'N/A',
-                    'ORGANISATION_URL' => 'N/A',
-                    'ORGANISATION_EMAIL' => 'acme.org@example.com',
-                    'ORGANISATION_PHONE' => 'N/A',
-                    'ORGANISATION_SOCIAL_MEDIA' => 'N/A',
-                    'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
-                    'INVITE_URL' => 'test-invite-url',
-                ];
+            $expectedValues = [
+                'ORGANISATION_NAME' => 'Acme Org',
+                'ORGANISATION_ADDRESS' => 'N/A',
+                'ORGANISATION_URL' => 'N/A',
+                'ORGANISATION_EMAIL' => 'acme.org@example.com',
+                'ORGANISATION_PHONE' => 'N/A',
+                'ORGANISATION_SOCIAL_MEDIA' => 'N/A',
+                'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
+                'INVITE_URL' => 'test-invite-url',
+            ];
+
+            return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
         });
     }
 
@@ -76,7 +78,7 @@ class OrganisationAdminInviteObserverTest extends TestCase
         $organisationAdminInviteMock->expects($this->any())
             ->method('__get')
             ->will($this->returnValueMap([
-                ['email', 'acme.org@example.com'],
+                ['email', 'foo.org@example.com'],
                 ['organisation', $organisationMock],
             ]));
 
@@ -91,15 +93,18 @@ class OrganisationAdminInviteObserverTest extends TestCase
 
         Queue::assertPushedOn('notifications', NotifyInviteeEmail ::class);
         Queue::assertPushed(NotifyInviteeEmail ::class, function (NotifyInviteeEmail $email): bool {
-            return $email->values == [
-                    'ORGANISATION_ADDRESS' => 'N/A', // TODO: Blocked until location work is finished.
-                    'ORGANISATION_URL' => 'http://acme.com',
-                    'ORGANISATION_EMAIL' => 'acme.org@example.com',
-                    'ORGANISATION_PHONE' => '011300000000',
-                    'ORGANISATION_SOCIAL_MEDIA' => 'N/A', // TODO: Blocked until social media work is finished.
-                    'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
-                    'INVITE_URL' => 'test-invite-url',
-                ];
+            $expectedValues = [
+                'ORGANISATION_NAME' => 'Acme Org',
+                'ORGANISATION_ADDRESS' => 'N/A', // TODO: Blocked until location work is finished.
+                'ORGANISATION_URL' => 'http://acme.com',
+                'ORGANISATION_EMAIL' => 'acme.org@example.com',
+                'ORGANISATION_PHONE' => '011300000000',
+                'ORGANISATION_SOCIAL_MEDIA' => 'N/A', // TODO: Blocked until social media work is finished.
+                'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
+                'INVITE_URL' => 'test-invite-url',
+            ];
+
+            return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
         });
 
         $this->markTestIncomplete('Need to merge in org data schema updates');

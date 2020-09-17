@@ -27,7 +27,7 @@ class PendingOrganisationAdminObserverTest extends TestCase
         $pendingOrganisationAdminMock->expects($this->any())
             ->method('__get')
             ->will($this->returnValueMap([
-                ['email', 'acme.org@example.com'],
+                ['email', 'foo.org@example.com'],
                 ['organisation', $organisationMock],
             ]));
 
@@ -44,10 +44,12 @@ class PendingOrganisationAdminObserverTest extends TestCase
         Queue::assertPushed(
             NotifyPendingOrganisationAdminEmail ::class,
             function (NotifyPendingOrganisationAdminEmail $email): bool {
-                return $email->values == [
-                        'ORGANISATION_NAME' => 'Acme Org',
-                        'CONFIRM_EMAIL_URL' => 'test-invite-url',
-                    ];
+                $expectedValues = [
+                    'ORGANISATION_NAME' => 'Acme Org',
+                    'CONFIRM_EMAIL_URL' => 'test-invite-url',
+                ];
+
+                return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
             }
         );
     }
