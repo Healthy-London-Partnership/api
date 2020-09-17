@@ -46,8 +46,8 @@ class OrganisationAdminInviteObserver
                     'INVITE_URL' => $this->adminUrlGenerator->generateOrganisationAdminInviteUrl(
                         $organisationAdminInvite
                     ),
-                ])
-            );
+                ]
+            ));
         }
     }
 }

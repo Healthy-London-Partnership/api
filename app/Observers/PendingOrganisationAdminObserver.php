@@ -39,7 +39,7 @@ class PendingOrganisationAdminObserver
                 'CONFIRM_EMAIL_URL' => $this->adminUrlGenerator->generatePendingOrganisationAdminConfirmationUrl(
                     $pendingOrganisationAdmin
                 ),
-            ])
-        );
+            ]
+        ));
     }
 }
