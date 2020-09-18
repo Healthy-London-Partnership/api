@@ -704,7 +704,7 @@ class OrganisationsTest extends TestCase
 
     public function test_guest_cannot_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -716,7 +716,7 @@ class OrganisationsTest extends TestCase
 
     public function test_service_worker_cannot_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -734,7 +734,7 @@ class OrganisationsTest extends TestCase
 
     public function test_service_admin_cannot_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -752,7 +752,7 @@ class OrganisationsTest extends TestCase
 
     public function test_organisation_admin_cannot_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -769,7 +769,7 @@ class OrganisationsTest extends TestCase
 
     public function test_global_admin_cannot_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -785,7 +785,7 @@ class OrganisationsTest extends TestCase
 
     public function test_super_admin_can_bulk_import()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $data = [
             'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
@@ -796,12 +796,12 @@ class OrganisationsTest extends TestCase
 
         $response = $this->json('POST', "/core/v1/organisations/import", $data);
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function test_validate_file_import_field()
     {
-        Storage::fake('uploads');
+        Storage::fake('local');
 
         $invalidFieldTypes = [
             ['spreadsheet' => 'This is a string'],
@@ -811,10 +811,7 @@ class OrganisationsTest extends TestCase
             ['spreadsheet' => UploadedFile::fake()->create('dummy.txt', 3000)],
             ['spreadsheet' => UploadedFile::fake()->create('dummy.csv', 3000)],
         ];
-        $validFieldTypes = [
-            ['spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000)],
-            ['spreadsheet' => UploadedFile::fake()->create('dummy.xlsx', 3000)],
-        ];
+
         $user = factory(User::class)->create()->makeSuperAdmin();
 
         Passport::actingAs($user);
@@ -824,10 +821,10 @@ class OrganisationsTest extends TestCase
             $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        foreach ($validFieldTypes as $data) {
-            $response = $this->json('POST', "/core/v1/organisations/import", $data);
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000)]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
-            $response->assertStatus(Response::HTTP_OK);
-        }
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => UploadedFile::fake()->create('dummy.xlsx', 3000)]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

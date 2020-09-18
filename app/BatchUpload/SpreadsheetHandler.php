@@ -2,9 +2,6 @@
 
 namespace App\BatchUpload;
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use League\Flysystem\FileNotFoundException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SpreadsheetHandler
@@ -77,12 +74,8 @@ class SpreadsheetHandler
      **/
     public function import(String $spreadsheetPath)
     {
-        if (!Storage::disk('local')->exists($spreadsheetPath)) {
-            throw new FileNotFoundException($spreadsheetPath);
-        }
-
-        $this->spreadsheetPath = 'app/' . $spreadsheetPath;
-        $fileType = IOFactory::identify(storage_path($this->spreadsheetPath));
+        $this->spreadsheetPath = $spreadsheetPath;
+        $fileType = IOFactory::identify($this->spreadsheetPath);
         $this->reader = IOFactory::createReader($fileType);
         $this->reader->setReadDataOnly(true);
         $this->reader->setReadFilter($this->chunkFilter);
@@ -100,7 +93,7 @@ class SpreadsheetHandler
     public function readHeaders()
     {
         $this->chunkFilter->setRows(1, 0);
-        $spreadsheet = $this->reader->load(storage_path($this->spreadsheetPath));
+        $spreadsheet = $this->reader->load($this->spreadsheetPath);
         $worksheet = $spreadsheet->getActiveSheet();
         $headerRow = $worksheet->getRowIterator(1, 1)->current();
         foreach ($headerRow->getCellIterator() as $cell) {
@@ -121,7 +114,7 @@ class SpreadsheetHandler
     {
         for ($startRow = 2; $startRow <= 65536; $startRow += $this->chunkSize) {
             $this->chunkFilter->setRows($startRow, $this->chunkSize);
-            $spreadsheet = $this->reader->load(storage_path($this->spreadsheetPath));
+            $spreadsheet = $this->reader->load($this->spreadsheetPath);
             $worksheet = $spreadsheet->getActiveSheet();
             if ($worksheet->getHighestDataRow() > 1) {
                 foreach ($worksheet->getRowIterator(2) as $rowIterator) {
@@ -137,24 +130,5 @@ class SpreadsheetHandler
             $spreadsheet->disconnectWorksheets();
             unset($spreadsheet);
         }
-    }
-
-    /**
-     * Validate the imported rows against provided rules
-     *
-     * @param Array $rules
-     * @return null
-     **/
-    public function validate(array $rules)
-    {
-        foreach ($this->rows->all() as $i => $row) {
-            $validator = Validator::make($row, $rules);
-
-            if ($validator->fails()) {
-                $this->errors->push($row);
-            }
-        }
-
-        return !$this->errors->count();
     }
 }
