@@ -8,6 +8,7 @@ use App\Http\Requests\Organisation\ImportRequest;
 use App\Models\Organisation;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use League\Flysystem\FileNotFoundException;
 
@@ -74,15 +75,26 @@ class ImportController extends Controller
 
         $spreadsheetHandler->readHeaders();
 
-        $validationRules = $this->app->make('App\Http\Requests\Organisation\StoreRequest')->rules();
-
         $rejectedRows = [];
 
         foreach ($spreadsheetHandler->readRows() as $row) {
-            $validator = Validator::make($row, $validationRules);
+            $validator = Validator::make($row, [
+                'name' => ['required', 'string', 'min:1', 'max:255'],
+                'description' => ['required', 'string', 'min:1', 'max:10000'],
+                'url' => ['present', 'url', 'max:255'],
+                'email' => ['present', 'nullable', 'required_without:phone', 'email', 'max:255'],
+                'phone' => [
+                    'present',
+                    'nullable',
+                    'required_without:email',
+                    'string',
+                    'min:1',
+                    'max:255',
+                ],
+            ]);
 
             if ($validator->fails()) {
-                $rejectedRows[] = $row;
+                $rejectedRows[] = ['row' => $row, 'errors' => $validator->errors()];
             }
         }
 
@@ -105,9 +117,11 @@ class ImportController extends Controller
 
         $importedRows = 0;
 
-        DB::transaction(function () use ($spreadsheetHandler, $importedRows) {
+        \DB::transaction(function () use ($spreadsheetHandler, &$importedRows) {
             $rowBatch = [];
             foreach ($spreadsheetHandler->readRows() as $row) {
+                $row['id'] = (string) Str::uuid();
+                $row['slug'] = Str::slug($row['name'], '-');
                 $rowBatch[] = $row;
 
                 if (count($rowBatch) === self::ROW_IMPORT_BATCH_SIZE) {
@@ -116,8 +130,9 @@ class ImportController extends Controller
                     $rowBatch = [];
                 }
             }
-            if (count($rowBatch)) {
-                DB::table('organisations')->insert($rowBatch);
+
+            if (count($rowBatch) && count($rowBatch) !== self::ROW_IMPORT_BATCH_SIZE) {
+                \DB::table('organisations')->insert($rowBatch);
                 $importedRows += count($rowBatch);
             }
         }, 5);

@@ -788,15 +788,16 @@ class OrganisationsTest extends TestCase
         Storage::fake('local');
 
         $data = [
-            'spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000),
+            'spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_1_good.xls', fopen(base_path('tests/assets/organisations_import_1_good.xls'), 'r'))),
         ];
+
         $user = factory(User::class)->create()->makeSuperAdmin();
 
         Passport::actingAs($user);
 
         $response = $this->json('POST', "/core/v1/organisations/import", $data);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_OK);
     }
 
     public function test_validate_file_import_field()
@@ -821,10 +822,16 @@ class OrganisationsTest extends TestCase
             $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => UploadedFile::fake()->create('dummy.xls', 3000)]);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_1_good.xls', fopen(base_path('tests/assets/organisations_import_1_good.xls'), 'r')))]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 1,
+        ]);
 
-        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => UploadedFile::fake()->create('dummy.xlsx', 3000)]);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_1_good.xlsx', fopen(base_path('tests/assets/organisations_import_1_good.xlsx'), 'r')))]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 1,
+        ]);
     }
 }

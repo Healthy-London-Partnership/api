@@ -47,8 +47,8 @@ class SpreadsheetHandlerTest extends TestCase
         $xlsWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->spreadsheet, "Xls");
 
         try {
-            $xlsxWriter->save(storage_path('app/' . $this->xlsxFilepath));
-            $xlsWriter->save(storage_path('app/' . $this->xlsFilepath));
+            $xlsxWriter->save(Storage::disk('local')->path($this->xlsxFilepath));
+            $xlsWriter->save(Storage::disk('local')->path($this->xlsFilepath));
         } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
             dump($e->getMessage());
         }
@@ -70,7 +70,7 @@ class SpreadsheetHandlerTest extends TestCase
     {
         $spreadsheetHandler = new SpreadsheetHandler();
 
-        $spreadsheetHandler->Import($this->xlsFilepath);
+        $spreadsheetHandler->Import(Storage::disk('local')->path($this->xlsFilepath));
 
         $spreadsheetHandler->readHeaders();
 
@@ -84,7 +84,7 @@ class SpreadsheetHandlerTest extends TestCase
     {
         $spreadsheetHandler = new SpreadsheetHandler();
 
-        $spreadsheetHandler->Import($this->xlsxFilepath);
+        $spreadsheetHandler->Import(Storage::disk('local')->path($this->xlsxFilepath));
 
         $spreadsheetHandler->readHeaders();
 
@@ -98,7 +98,7 @@ class SpreadsheetHandlerTest extends TestCase
     {
         $spreadsheetHandler = new SpreadsheetHandler();
 
-        $spreadsheetHandler->Import($this->xlsFilepath);
+        $spreadsheetHandler->Import(Storage::disk('local')->path($this->xlsFilepath));
 
         $organisations = Organisation::all();
 

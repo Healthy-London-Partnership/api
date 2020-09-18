@@ -122,7 +122,9 @@ class SpreadsheetHandler
                     $cellIterator = $rowIterator->getCellIterator();
                     $cellIterator->setIterateOnlyExistingCells(false);
                     foreach ($cellIterator as $cell) {
-                        $row[$this->headers[$cell->getColumn()]] = $cell->getValue();
+                        if (isset($this->headers[$cell->getColumn()])) {
+                            $row[$this->headers[$cell->getColumn()]] = $cell->getValue();
+                        }
                     }
                     yield $row;
                 }
