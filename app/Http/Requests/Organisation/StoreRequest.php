@@ -70,7 +70,7 @@ class StoreRequest extends FormRequest
                 SocialMedia::TYPE_OTHER,
             ])],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
-            'location_id' => ['sometimes', 'exists:locations,id'],
+            'location_id' => ['nullable', 'exists:locations,id'],
         ];
     }
 }
