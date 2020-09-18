@@ -119,13 +119,14 @@ class SpreadsheetHandler
             if ($worksheet->getHighestDataRow() > 1) {
                 foreach ($worksheet->getRowIterator(2) as $rowIterator) {
                     $row = [];
-                    $cellIterator = $rowIterator->getCellIterator();
+                    $cellIterator = $rowIterator->getCellIterator(array_key_first($this->headers), array_key_last($this->headers));
                     $cellIterator->setIterateOnlyExistingCells(false);
                     foreach ($cellIterator as $cell) {
                         if (isset($this->headers[$cell->getColumn()])) {
                             $row[$this->headers[$cell->getColumn()]] = $cell->getValue();
                         }
                     }
+                    dump($row);
                     yield $row;
                 }
             }

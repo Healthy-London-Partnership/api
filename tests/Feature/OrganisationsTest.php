@@ -800,7 +800,7 @@ class OrganisationsTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
     }
 
-    public function test_validate_file_import_field()
+    public function test_validate_file_import_type()
     {
         Storage::fake('local');
 
@@ -832,6 +832,106 @@ class OrganisationsTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJson([
             'imported_row_count' => 1,
+        ]);
+    }
+
+    public function test_validate_file_import_fields()
+    {
+        Storage::fake('local');
+
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_2_bad.xls', fopen(base_path('tests/assets/organisations_import_2_bad.xls'), 'r')))]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'imported_row_count' => 0,
+            'invalid_rows' => [
+                [
+                    'row' => [],
+                    'errors' => [
+                        'name' => [],
+                        'description' => [],
+                        'url' => [],
+                        'email' => [],
+                    ],
+                ],
+                [
+                    'row' => [],
+                    'errors' => [
+                        'email' => [],
+                        'phone' => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_2_bad.xlsx', fopen(base_path('tests/assets/organisations_import_2_bad.xlsx'), 'r')))]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'imported_row_count' => 0,
+            'invalid_rows' => [
+                [
+                    'row' => [],
+                    'errors' => [
+                        'name' => [],
+                        'description' => [],
+                        'url' => [],
+                        'email' => [],
+                    ],
+                ],
+                [
+                    'row' => [],
+                    'errors' => [
+                        'email' => [],
+                        'phone' => [],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function test_validate_file_import_100rows()
+    {
+        Storage::fake('local');
+
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_100_good.xls', fopen(base_path('tests/assets/organisations_import_100_good.xls'), 'r')))]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 100,
+        ]);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_100_good.xlsx', fopen(base_path('tests/assets/organisations_import_100_good.xlsx'), 'r')))]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 100,
+        ]);
+    }
+
+    public function test_validate_file_import_5krows()
+    {
+        Storage::fake('local');
+
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_5000_good.xls', fopen(base_path('tests/assets/organisations_import_5000_good.xls'), 'r')))]);
+        dd($response->json()['invalid_rows'][0]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 5000,
+        ]);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_5000_good.xlsx', fopen(base_path('tests/assets/organisations_import_5000_good.xlsx'), 'r')))]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'imported_row_count' => 5000,
         ]);
     }
 }
