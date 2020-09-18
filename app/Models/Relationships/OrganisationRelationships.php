@@ -5,8 +5,10 @@ namespace App\Models\Relationships;
 use App\Models\File;
 use App\Models\OrganisationAdminInvite;
 use App\Models\PendingOrganisationAdmin;
+use App\Models\Location;
 use App\Models\Role;
 use App\Models\Service;
+use App\Models\SocialMedia;
 use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,5 +73,21 @@ trait OrganisationRelationships
     public function pendingOrganisationAdmins()
     {
         return $this->hasMany(PendingOrganisationAdmin::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function socialMedias()
+    {
+        return $this->morphMany(SocialMedia::class, 'sociable');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }
