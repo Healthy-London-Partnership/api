@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\OrganisationAdminInvite;
 
+use App\Rules\Password;
+use App\Rules\UkPhoneNumber;
+use App\Rules\UserEmailNotTaken;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SubmitRequest extends FormRequest
@@ -24,7 +27,11 @@ class SubmitRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'first_name' => ['required', 'string', 'min:1', 'max:255'],
+            'last_name' => ['required', 'string', 'min:1', 'max:255'],
+            'email' => ['required', 'email', 'max:255', new UserEmailNotTaken()],
+            'phone' => ['present', 'nullable', 'string', 'min:1', 'max:255', new UkPhoneNumber()],
+            'password' => ['required', 'string', 'min:8', 'max:255', new Password()],
         ];
     }
 }
