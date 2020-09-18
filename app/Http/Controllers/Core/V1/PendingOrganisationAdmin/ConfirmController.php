@@ -8,7 +8,6 @@ use App\Http\Requests\PendingOrganisationAdmin\ConfirmRequest;
 use App\Http\Resources\UserResource;
 use App\Models\PendingOrganisationAdmin;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ConfirmController extends Controller
