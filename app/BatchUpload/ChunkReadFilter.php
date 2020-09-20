@@ -43,6 +43,9 @@ class ChunkReadFilter implements IReadFilter
      **/
     public function readCell($column, $row, $worksheetName = '')
     {
+        /**
+         * Only read the first (header) row, or rows within the chunksize
+         */
         return ($row == 1) || ($row >= $this->startRow && $row < $this->endRow);
     }
 }
