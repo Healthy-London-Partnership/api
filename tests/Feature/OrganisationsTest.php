@@ -1003,7 +1003,7 @@ class OrganisationsTest extends TestCase
 
         $response = $this->json('POST', "/core/v1/organisations/import", $data);
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
     }
 
     public function test_validate_file_import_type()
