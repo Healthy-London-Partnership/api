@@ -37,7 +37,9 @@ class OrganisationController extends Controller
      */
     public function index(IndexRequest $request)
     {
-        $baseQuery = Organisation::query();
+        $baseQuery = Organisation::query()
+            ->select('*')
+            ->withHasOwner();
 
         $organisations = QueryBuilder::for($baseQuery)
             ->allowedFilters([
@@ -114,6 +116,8 @@ class OrganisationController extends Controller
     public function show(ShowRequest $request, Organisation $organisation)
     {
         $baseQuery = Organisation::query()
+            ->select('*')
+            ->withHasOwner()
             ->where('id', $organisation->id);
 
         $organisation = QueryBuilder::for($baseQuery)
