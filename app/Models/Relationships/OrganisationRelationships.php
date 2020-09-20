@@ -3,9 +3,9 @@
 namespace App\Models\Relationships;
 
 use App\Models\File;
+use App\Models\Location;
 use App\Models\OrganisationAdminInvite;
 use App\Models\PendingOrganisationAdmin;
-use App\Models\Location;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\SocialMedia;
