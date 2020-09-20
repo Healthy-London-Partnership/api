@@ -55,7 +55,7 @@ class ImportController extends Controller
 
         Storage::disk('local')->delete($filePath);
 
-        $responseStatus = count($rejectedRows) ? 422 : 200;
+        $responseStatus = count($rejectedRows) ? 422 : 201;
         return response()->json([
             'imported_row_count' => $importedRows,
             'invalid_rows' => $rejectedRows,

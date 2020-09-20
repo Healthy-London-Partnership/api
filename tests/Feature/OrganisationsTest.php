@@ -1029,13 +1029,13 @@ class OrganisationsTest extends TestCase
         }
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_1_good.xls', fopen(base_path('tests/assets/organisations_import_1_good.xls'), 'r')))]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 1,
         ]);
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_1_good.xlsx', fopen(base_path('tests/assets/organisations_import_1_good.xlsx'), 'r')))]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 1,
         ]);
@@ -1107,13 +1107,13 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_100_good.xls', fopen(base_path('tests/assets/organisations_import_100_good.xls'), 'r')))]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 100,
         ]);
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_100_good.xlsx', fopen(base_path('tests/assets/organisations_import_100_good.xlsx'), 'r')))]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 100,
         ]);
@@ -1128,14 +1128,13 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_5000_good.xls', fopen(base_path('tests/assets/organisations_import_5000_good.xls'), 'r')))]);
-        // dd($response->json()['invalid_rows'][0]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 5000,
         ]);
 
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => (new \Illuminate\Http\Testing\File('organisations_import_5000_good.xlsx', fopen(base_path('tests/assets/organisations_import_5000_good.xlsx'), 'r')))]);
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
             'imported_row_count' => 5000,
         ]);
