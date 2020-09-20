@@ -74,8 +74,6 @@ class FirstFollowUpsCommandTest extends TestCase
 
             return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
         });
-
-        $this->markTestIncomplete('Need to merge in org data schema updates');
     }
 
     /**

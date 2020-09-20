@@ -4,12 +4,10 @@ namespace App\Console\Commands\Hlp\Notify\OrganisationAdminInvitee;
 
 use App\Emails\OrganisationAdminInviteFirstFollowUps\NotifyInviteeEmail;
 use App\Generators\AdminUrlGenerator;
-use App\Models\Location;
 use App\Models\Notification;
 use App\Models\OrganisationAdminInvite;
-use App\Models\SocialMedia;
+use App\Transformers\OrganisationInviteTransformer;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -33,8 +31,9 @@ class FirstFollowUpsCommand extends Command
      * Execute the console command.
      *
      * @param \App\Generators\AdminUrlGenerator $adminUrlGenerator
+     * @param \App\Transformers\OrganisationInviteTransformer $transformer
      */
-    public function handle(AdminUrlGenerator $adminUrlGenerator): void
+    public function handle(AdminUrlGenerator $adminUrlGenerator, OrganisationInviteTransformer $transformer): void
     {
         $dates = array_map(function (int $week): string {
             return Date::today()->subWeeks($week)->toDateString();
@@ -52,13 +51,13 @@ class FirstFollowUpsCommand extends Command
                     $organisationAdminInvite->email,
                     [
                         'ORGANISATION_NAME' => $organisationAdminInvite->organisation->name,
-                        'ORGANISATION_ADDRESS' => $this->transformAddress(
+                        'ORGANISATION_ADDRESS' => $transformer->transformAddress(
                             $organisationAdminInvite->organisation->location
                         ) ?: 'N/A',
                         'ORGANISATION_URL' => $organisationAdminInvite->organisation->url ?: 'N/A',
                         'ORGANISATION_EMAIL' => $organisationAdminInvite->organisation->email ?: 'N/A',
                         'ORGANISATION_PHONE' => $organisationAdminInvite->organisation->phone ?: 'N/A',
-                        'ORGANISATION_SOCIAL_MEDIA' => $this->transformSocialMedias(
+                        'ORGANISATION_SOCIAL_MEDIA' => $transformer->transformSocialMedias(
                             $organisationAdminInvite->organisation->socialMedias
                         ) ?: 'N/A',
                         'ORGANISATION_DESCRIPTION' => $organisationAdminInvite->organisation->description,
@@ -69,76 +68,5 @@ class FirstFollowUpsCommand extends Command
                 )
             );
         }
-    }
-
-    /**
-     * @param \App\Models\Location|null $location
-     * @return string|null
-     */
-    protected function transformAddress(?Location $location): ?string
-    {
-        if ($location === null) {
-            return null;
-        }
-
-        $addressParts = [
-            $location->address_line_1,
-            $location->address_line_2,
-            $location->address_line_3,
-            $location->city,
-            $location->county,
-            $location->postcode,
-            $location->country,
-        ];
-
-        $addressParts = array_filter($addressParts);
-
-        return implode(', ', $addressParts);
-    }
-
-    /**
-     * @param \Illuminate\Database\Eloquent\Collection|null $socialMedias
-     * @return string|null
-     */
-    protected function transformSocialMedias(?Collection $socialMedias): ?string
-    {
-        if ($socialMedias === null) {
-            return null;
-        }
-
-        return $socialMedias
-            ->map(function (SocialMedia $socialMedia): string {
-                return $this->transformSocialMedia($socialMedia);
-            })
-            ->implode(', ');
-    }
-
-    /**
-     * @param \App\Models\SocialMedia $socialMedia
-     * @return string
-     */
-    protected function transformSocialMedia(SocialMedia $socialMedia): string
-    {
-        $type = $socialMedia->type;
-
-        switch ($type) {
-            case SocialMedia::TYPE_TWITTER:
-                $type = 'Twitter';
-                break;
-            case SocialMedia::TYPE_FACEBOOK:
-                $type = 'Facebook';
-                break;
-            case SocialMedia::TYPE_INSTAGRAM:
-                $type = 'Instagram';
-                break;
-            case SocialMedia::TYPE_YOUTUBE:
-                $type = 'YouTube';
-                break;
-            case SocialMedia::TYPE_OTHER:
-                $type = 'Other';
-                break;
-        }
-
-        return "{$type}: {$socialMedia->url}";
     }
 }

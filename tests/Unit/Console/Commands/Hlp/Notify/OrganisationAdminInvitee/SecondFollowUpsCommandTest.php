@@ -4,8 +4,10 @@ namespace Tests\Unit\Console\Commands\Hlp\Notify\OrganisationAdminInvitee;
 
 use App\Console\Commands\Hlp\Notify\OrganisationAdminInvitee\SecondFollowUpsCommand;
 use App\Emails\OrganisationAdminInviteSecondFollowUps\NotifyInviteeEmail;
+use App\Models\Location;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
+use App\Models\SocialMedia;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Queue;
@@ -29,6 +31,25 @@ class SecondFollowUpsCommandTest extends TestCase
             'phone' => '011300000000',
         ]);
 
+        $organisation->location()->associate(
+            factory(Location::class)->create([
+                'address_line_1' => '1 Fake Street',
+                'address_line_2' => 'Floor 2',
+                'address_line_3' => 'Room 3',
+                'city' => 'Leeds',
+                'county' => 'West Yorkshire',
+                'postcode' => 'LS1 2AB',
+                'country' => 'United Kingdom',
+            ])
+        );
+
+        $organisation->socialMedias()->create([
+            'type' => SocialMedia::TYPE_FACEBOOK,
+            'url' => 'http://facebook.com/AcmeOrg',
+        ]);
+
+        $organisation->save();
+
         factory(OrganisationAdminInvite::class)->create([
             'id' => 'test-id',
             'organisation_id' => $organisation->id,
@@ -42,19 +63,17 @@ class SecondFollowUpsCommandTest extends TestCase
         Queue::assertPushed(NotifyInviteeEmail::class, function (NotifyInviteeEmail $email) {
             $expectedValues = [
                 'ORGANISATION_NAME' => 'Acme Org',
-                'ORGANISATION_ADDRESS' => 'N/A', // TODO: Blocked until location work is finished.
+                'ORGANISATION_ADDRESS' => '1 Fake Street, Floor 2, Room 3, Leeds, West Yorkshire, LS1 2AB, United Kingdom',
                 'ORGANISATION_URL' => 'http://acme.com',
                 'ORGANISATION_EMAIL' => 'acme.org@example.com',
                 'ORGANISATION_PHONE' => '011300000000',
-                'ORGANISATION_SOCIAL_MEDIA' => 'N/A', // TODO: Blocked until social media work is finished.
+                'ORGANISATION_SOCIAL_MEDIA' => 'Facebook: http://facebook.com/AcmeOrg',
                 'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
                 'INVITE_URL' => config('hlp.backend_uri') . '/organisation-admin-invites/test-id',
             ];
 
             return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
         });
-
-        $this->markTestIncomplete('Need to merge in org data schema updates');
     }
 
     /**
