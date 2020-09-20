@@ -4,9 +4,13 @@ namespace Tests\Unit\Observers;
 
 use App\Emails\OrganisationAdminInviteInitial\NotifyInviteeEmail;
 use App\Generators\AdminUrlGenerator;
+use App\Models\Location;
 use App\Models\Organisation;
 use App\Models\OrganisationAdminInvite;
+use App\Models\SocialMedia;
 use App\Observers\OrganisationAdminInviteObserver;
+use App\Transformers\OrganisationInviteTransformer;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -39,7 +43,20 @@ class OrganisationAdminInviteObserverTest extends TestCase
             ->with($organisationAdminInviteMock)
             ->willReturn('test-invite-url');
 
-        $observer = new OrganisationAdminInviteObserver($adminUrlGeneratorMock);
+        $organisationInviteTransformerMock = $this->createMock(OrganisationInviteTransformer::class);
+        $organisationInviteTransformerMock->expects($this->once())
+            ->method('transformAddress')
+            ->with(null)
+            ->willReturn(null);
+        $organisationInviteTransformerMock->expects($this->once())
+            ->method('transformSocialMedias')
+            ->with(null)
+            ->willReturn(null);
+
+        $observer = new OrganisationAdminInviteObserver(
+            $adminUrlGeneratorMock,
+            $organisationInviteTransformerMock
+        );
         $observer->created($organisationAdminInviteMock);
 
         Queue::assertPushedOn('notifications', NotifyInviteeEmail ::class);
@@ -63,6 +80,11 @@ class OrganisationAdminInviteObserverTest extends TestCase
     {
         Queue::fake();
 
+        $locationMock = $this->createMock(Location::class);
+
+        $socialMediaMock = $this->createMock(SocialMedia::class);
+        $socialMedias = new Collection([$socialMediaMock]);
+
         $organisationMock = $this->createMock(Organisation::class);
         $organisationMock->expects($this->any())
             ->method('__get')
@@ -72,6 +94,8 @@ class OrganisationAdminInviteObserverTest extends TestCase
                 ['description', 'Lorem ipsum'],
                 ['url', 'http://acme.com'],
                 ['phone', '011300000000'],
+                ['location', $locationMock],
+                ['socialMedias', $socialMedias],
             ]));
 
         $organisationAdminInviteMock = $this->createMock(OrganisationAdminInvite::class);
@@ -88,26 +112,37 @@ class OrganisationAdminInviteObserverTest extends TestCase
             ->with($organisationAdminInviteMock)
             ->willReturn('test-invite-url');
 
-        $observer = new OrganisationAdminInviteObserver($adminUrlGeneratorMock);
+        $organisationInviteTransformerMock = $this->createMock(OrganisationInviteTransformer::class);
+        $organisationInviteTransformerMock->expects($this->once())
+            ->method('transformAddress')
+            ->with($locationMock)
+            ->willReturn('1 Fake Street, Floor 2, Room 3, Leeds, West Yorkshire, LS1 2AB, United Kingdom');
+        $organisationInviteTransformerMock->expects($this->once())
+            ->method('transformSocialMedias')
+            ->with($socialMedias)
+            ->willReturn('Facebook: http://facebook.com/AcmeOrg');
+
+        $observer = new OrganisationAdminInviteObserver(
+            $adminUrlGeneratorMock,
+            $organisationInviteTransformerMock
+        );
         $observer->created($organisationAdminInviteMock);
 
         Queue::assertPushedOn('notifications', NotifyInviteeEmail ::class);
         Queue::assertPushed(NotifyInviteeEmail ::class, function (NotifyInviteeEmail $email): bool {
             $expectedValues = [
                 'ORGANISATION_NAME' => 'Acme Org',
-                'ORGANISATION_ADDRESS' => 'N/A', // TODO: Blocked until location work is finished.
+                'ORGANISATION_ADDRESS' => '1 Fake Street, Floor 2, Room 3, Leeds, West Yorkshire, LS1 2AB, United Kingdom',
                 'ORGANISATION_URL' => 'http://acme.com',
                 'ORGANISATION_EMAIL' => 'acme.org@example.com',
                 'ORGANISATION_PHONE' => '011300000000',
-                'ORGANISATION_SOCIAL_MEDIA' => 'N/A', // TODO: Blocked until social media work is finished.
+                'ORGANISATION_SOCIAL_MEDIA' => 'Facebook: http://facebook.com/AcmeOrg',
                 'ORGANISATION_DESCRIPTION' => 'Lorem ipsum',
                 'INVITE_URL' => 'test-invite-url',
             ];
 
             return ($email->to === 'foo.org@example.com') && ($email->values == $expectedValues);
         });
-
-        $this->markTestIncomplete('Need to merge in org data schema updates');
     }
 
     public function test_created_does_not_send_emails_to_invitee_when_email_is_null()
@@ -125,7 +160,12 @@ class OrganisationAdminInviteObserverTest extends TestCase
         $adminUrlGeneratorMock->expects($this->never())
             ->method('generateOrganisationAdminInviteUrl');
 
-        $observer = new OrganisationAdminInviteObserver($adminUrlGeneratorMock);
+        $organisationInviteTransformerMock = $this->createMock(OrganisationInviteTransformer::class);
+
+        $observer = new OrganisationAdminInviteObserver(
+            $adminUrlGeneratorMock,
+            $organisationInviteTransformerMock
+        );
         $observer->created($organisationAdminInviteMock);
 
         Queue::assertNotPushed(NotifyInviteeEmail ::class);
