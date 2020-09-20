@@ -20,6 +20,7 @@ class OrganisationSchema extends Schema
             ->properties(
                 Schema::string('id')
                     ->format(Schema::TYPE_OBJECT),
+                Schema::boolean('has_owner'),
                 Schema::boolean('has_logo'),
                 Schema::string('name'),
                 Schema::string('slug'),
