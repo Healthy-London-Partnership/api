@@ -4,12 +4,14 @@ namespace Tests\Feature;
 
 use App\Events\EndpointHit;
 use App\Models\Audit;
-use App\Models\File;
+use App\Models\Location;
 use App\Models\Organisation;
 use App\Models\Service;
+use App\Models\SocialMedia;
 use App\Models\UpdateRequest;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Faker\Factory as Faker;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -40,6 +42,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -155,12 +159,11 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('POST', '/core/v1/organisations', $payload);
-
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonFragment($payload);
     }
 
-    public function test_global_admin_can_create_one_with_single_form_of_contact()
+    public function test_global_admin_can_create_one_with_minimal_fields()
     {
         /**
          * @var \App\Models\User $user
@@ -171,8 +174,8 @@ class OrganisationsTest extends TestCase
             'slug' => 'test-org',
             'name' => 'Test Org',
             'description' => 'Test description',
-            'url' => 'http://test-org.example.com',
-            'email' => 'info@test-org.example.com',
+            'url' => null,
+            'email' => null,
             'phone' => null,
         ];
 
@@ -184,7 +187,7 @@ class OrganisationsTest extends TestCase
         $response->assertJsonFragment($payload);
     }
 
-    public function test_global_admin_cannot_create_one_with_no_form_of_contact()
+    public function test_global_admin_cannot_create_one_with_no_description()
     {
         /**
          * @var \App\Models\User $user
@@ -194,8 +197,8 @@ class OrganisationsTest extends TestCase
         $payload = [
             'slug' => 'test-org',
             'name' => 'Test Org',
-            'description' => 'Test description',
-            'url' => 'http://test-org.example.com',
+            'description' => null,
+            'url' => null,
             'email' => null,
             'phone' => null,
         ];
@@ -256,6 +259,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -279,6 +284,8 @@ class OrganisationsTest extends TestCase
                 'url' => $organisation->url,
                 'email' => $organisation->email,
                 'phone' => $organisation->phone,
+                'social_medias' => [],
+                'location' => null,
                 'created_at' => $organisation->created_at->format(CarbonImmutable::ISO8601),
                 'updated_at' => $organisation->updated_at->format(CarbonImmutable::ISO8601),
             ],
@@ -349,6 +356,7 @@ class OrganisationsTest extends TestCase
             'url' => 'http://test-org.example.com',
             'email' => 'info@test-org.example.com',
             'phone' => '07700000000',
+            'location_id' => null,
         ];
 
         Passport::actingAs($user);
@@ -369,7 +377,7 @@ class OrganisationsTest extends TestCase
         $this->assertEquals($data, $payload);
     }
 
-    public function test_organisation_admin_can_update_with_single_form_of_contact()
+    public function test_organisation_admin_can_update_with_minimal_fields()
     {
         $organisation = factory(Organisation::class)->create();
         $user = factory(User::class)->create()->makeOrganisationAdmin($organisation);
@@ -377,9 +385,10 @@ class OrganisationsTest extends TestCase
             'slug' => 'test-org',
             'name' => 'Test Org',
             'description' => 'Test description',
-            'url' => 'http://test-org.example.com',
-            'email' => 'info@test-org.example.com',
+            'url' => null,
+            'email' => null,
             'phone' => null,
+            'location_id' => null,
         ];
 
         Passport::actingAs($user);
@@ -400,7 +409,7 @@ class OrganisationsTest extends TestCase
         $this->assertEquals($data, $payload);
     }
 
-    public function test_organisation_admin_cannot_update_with_no_form_of_contact()
+    public function test_organisation_admin_cannot_update_with_no_description()
     {
         $organisation = factory(Organisation::class)->create([
             'email' => 'info@test-org.example.com',
@@ -413,8 +422,8 @@ class OrganisationsTest extends TestCase
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", [
             'slug' => 'test-org',
             'name' => 'Test Org',
-            'description' => 'Test description',
-            'url' => 'http://test-org.example.com',
+            'description' => null,
+            'url' => null,
             'email' => null,
             'phone' => null,
         ]);
@@ -675,9 +684,7 @@ class OrganisationsTest extends TestCase
          */
         $user = factory(User::class)->create();
         $user->makeGlobalAdmin();
-        $organisation = factory(Organisation::class)->create([
-            'logo_file_id' => factory(File::class)->create()->id,
-        ]);
+        $organisation = factory(Organisation::class)->states('web', 'email', 'phone', 'logo')->create();
         $payload = [
             'slug' => $organisation->slug,
             'name' => $organisation->name,
@@ -691,11 +698,210 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
-
         $response->assertStatus(Response::HTTP_OK);
         $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
         $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
         $this->assertEquals(null, $updateRequest->data['logo_file_id']);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_add_social_media()
+    {
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->create();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'social_medias' => [
+                [
+                    'type' => SocialMedia::TYPE_INSTAGRAM,
+                    'url' => 'https://www.instagram.com/ayupdigital',
+                ],
+            ],
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($payload['social_medias'], $updateRequest->data['social_medias']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(SocialMedia::class), [
+            'sociable_id' => $organisation->id,
+            'sociable_type' => UpdateRequest::EXISTING_TYPE_ORGANISATION,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_remove_social_media()
+    {
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->states('social')->create();
+        $social = $organisation->socialMedias->all();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'social_medias' => [
+                [
+                    'type' => $social[1]->type,
+                    'url' => $social[1]->url,
+                ],
+                [
+                    'type' => $social[2]->type,
+                    'url' => $social[2]->url,
+                ],
+            ],
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($payload['social_medias'], $updateRequest->data['social_medias']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(SocialMedia::class), [
+            'sociable_id' => $organisation->id,
+            'sociable_type' => UpdateRequest::EXISTING_TYPE_ORGANISATION,
+            'url' => $social[1]->url,
+        ]);
+
+        $this->assertDatabaseHas(table(SocialMedia::class), [
+            'sociable_id' => $organisation->id,
+            'sociable_type' => UpdateRequest::EXISTING_TYPE_ORGANISATION,
+            'url' => $social[2]->url,
+        ]);
+
+        $this->assertDatabaseMissing(table(SocialMedia::class), [
+            'sociable_id' => $organisation->id,
+            'sociable_type' => UpdateRequest::EXISTING_TYPE_ORGANISATION,
+            'url' => $social[0]->url,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_add_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->create();
+        $address = factory(Location::class)->create();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => $address->id,
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($address->id, $updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => $address->id,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_update_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->states('location')->create();
+        $address1 = $organisation->location;
+        $address2 = factory(Location::class)->create();
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => $address2->id,
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEquals($address2->id, $updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => $address2->id,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function organisation_admin_can_delete_address()
+    {
+        $faker = Faker::create('en_GB');
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->states('location')->create();
+        $address = $organisation->location;
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'location_id' => null,
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $organisation->id]);
+        $updateRequest = UpdateRequest::where('updateable_id', $organisation->id)->firstOrFail();
+        $this->assertEmpty($updateRequest->data['location_id']);
+
+        $updateRequest->apply($user);
+
+        $this->assertDatabaseHas(table(Organisation::class), [
+            'id' => $organisation->id,
+            'location_id' => null,
+        ]);
     }
 
     /**
