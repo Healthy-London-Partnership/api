@@ -22,17 +22,6 @@ class Organisation extends Model implements AppliesUpdateRequests
     use UpdateRequests;
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'has_owner' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    /**
      * Check if the update request is valid.
      *
      * @param \App\Models\UpdateRequest $updateRequest

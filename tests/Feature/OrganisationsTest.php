@@ -34,7 +34,6 @@ class OrganisationsTest extends TestCase
         $response->assertJsonFragment([
             [
                 'id' => $organisation->id,
-                'has_owner' => false,
                 'has_logo' => $organisation->hasLogo(),
                 'slug' => $organisation->slug,
                 'name' => $organisation->name,
@@ -252,7 +251,6 @@ class OrganisationsTest extends TestCase
         $response->assertJsonFragment([
             [
                 'id' => $organisation->id,
-                'has_owner' => false,
                 'has_logo' => $organisation->hasLogo(),
                 'slug' => $organisation->slug,
                 'name' => $organisation->name,
@@ -278,7 +276,6 @@ class OrganisationsTest extends TestCase
         $response->assertJsonFragment([
             [
                 'id' => $organisation->id,
-                'has_owner' => false,
                 'has_logo' => $organisation->hasLogo(),
                 'slug' => $organisation->slug,
                 'name' => $organisation->name,
