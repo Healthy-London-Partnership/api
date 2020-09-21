@@ -30,6 +30,7 @@ class TaxonomyOrganisationsTest extends TestCase
         $response->assertJsonFragment([
             [
                 'id' => $taxonomy->id,
+                'slug' => $taxonomy->slug,
                 'name' => $taxonomy->name,
                 'order' => $taxonomy->order,
                 'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
@@ -252,6 +253,7 @@ class TaxonomyOrganisationsTest extends TestCase
         $response->assertJson([
             'data' => [
                 'id' => $taxonomy->id,
+                'slug' => $taxonomy->slug,
                 'name' => $taxonomy->name,
                 'order' => $taxonomy->order,
                 'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
