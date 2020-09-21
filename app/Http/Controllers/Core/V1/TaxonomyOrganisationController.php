@@ -92,13 +92,17 @@ class TaxonomyOrganisationController extends Controller
      * Update the specified resource in storage.
      *
      * @param \App\Http\Requests\TaxonomyOrganisation\UpdateRequest $request
+     * @param \App\Generators\UniqueSlugGenerator $slugGenerator
      * @param \App\Models\Taxonomy $taxonomy
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Taxonomy $taxonomy)
+    public function update(UpdateRequest $request, UniqueSlugGenerator $slugGenerator, Taxonomy $taxonomy)
     {
-        return DB::transaction(function () use ($request, $taxonomy) {
+        return DB::transaction(function () use ($request, $slugGenerator, $taxonomy) {
             $taxonomy->update([
+                'slug' => $slugGenerator->compareEquals($request->name, $taxonomy->slug)
+                    ? $taxonomy->slug
+                    : $slugGenerator->generate($request->name, table(Taxonomy::class)),
                 'name' => $request->name,
                 'order' => $request->order,
             ]);

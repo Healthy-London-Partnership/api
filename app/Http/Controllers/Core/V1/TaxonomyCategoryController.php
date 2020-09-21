@@ -14,6 +14,7 @@ use App\Http\Resources\TaxonomyCategoryResource;
 use App\Http\Responses\ResourceDeleted;
 use App\Models\Taxonomy;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class TaxonomyCategoryController extends Controller
@@ -94,14 +95,18 @@ class TaxonomyCategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param \App\Http\Requests\TaxonomyCategory\UpdateRequest $request
+     * @param \App\Generators\UniqueSlugGenerator $slugGenerator
      * @param \App\Models\Taxonomy $taxonomy
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Taxonomy $taxonomy)
+    public function update(UpdateRequest $request, UniqueSlugGenerator $slugGenerator, Taxonomy $taxonomy)
     {
-        return DB::transaction(function () use ($request, $taxonomy) {
+        return DB::transaction(function () use ($request, $slugGenerator, $taxonomy) {
             $taxonomy->update([
                 'parent_id' => $request->parent_id ?? Taxonomy::category()->id,
+                'slug' => $slugGenerator->compareEquals($request->name, $taxonomy->slug)
+                    ? $taxonomy->slug
+                    : $slugGenerator->generate($request->name, table(Taxonomy::class)),
                 'name' => $request->name,
                 'order' => $request->order,
             ]);
