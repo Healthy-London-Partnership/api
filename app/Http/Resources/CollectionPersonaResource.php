@@ -22,7 +22,7 @@ class CollectionPersonaResource extends JsonResource
             'subtitle' => $this->meta['subtitle'],
             'order' => $this->order,
             'sideboxes' => $this->meta['sideboxes'],
-            'category_taxonomies' => TaxonomyCategoryResource::collection($this->taxonomies),
+            'category_taxonomies' => TaxonomyResource::collection($this->taxonomies),
             'created_at' => $this->created_at->format(CarbonImmutable::ISO8601),
             'updated_at' => $this->updated_at->format(CarbonImmutable::ISO8601),
         ];
