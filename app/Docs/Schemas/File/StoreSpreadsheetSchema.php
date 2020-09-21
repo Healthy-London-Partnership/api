@@ -21,9 +21,9 @@ class StoreSpreadsheetSchema extends Schema
                 'spreadsheet'
             )
             ->properties(
-                Schema::object('spreadsheet')
+                Schema::string('spreadsheet')
                     ->format(static::FORMAT_BINARY)
-                    ->description('Excel compatible spreadsheet')
+                    ->description('Base64 encoded string of an Excel compatible spreadsheet')
             );
     }
 }

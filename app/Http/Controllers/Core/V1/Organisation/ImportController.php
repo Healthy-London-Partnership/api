@@ -6,11 +6,13 @@ use App\BatchUpload\SpreadsheetHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Organisation\ImportRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use League\Flysystem\FileNotFoundException;
+use Symfony\Component\Mime\MimeTypes;
 
 class ImportController extends Controller
 {
@@ -37,10 +39,9 @@ class ImportController extends Controller
      */
     public function __invoke(ImportRequest $request)
     {
-        if (!$request->file('spreadsheet')->isValid()) {
-            throw ValidationException::withMessages(['Supplied file is not valid']);
-        }
-        $filePath = $request->file('spreadsheet')->store('batch-upload');
+        Log::info($request->input('spreadsheet'));
+        $filePath = $this->storeBase64FileString($request->input('spreadsheet'), 'batch-upload');
+        Log::info($filePath);
 
         if (!Storage::disk('local')->exists($filePath) || !is_readable(Storage::disk('local')->path($filePath))) {
             throw new FileNotFoundException($filePath);
@@ -55,11 +56,79 @@ class ImportController extends Controller
 
         Storage::disk('local')->delete($filePath);
 
-        $responseStatus = count($rejectedRows) ? 422 : 201;
+        $responseStatus = 201;
+        $response = ['imported_row_count' => $importedRows];
+
+        if (count($rejectedRows)) {
+            $responseStatus = 422;
+            $response = ['errors' => ['spreadsheet' => $rejectedRows]];
+        }
         return response()->json([
-            'imported_row_count' => $importedRows,
-            'invalid_rows' => $rejectedRows,
+            'data' => $response,
         ], $responseStatus);
+    }
+
+    /**
+     * Store a binary file blob and update the models properties
+     *
+     * @param String $blob
+     * @param String $path
+     * @param String $mime_type
+     * @param String $ext
+     * @return String
+     **/
+    public function storeBinaryUpload(string $blob, string $path, $mime_type = null, $ext = null)
+    {
+        $path = empty($path) ? '' : trim($path, '/') . '/';
+        $mime_type = $mime_type ?? $this->getFileStringMimeType($blob);
+        $ext = $ext ?? $this->guessFileExtension($mime_type);
+        $filename = md5($blob) . '.' . $ext;
+        Storage::disk('local')->put($path . $filename, $blob);
+        return $path . $filename;
+    }
+
+    /**
+     * Store a Base 64 encoded data string
+     *
+     * @param string $file_data
+     * @param string $path
+     * @return String
+     **/
+    public function storeBase64FileString(string $file_data, string $path)
+    {
+        preg_match('/^data:(application\/vnd[a-z\-\.]+);base64,(.*)/', $file_data, $matches);
+        if (count($matches) < 3) {
+            throw new ValidationException('Invalid Base64 Excel data');
+        }
+        if (!$file_blob = base64_decode(trim($matches[2]), true)) {
+            throw new ValidationException('Invalid Base64 Excel data');
+        }
+        return $this->storeBinaryUpload($file_blob, $path, $matches[1]);
+    }
+
+    /**
+     * Get the mime type of a binary file string
+     *
+     * @var String $file_str
+     * @return String mime type
+     **/
+    public function getFileStringMimeType(string $file_str)
+    {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_buffer($finfo, $file_str);
+        finfo_close($finfo);
+        return $mime_type;
+    }
+
+    /**
+     * Guess the extension for a file from it's mime-type
+     *
+     * @param String $mime_type
+     * @return String
+     **/
+    public function guessFileExtension(string $mime_type)
+    {
+        return (new MimeTypes)->getExtensions($mime_type)[0] ?? null;
     }
 
     /**

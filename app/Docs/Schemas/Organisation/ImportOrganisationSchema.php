@@ -16,22 +16,7 @@ class ImportOrganisationSchema extends Schema
         return parent::create($objectId)
             ->type(static::TYPE_OBJECT)
             ->properties(
-                Schema::integer('imported_row_count'),
-                Schema::array('invalid_rows')
-                    ->items(Schema::object()->properties(
-                        Schema::object('row')->properties(
-                            Schema::string('name'),
-                            Schema::string('description'),
-                            Schema::string('url'),
-                            Schema::string('email')
-                        ),
-                        Schema::object('errors')->properties(
-                            Schema::string('name'),
-                            Schema::string('description'),
-                            Schema::string('url'),
-                            Schema::string('email')
-                        )
-                    ))
+                Schema::integer('imported_row_count')
             );
     }
 }
