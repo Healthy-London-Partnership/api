@@ -14,7 +14,6 @@ use App\Http\Resources\TaxonomyCategoryResource;
 use App\Http\Responses\ResourceDeleted;
 use App\Models\Taxonomy;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class TaxonomyCategoryController extends Controller
