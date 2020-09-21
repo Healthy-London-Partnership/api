@@ -45,7 +45,7 @@ class ServiceResource extends JsonResource
             'offerings' => OfferingResource::collection($this->offerings),
             'social_medias' => SocialMediaResource::collection($this->socialMedias),
             'gallery_items' => ServiceGalleryItemResource::collection($this->serviceGalleryItems),
-            'category_taxonomies' => TaxonomyResource::collection($this->taxonomies),
+            'category_taxonomies' => TaxonomyCategoryResource::collection($this->taxonomies),
             'last_modified_at' => $this->last_modified_at->format(CarbonImmutable::ISO8601),
             'created_at' => $this->created_at->format(CarbonImmutable::ISO8601),
             'updated_at' => $this->updated_at->format(CarbonImmutable::ISO8601),
