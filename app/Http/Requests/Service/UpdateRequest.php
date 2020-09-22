@@ -101,6 +101,7 @@ class UpdateRequest extends FormRequest
                     $this->service->status
                 ),
             ],
+            'is_national' => ['boolean'],
             'intro' => ['string', 'min:1', 'max:300'],
             'description' => ['string', new MarkdownMinLength(1), new MarkdownMaxLength(1600)],
             'wait_time' => [
@@ -167,7 +168,7 @@ class UpdateRequest extends FormRequest
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
 
                     return $referralMethod === Service::REFERRAL_METHOD_INTERNAL
-                        && $this->service->referral_email === null;
+                    && $this->service->referral_email === null;
                 }),
                 new NullableIf(function () {
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
@@ -190,7 +191,7 @@ class UpdateRequest extends FormRequest
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
 
                     return $referralMethod === Service::REFERRAL_METHOD_EXTERNAL
-                        && $this->service->referral_url === null;
+                    && $this->service->referral_url === null;
                 }),
                 new NullableIf(function () {
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);

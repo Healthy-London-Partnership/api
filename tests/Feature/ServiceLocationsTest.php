@@ -188,6 +188,27 @@ class ServiceLocationsTest extends TestCase
         ]);
     }
 
+    public function test_service_admin_cannot_create_one_on_a_national_service()
+    {
+        $location = factory(Location::class)->create();
+        $service = factory(Service::class)->create([
+            'is_national' => true,
+        ]);
+        $user = factory(User::class)->create()->makeServiceAdmin($service);
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', '/core/v1/service-locations', [
+            'service_id' => $service->id,
+            'location_id' => $location->id,
+            'name' => null,
+            'regular_opening_hours' => [],
+            'holiday_opening_hours' => [],
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public function test_service_admin_can_create_one_with_opening_hours()
     {
         $location = factory(Location::class)->create();
@@ -606,7 +627,6 @@ class ServiceLocationsTest extends TestCase
     /*
      * Upload a specific service location's image.
      */
-
 
     public function test_organisation_admin_can_upload_image()
     {
