@@ -1,7 +1,6 @@
 os: linux
 dist: xenial
 
-if: tag IS blank
 branches:
   only:
     # Master
