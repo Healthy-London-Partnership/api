@@ -6,6 +6,7 @@ use App\Events\EndpointHit;
 use App\Models\Audit;
 use App\Models\Location;
 use App\Models\Organisation;
+use App\Models\Role;
 use App\Models\Service;
 use App\Models\SocialMedia;
 use App\Models\UpdateRequest;
@@ -1036,6 +1037,14 @@ class OrganisationsTest extends TestCase
             ],
         ]);
 
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => 'data:application/octet-stream;base64,' . base64_encode(file_get_contents(base_path('tests/assets/organisations_import_1_good.xls')))]);
+        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertJson([
+            'data' => [
+                'imported_row_count' => 1,
+            ],
+        ]);
+
         $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' . base64_encode(file_get_contents(base_path('tests/assets/organisations_import_1_good.xlsx')))]);
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
@@ -1155,6 +1164,33 @@ class OrganisationsTest extends TestCase
             'data' => [
                 'imported_row_count' => 5000,
             ],
+        ]);
+    }
+
+    public function test_organisation_admins_created_on_import()
+    {
+        Storage::fake('local');
+
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        $admin = factory(User::class)->create()->makeGlobalAdmin();
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", ['spreadsheet' => 'data:application/vnd.ms-excel;base64,' . base64_encode(file_get_contents(base_path('tests/assets/organisations_import_1_good.xls')))]);
+        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertJson([
+            'data' => [
+                'imported_row_count' => 1,
+            ],
+        ]);
+
+        $organisationId = DB::table('organisations')->latest()->pluck('id');
+
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $admin->id,
+            'organisation_id' => $organisationId,
+            'role_id' => Role::organisationAdmin()->id(),
         ]);
     }
 }

@@ -29,7 +29,7 @@ class ImportRequest extends FormRequest
         return [
             'spreadsheet' => [
                 'required',
-                'regex:/^data:application\/vnd[a-z\-\.]+;base64,/',
+                'regex:/^data:application\/[a-z\-\.]+;base64,/',
             ],
         ];
     }
