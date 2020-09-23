@@ -46,7 +46,7 @@ class SearchController extends Controller
 
         // Apply filter on `is_national` field.
         if ($request->has('is_national')) {
-            $search->applyIsNational((boolean) $request->is_national);
+            $search->applyIsNational((bool)$request->is_national);
         }
 
         // If location was passed, then parse the location.

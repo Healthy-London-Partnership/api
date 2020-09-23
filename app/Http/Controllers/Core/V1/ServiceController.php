@@ -60,25 +60,25 @@ class ServiceController extends Controller
             });
 
         $services = QueryBuilder::for($baseQuery)
-                ->allowedFilters([
-                    Filter::exact('id'),
-                    Filter::exact('organisation_id'),
-                    'name',
-                    Filter::custom('organisation_name', OrganisationNameFilter::class),
-                    Filter::exact('status'),
-                    Filter::exact('referral_method'),
-                    Filter::exact('is_national'),
-                    Filter::custom('has_permission', HasPermissionFilter::class),
-                ])
-                ->allowedIncludes(['organisation'])
-                ->allowedSorts([
-                    'name',
-                    Sort::custom('organisation_name', OrganisationNameSort::class),
-                    'status',
-                    'referral_method',
-                ])
-                ->defaultSort('name')
-                ->paginate(per_page($request->per_page));
+            ->allowedFilters([
+                Filter::exact('id'),
+                Filter::exact('organisation_id'),
+                'name',
+                Filter::custom('organisation_name', OrganisationNameFilter::class),
+                Filter::exact('status'),
+                Filter::exact('referral_method'),
+                Filter::exact('is_national'),
+                Filter::custom('has_permission', HasPermissionFilter::class),
+            ])
+            ->allowedIncludes(['organisation'])
+            ->allowedSorts([
+                'name',
+                Sort::custom('organisation_name', OrganisationNameSort::class),
+                'status',
+                'referral_method',
+            ])
+            ->defaultSort('name')
+            ->paginate(per_page($request->per_page));
 
         event(EndpointHit::onRead($request, 'Viewed all services'));
 
@@ -226,8 +226,8 @@ class ServiceController extends Controller
             ->where('id', $service->id);
 
         $service = QueryBuilder::for($baseQuery)
-                ->allowedIncludes(['organisation'])
-                ->firstOrFail();
+            ->allowedIncludes(['organisation'])
+            ->firstOrFail();
 
         event(EndpointHit::onRead($request, "Viewed service [{$service->id}]", $service));
 

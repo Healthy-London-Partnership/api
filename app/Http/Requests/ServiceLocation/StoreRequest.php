@@ -35,7 +35,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'service_id' => ['required', 'exists:services,id', new IsLocalService, new IsServiceAdmin($this->user())],
+            'service_id' => ['required', 'exists:services,id', new IsLocalService(), new IsServiceAdmin($this->user())],
             'location_id' => ['required', 'exists:locations,id'],
             'name' => ['present', 'nullable', 'string', 'min:1', 'max:255'],
 
