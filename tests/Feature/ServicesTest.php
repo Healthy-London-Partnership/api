@@ -1391,7 +1391,7 @@ class ServicesTest extends TestCase
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
             'status' => Service::STATUS_ACTIVE,
-            'is_national' => true,
+            'is_national' => false,
             'intro' => 'This is a test intro',
             'description' => 'Lorem ipsum',
             'wait_time' => null,

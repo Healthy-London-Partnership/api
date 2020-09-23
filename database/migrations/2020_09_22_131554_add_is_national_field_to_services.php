@@ -14,7 +14,7 @@ class AddIsNationalFieldToServices extends Migration
     public function up()
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->boolean('is_national')->after('status')->default(false);
+            $table->boolean('is_national')->after('status')->default(true);
         });
     }
 

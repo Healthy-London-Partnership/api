@@ -291,6 +291,12 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment(['id' => $nationalService->id]);
         $response->assertJsonMissing(['id' => $localService->id]);
+    }
+
+    public function test_filter_by_not_national_works()
+    {
+        $nationalService = factory(Service::class)->create(['is_national' => true]);
+        $localService = factory(Service::class)->create(['is_national' => false]);
 
         $response = $this->json('POST', '/core/v1/search', [
             'is_national' => false,
@@ -450,6 +456,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
         $localService = factory(Service::class)->create([
             'name' => 'Testing Service',
+            'is_national' => false,
         ]);
 
         $response = $this->json('POST', '/core/v1/search', [
@@ -469,7 +476,9 @@ class SearchTest extends TestCase implements UsesElasticsearch
             'is_national' => true,
         ]);
 
-        $localService = factory(Service::class)->create();
+        $localService = factory(Service::class)->create([
+            'is_national' => false,
+        ]);
         $localServiceLocation = factory(ServiceLocation::class)->create(['service_id' => $localService->id]);
         DB::table('locations')->where('id', $localServiceLocation->location->id)->update(['lat' => 45, 'lon' => 90]);
         $localService->save();

@@ -327,6 +327,7 @@ class ElasticsearchSearch implements Search
         $this->query['size'] = $perPage;
 
         $response = Service::searchRaw($this->query);
+
         $this->logMetrics($response);
 
         return $this->toResource($response, true, $page);
