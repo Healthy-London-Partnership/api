@@ -1117,7 +1117,7 @@ class OrganisationsTest extends TestCase
         ]);
     }
 
-    public function test_validate_file_import_100rows()
+    public function test_organisations_file_import_100rows()
     {
         Storage::fake('local');
 
@@ -1142,7 +1142,7 @@ class OrganisationsTest extends TestCase
         ]);
     }
 
-    public function test_validate_file_import_5krows()
+    public function test_organisations_file_import_5krows()
     {
         Storage::fake('local');
 
@@ -1185,12 +1185,12 @@ class OrganisationsTest extends TestCase
             ],
         ]);
 
-        $organisationId = DB::table('organisations')->latest()->pluck('id');
+        $organisationId = \DB::table('organisations')->latest()->pluck('id');
 
         $this->assertDatabaseHas('user_roles', [
             'user_id' => $admin->id,
             'organisation_id' => $organisationId,
-            'role_id' => Role::organisationAdmin()->id(),
+            'role_id' => Role::organisationAdmin()->id,
         ]);
     }
 }

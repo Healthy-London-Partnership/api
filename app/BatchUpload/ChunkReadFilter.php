@@ -7,26 +7,26 @@ use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 class ChunkReadFilter implements IReadFilter
 {
     /**
-     * Start row
+     * Start row.
      *
-     * @var Integer
-     **/
+     * @var int
+     */
     private $startRow = 0;
 
     /**
-     * End row
+     * End row.
      *
-     * @var Integer
-     **/
+     * @var int
+     */
     private $endRow = 0;
 
     /**
-     * Set the start and end rows
+     * Set the start and end rows.
      *
-     * @param Integer $startRow
-     * @param Integer $endRow
-     * @return null
-     **/
+     * @param int $startRow
+     * @param int $endRow
+     * @param mixed $chunkSize
+     */
     public function setRows($startRow, $chunkSize)
     {
         $this->startRow = $startRow;
@@ -34,17 +34,17 @@ class ChunkReadFilter implements IReadFilter
     }
 
     /**
-     * Should the cell be read
+     * Should the cell be read.
      *
-     * @param String $column
-     * @param Integer $row
-     * @param String $worksheetName
-     * @return Boolean
-     **/
+     * @param string $column
+     * @param int $row
+     * @param string $worksheetName
+     * @return bool
+     */
     public function readCell($column, $row, $worksheetName = '')
     {
         /**
-         * Only read the first (header) row, or rows within the chunksize
+         * Only read the first (header) row, or rows within the chunksize.
          */
         return ($row == 1) || ($row >= $this->startRow && $row < $this->endRow);
     }

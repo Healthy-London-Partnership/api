@@ -2,7 +2,6 @@
 
 namespace App\Docs\Schemas\File;
 
-use App\Models\File;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 

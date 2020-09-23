@@ -18,9 +18,8 @@ use Symfony\Component\Mime\MimeTypes;
 class ImportController extends Controller
 {
     /**
-     * Number of rows to import at once
-     *
-     **/
+     * Number of rows to import at once.
+     */
     const ROW_IMPORT_BATCH_SIZE = 100;
 
     /**
@@ -68,20 +67,21 @@ class ImportController extends Controller
             $responseStatus = 422;
             $response = ['errors' => ['spreadsheet' => $rejectedRows]];
         }
+
         return response()->json([
             'data' => $response,
         ], $responseStatus);
     }
 
     /**
-     * Store a binary file blob and update the models properties
+     * Store a binary file blob and update the models properties.
      *
-     * @param String $blob
-     * @param String $path
-     * @param String $mime_type
-     * @param String $ext
-     * @return String
-     **/
+     * @param string $blob
+     * @param string $path
+     * @param string $mime_type
+     * @param string $ext
+     * @return string
+     */
     protected function storeBinaryUpload(string $blob, string $path, $mime_type = null, $ext = null)
     {
         $path = empty($path) ? '' : trim($path, '/') . '/';
@@ -89,16 +89,17 @@ class ImportController extends Controller
         $ext = $ext ?? $this->guessFileExtension($mime_type);
         $filename = md5($blob) . '.' . $ext;
         Storage::disk('local')->put($path . $filename, $blob);
+
         return $path . $filename;
     }
 
     /**
-     * Store a Base 64 encoded data string
+     * Store a Base 64 encoded data string.
      *
      * @param string $file_data
      * @param string $path
-     * @return String
-     **/
+     * @return string
+     */
     protected function storeBase64FileString(string $file_data, string $path)
     {
         preg_match('/^data:(application\/[a-z\-\.]+);base64,(.*)/', $file_data, $matches);
@@ -108,41 +109,43 @@ class ImportController extends Controller
         if (!$file_blob = base64_decode(trim($matches[2]), true)) {
             throw ValidationException::withMessages(['spreadsheet' => 'Invalid Base64 Excel data']);
         }
+
         return $this->storeBinaryUpload($file_blob, $path, $matches[1]);
     }
 
     /**
-     * Get the mime type of a binary file string
+     * Get the mime type of a binary file string.
      *
-     * @var String $file_str
-     * @return String mime type
-     **/
+     * @var string
+     * @return string mime type
+     */
     protected function getFileStringMimeType(string $file_str)
     {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime_type = finfo_buffer($finfo, $file_str);
         finfo_close($finfo);
+
         return $mime_type;
     }
 
     /**
-     * Guess the extension for a file from it's mime-type
+     * Guess the extension for a file from it's mime-type.
      *
-     * @param String $mime_type
-     * @return String
-     **/
+     * @param string $mime_type
+     * @return string
+     */
     protected function guessFileExtension(string $mime_type)
     {
-        return (new MimeTypes)->getExtensions($mime_type)[0] ?? null;
+        return (new MimeTypes())->getExtensions($mime_type)[0] ?? null;
     }
 
     /**
-     * Validate the spreadsheet rows
+     * Validate the spreadsheet rows.
      *
-     * @param String $filePath
-     * @return Array
-     **/
-    protected function validateSpreadsheet(String $filePath)
+     * @param string $filePath
+     * @return array
+     */
+    protected function validateSpreadsheet(string $filePath)
     {
         $spreadsheetHandler = new SpreadsheetHandler();
 
@@ -178,12 +181,11 @@ class ImportController extends Controller
     }
 
     /**
-     * Import the uploaded file contents
+     * Import the uploaded file contents.
      *
-     * @param String $filePath
-     * @return null
-     **/
-    protected function importSpreadsheet(String $filePath)
+     * @param string $filePath
+     */
+    protected function importSpreadsheet(string $filePath)
     {
         $spreadsheetHandler = new SpreadsheetHandler();
 
@@ -192,13 +194,14 @@ class ImportController extends Controller
         $spreadsheetHandler->readHeaders();
 
         $importedRows = 0;
+        $adminRowBatch = [];
 
-        DB::transaction(function () use ($spreadsheetHandler, &$importedRows) {
+        DB::transaction(function () use ($spreadsheetHandler, &$importedRows, &$adminRowBatch) {
             $organisationAdminRoleId = Role::organisationAdmin()->id;
             $globalAdminIds = Role::globalAdmin()->users()->pluck('users.id');
             $organisationRowBatch = $adminRowBatch = [];
             foreach ($spreadsheetHandler->readRows() as $organisationRow) {
-                $organisationRow['id'] = (string) Str::uuid();
+                $organisationRow['id'] = (string)Str::uuid();
                 $organisationRow['slug'] = Str::slug($organisationRow['name'] . ' ' . uniqid(), '-');
                 $organisationRow['created_at'] = Date::now();
                 $organisationRow['updated_at'] = Date::now();
@@ -206,7 +209,7 @@ class ImportController extends Controller
 
                 foreach ($globalAdminIds as $globalAdminId) {
                     $adminRowBatch[] = [
-                        'id' => (string) Str::uuid(),
+                        'id' => (string)Str::uuid(),
                         'user_id' => $globalAdminId,
                         'role_id' => $organisationAdminRoleId,
                         'organisation_id' => $organisationRow['id'],
@@ -217,19 +220,16 @@ class ImportController extends Controller
 
                 if (count($organisationRowBatch) === self::ROW_IMPORT_BATCH_SIZE) {
                     DB::table('organisations')->insert($organisationRowBatch);
-                    $importedRows += self::ROW_IMPORT_BATCH_SIZE;
-                    $organisationRowBatch = [];
-
                     DB::table('user_roles')->insert($adminRowBatch);
-                    $adminRowBatch = [];
+                    $importedRows += self::ROW_IMPORT_BATCH_SIZE;
+                    $organisationRowBatch = $adminRowBatch = [];
                 }
             }
 
             if (count($organisationRowBatch) && count($organisationRowBatch) !== self::ROW_IMPORT_BATCH_SIZE) {
                 DB::table('organisations')->insert($organisationRowBatch);
-                $importedRows += count($organisationRowBatch);
-
                 DB::table('user_roles')->insert($adminRowBatch);
+                $importedRows += count($organisationRowBatch);
             }
         }, 5);
 

@@ -2,9 +2,9 @@
 
 namespace App\Docs\Paths\Organisations;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use App\Docs\Operations\Organisations\ImportOrganisationsOperation;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
 
 class OrganisationsImportPath extends PathItem
 {

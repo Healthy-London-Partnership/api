@@ -16,6 +16,7 @@ class ImportRequest extends FormRequest
         if ($this->user()) {
             return $this->user()->isSuperAdmin();
         }
+
         return false;
     }
 

@@ -7,58 +7,59 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class SpreadsheetHandler
 {
     /**
-     * The spreadsheet import / export library
+     * The spreadsheet import / export library.
      *
      * @var \PhpOffice\PhpSpreadsheet\Reader\Xlsx | \PhpOffice\PhpSpreadsheet\Reader\Xls
-     **/
+     */
     protected $reader;
 
     /**
-     * Path to the spreadsheet file
+     * Path to the spreadsheet file.
      *
-     * @var String
-     **/
+     * @var string
+     */
     protected $spreadsheetPath;
 
     /**
-     * Reader filter to break file into chunks
+     * Reader filter to break file into chunks.
      *
      * @var ChunkReadFilter
-     **/
+     */
     protected $chunkFilter;
 
     /**
-     * The spreadsheet reader chunk size
+     * The spreadsheet reader chunk size.
      *
-     * @var Integer
-     **/
+     * @var int
+     */
     protected $chunkSize = 2048;
 
     /**
-     * The imported header row
+     * The imported header row.
      *
      * @var \Array
-     **/
+     */
     public $headers = [];
 
     /**
-     * The imported rows
+     * The imported rows.
      *
      * @var \Illuminate\Support\Collection
-     **/
+     */
     public $rows = [];
 
     /**
-     * Rows which failed to validate
+     * Rows which failed to validate.
      *
      * @var \Illuminate\Support\Collection
-     **/
+     */
     public $errors;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     **/
+     * @param mixed $chunkSize
+     */
     public function __construct($chunkSize = 2048)
     {
         $this->chunkFilter = new ChunkReadFilter();
@@ -68,23 +69,21 @@ class SpreadsheetHandler
     }
 
     /**
-     * Import the Spreadsheet
-     *
-     * @return null
-     **/
-    public function import(String $spreadsheetPath)
+     * Import the Spreadsheet.
+     */
+    public function import(string $spreadsheetPath)
     {
         $this->spreadsheetPath = $spreadsheetPath;
 
         /**
-         * Create the relevant reader based on the file type
+         * Create the relevant reader based on the file type.
          */
         $fileType = IOFactory::identify($this->spreadsheetPath);
         $this->reader = IOFactory::createReader($fileType);
         $this->reader->setReadDataOnly(true);
 
         /**
-         * Set the read filter
+         * Set the read filter.
          */
         $this->reader->setReadFilter($this->chunkFilter);
 
@@ -92,12 +91,11 @@ class SpreadsheetHandler
     }
 
     /**
-     * Read the spreadsheet headers
+     * Read the spreadsheet headers.
      *
      * @param type name
-     * @return null
      * @author
-     **/
+     */
     public function readHeaders()
     {
         $this->chunkFilter->setRows(1, 0);
@@ -105,20 +103,20 @@ class SpreadsheetHandler
         $worksheet = $spreadsheet->getActiveSheet();
 
         /**
-         * Limit the row iterator to the first row
+         * Limit the row iterator to the first row.
          */
         $headerRow = $worksheet->getRowIterator(1, 1)->current();
 
         /**
          * Build the headers row.
-         * By default the cellIterator will only return populated cells
+         * By default the cellIterator will only return populated cells.
          */
         foreach ($headerRow->getCellIterator() as $cell) {
             $this->headers[$cell->getColumn()] = $cell->getValue();
         }
 
         /**
-         * Free the spreadsheet from memory
+         * Free the spreadsheet from memory.
          */
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
@@ -129,8 +127,7 @@ class SpreadsheetHandler
      * This method is an iterator and yields the rows.
      *
      * @param type name
-     * @return null
-     **/
+     */
     public function readRows()
     {
         for ($startRow = 2; $startRow <= 65536; $startRow += $this->chunkSize) {
@@ -142,30 +139,29 @@ class SpreadsheetHandler
              * The read filter allows for the header row, so after all data rows have been
              * read the highest data row will be 1 (the header row). So if this is the
              * highest row we need to bail.
-             **/
-
+             */
             if ($worksheet->getHighestDataRow() == 1) {
                 break;
             }
 
             /**
-             * Iterate over the rows in chunks defined by $this->chunkSize
+             * Iterate over the rows in chunks defined by $this->chunkSize.
              */
             foreach ($worksheet->getRowIterator($startRow) as $rowIterator) {
                 $row = [];
 
                 /**
-                 * Limit the cell iterator by the columns used in the heading row
+                 * Limit the cell iterator by the columns used in the heading row.
                  */
                 $cellIterator = $rowIterator->getCellIterator(array_key_first($this->headers), array_key_last($this->headers));
 
                 /**
-                 * Accept empty cells as not all cells will be populated
+                 * Accept empty cells as not all cells will be populated.
                  */
                 $cellIterator->setIterateOnlyExistingCells(false);
 
                 /**
-                 * Build the row from the cells
+                 * Build the row from the cells.
                  */
                 foreach ($cellIterator as $cell) {
                     if (isset($this->headers[$cell->getColumn()])) {
@@ -174,13 +170,13 @@ class SpreadsheetHandler
                 }
 
                 /**
-                 * Yield the row
+                 * Yield the row.
                  */
                 yield $row;
             }
 
             /**
-             * Free the spreadsheet from memory
+             * Free the spreadsheet from memory.
              */
             $spreadsheet->disconnectWorksheets();
             unset($spreadsheet);
