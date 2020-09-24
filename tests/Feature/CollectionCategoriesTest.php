@@ -546,6 +546,51 @@ class CollectionCategoriesTest extends TestCase
         ]);
     }
 
+    public function test_guest_can_view_one_by_slug()
+    {
+        $collectionCategory = Collection::categories()->inRandomOrder()->firstOrFail();
+
+        $response = $this->json('GET', "/core/v1/collections/categories/{$collectionCategory->slug}");
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonResource([
+            'id',
+            'slug',
+            'name',
+            'intro',
+            'icon',
+            'order',
+            'sideboxes' => [
+                '*' => [
+                    'title',
+                    'content',
+                ],
+            ],
+            'category_taxonomies' => [
+                '*' => [
+                    'id',
+                    'parent_id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ],
+            ],
+            'created_at',
+            'updated_at',
+        ]);
+        $response->assertJsonFragment([
+            'id' => $collectionCategory->id,
+            'slug' => $collectionCategory->slug,
+            'name' => $collectionCategory->name,
+            'intro' => $collectionCategory->meta['intro'],
+            'icon' => $collectionCategory->meta['icon'],
+            'order' => $collectionCategory->order,
+            'sideboxes' => $collectionCategory->meta['sideboxes'],
+            'created_at' => $collectionCategory->created_at->format(CarbonImmutable::ISO8601),
+            'updated_at' => $collectionCategory->updated_at->format(CarbonImmutable::ISO8601),
+        ]);
+    }
+
     public function test_audit_created_when_viewed()
     {
         $this->fakeEvents();
