@@ -29,6 +29,7 @@ class CollectionCategoriesTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCollection([
             'id',
+            'slug',
             'name',
             'intro',
             'icon',
@@ -169,6 +170,7 @@ class CollectionCategoriesTest extends TestCase
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonResource([
             'id',
+            'slug',
             'name',
             'intro',
             'icon',
@@ -220,6 +222,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -230,6 +233,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'seconds',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -240,6 +244,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -279,6 +284,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -289,6 +295,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -299,6 +306,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -338,6 +346,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -348,6 +357,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -358,6 +368,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -422,6 +433,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -432,6 +444,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -497,6 +510,7 @@ class CollectionCategoriesTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonResource([
             'id',
+            'slug',
             'name',
             'intro',
             'icon',
@@ -521,6 +535,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $response->assertJsonFragment([
             'id' => $collectionCategory->id,
+            'slug' => $collectionCategory->slug,
             'name' => $collectionCategory->name,
             'intro' => $collectionCategory->meta['intro'],
             'icon' => $collectionCategory->meta['icon'],
@@ -636,6 +651,7 @@ class CollectionCategoriesTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonResource([
             'id',
+            'slug',
             'name',
             'intro',
             'icon',
@@ -682,6 +698,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -692,6 +709,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -702,6 +720,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -740,6 +759,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -750,6 +770,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -760,6 +781,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -798,6 +820,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -808,6 +831,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -818,6 +842,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -856,6 +881,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $category = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -891,6 +917,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $category = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -1057,6 +1084,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -1067,6 +1095,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -1077,6 +1106,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -1108,6 +1138,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -1118,6 +1149,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -1128,6 +1160,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
@@ -1159,6 +1192,7 @@ class CollectionCategoriesTest extends TestCase
         $user->makeSuperAdmin();
         $first = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'first',
             'name' => 'First',
             'order' => 1,
             'meta' => [
@@ -1169,6 +1203,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $second = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'second',
             'name' => 'Second',
             'order' => 2,
             'meta' => [
@@ -1179,6 +1214,7 @@ class CollectionCategoriesTest extends TestCase
         ]);
         $third = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'third',
             'name' => 'Third',
             'order' => 3,
             'meta' => [
