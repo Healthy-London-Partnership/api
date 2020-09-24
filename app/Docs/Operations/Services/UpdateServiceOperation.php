@@ -2,13 +2,15 @@
 
 namespace App\Docs\Operations\Services;
 
-use App\Docs\Responses\UpdateRequestReceivedResponse;
+use App\Docs\Schemas\ResourceSchema;
+use App\Docs\Schemas\Service\ServiceSchema;
 use App\Docs\Schemas\Service\UpdateServiceSchema;
 use App\Docs\Tags\ServicesTag;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 
 class UpdateServiceOperation extends Operation
@@ -49,7 +51,11 @@ EOT
                     )
             )
             ->responses(
-                UpdateRequestReceivedResponse::create(null, UpdateServiceSchema::create())
+                Response::created()->content(
+                    MediaType::json()->schema(
+                        ResourceSchema::create(null, ServiceSchema::create())
+                    )
+                )
             );
     }
 }
