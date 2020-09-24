@@ -1984,6 +1984,7 @@ class ServicesTest extends TestCase
             'slug' => 'test-service',
             'is_national' => false,
         ]);
+        $taxonomy = Taxonomy::category()->children()->firstOrFail();
         $location = factory(Location::class)->create();
         $service = factory(Service::class)->create();
         $service->serviceLocations()->create(['location_id' => $location->id]);
@@ -2028,7 +2029,9 @@ class ServicesTest extends TestCase
             'useful_infos' => [],
             'offerings' => [],
             'social_medias' => [],
-            'category_taxonomies' => [],
+            'category_taxonomies' => [
+                $taxonomy->id,
+            ],
         ];
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 

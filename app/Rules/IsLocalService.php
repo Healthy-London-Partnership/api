@@ -16,9 +16,9 @@ class IsLocalService implements Rule
      */
     public function passes($attribute, $value)
     {
-        return !Service::query()->where([
-            'id' => $value,
-            'is_national' => true,
+        return Service::query()->where([
+            ['id', '=', $value],
+            ['is_national', '<>', true],
         ])->exists();
     }
 
