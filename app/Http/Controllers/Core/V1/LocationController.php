@@ -147,21 +147,18 @@ class LocationController extends Controller
     public function update(UpdateRequest $request, Location $location)
     {
         return DB::transaction(function () use ($request, $location) {
-            $updateRequest = $location->updateRequests()->create([
-                'user_id' => $request->user()->id,
-                'data' => array_filter_missing([
-                    'address_line_1' => $request->missing('address_line_1'),
-                    'address_line_2' => $request->missing('address_line_2'),
-                    'address_line_3' => $request->missing('address_line_3'),
-                    'city' => $request->missing('city'),
-                    'county' => $request->missing('county'),
-                    'postcode' => $request->missing('postcode'),
-                    'country' => $request->missing('country'),
-                    'accessibility_info' => $request->missing('accessibility_info'),
-                    'has_wheelchair_access' => $request->missing('has_wheelchair_access'),
-                    'has_induction_loop' => $request->missing('has_induction_loop'),
-                    'image_file_id' => $request->missing('image_file_id'),
-                ]),
+            $location->update([
+                'address_line_1' => $request->input('address_line_1', $location->address_line_1),
+                'address_line_2' => $request->input('address_line_2', $location->address_line_2),
+                'address_line_3' => $request->input('address_line_3', $location->address_line_3),
+                'city' => $request->input('city', $location->city),
+                'county' => $request->input('county', $location->county),
+                'postcode' => $request->input('postcode', $location->postcode),
+                'country' => $request->input('country', $location->country),
+                'accessibility_info' => $request->input('accessibility_info', $location->accessibility_info),
+                'has_wheelchair_access' => $request->input('has_wheelchair_access', $location->has_wheelchair_access),
+                'has_induction_loop' => $request->input('has_induction_loop', $location->has_induction_loop),
+                'image_file_id' => $request->input('image_file_id', $location->image_file_id),
             ]);
 
             if ($request->filled('image_file_id')) {
@@ -176,7 +173,7 @@ class LocationController extends Controller
 
             event(EndpointHit::onUpdate($request, "Updated location [{$location->id}]", $location));
 
-            return new UpdateRequestReceived($updateRequest);
+            return new LocationResource($location);
         });
     }
 
