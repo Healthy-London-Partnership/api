@@ -13,6 +13,7 @@ class AddIsNationalFieldToServices extends Migration
     {
         Schema::table('services', function (Blueprint $table) {
             $table->boolean('is_national')->after('status')->default(true);
+            $table->index('is_national');
         });
     }
 
@@ -22,6 +23,7 @@ class AddIsNationalFieldToServices extends Migration
     public function down()
     {
         Schema::table('services', function (Blueprint $table) {
+            $table->dropIndex(['is_national']);
             $table->dropColumn('is_national');
         });
     }
