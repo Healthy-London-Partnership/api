@@ -41,6 +41,7 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
     const TYPE_HELPLINE = 'helpline';
     const TYPE_INFORMATION = 'information';
     const TYPE_APP = 'app';
+    const TYPE_ADVICE = 'advice';
 
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
@@ -237,8 +238,8 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
             'referral_email' => $data['referral_email'] ?? $this->referral_email,
             'referral_url' => $data['referral_url'] ?? $this->referral_url,
             'logo_file_id' => array_key_exists('logo_file_id', $data)
-                ? $data['logo_file_id']
-                : $this->logo_file_id,
+            ? $data['logo_file_id']
+            : $this->logo_file_id,
             // This must always be updated regardless of the fields changed.
             'last_modified_at' => Date::now(),
         ]);

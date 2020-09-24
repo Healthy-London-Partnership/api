@@ -85,6 +85,7 @@ class UpdateRequest extends FormRequest
                     Service::TYPE_HELPLINE,
                     Service::TYPE_INFORMATION,
                     Service::TYPE_APP,
+                    Service::TYPE_ADVICE,
                 ]),
             ],
             'status' => [
@@ -167,7 +168,7 @@ class UpdateRequest extends FormRequest
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
 
                     return $referralMethod === Service::REFERRAL_METHOD_INTERNAL
-                        && $this->service->referral_email === null;
+                    && $this->service->referral_email === null;
                 }),
                 new NullableIf(function () {
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
@@ -190,7 +191,7 @@ class UpdateRequest extends FormRequest
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
 
                     return $referralMethod === Service::REFERRAL_METHOD_EXTERNAL
-                        && $this->service->referral_url === null;
+                    && $this->service->referral_url === null;
                 }),
                 new NullableIf(function () {
                     $referralMethod = $this->input('referral_method', $this->service->referral_method);
