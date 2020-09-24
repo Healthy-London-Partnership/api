@@ -22,14 +22,6 @@ class UpdateServiceOperation extends Operation
      */
     public static function create(string $objectId = null): BaseObject
     {
-        $updateServiceSchema = UpdateServiceSchema::create();
-        $updateServiceSchema = $updateServiceSchema->properties(
-            Schema::boolean('preview')
-                ->default(false)
-                ->description('When enabled, only a preview of the update request will be generated'),
-            ...$updateServiceSchema->properties
-        );
-
         return parent::create($objectId)
             ->action(static::ACTION_PUT)
             ->tags(ServicesTag::create())
@@ -47,7 +39,7 @@ EOT
                 RequestBody::create()
                     ->required()
                     ->content(
-                        MediaType::json()->schema($updateServiceSchema)
+                        MediaType::json()->schema(UpdateServiceSchema::create())
                     )
             )
             ->responses(

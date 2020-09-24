@@ -15,6 +15,7 @@ use App\Http\Responses\ResourceDeleted;
 use App\Http\Responses\UpdateRequestReceived;
 use App\Models\File;
 use App\Models\Organisation;
+use App\Normalisers\SocialMediaNormaliser;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\Filter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -130,12 +131,16 @@ class OrganisationController extends Controller
      * Update the specified resource in storage.
      *
      * @param \App\Http\Requests\Organisation\UpdateRequest $request
+     * @param \App\Normalisers\SocialMediaNormaliser $socialMediaNormaliser
      * @param \App\Models\Organisation $organisation
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Organisation $organisation)
-    {
-        return DB::transaction(function () use ($request, $organisation) {
+    public function update(
+        UpdateRequest $request,
+        SocialMediaNormaliser $socialMediaNormaliser,
+        Organisation $organisation
+    ) {
+        return DB::transaction(function () use ($request, $socialMediaNormaliser, $organisation) {
             $organisation->update([
                 'slug' => $request->input('slug', $organisation->slug),
                 'name' => $request->input('name', $organisation->name),
@@ -150,15 +155,10 @@ class OrganisationController extends Controller
             // Update the social media records.
             if ($request->has('social_medias')) {
                 $organisation->socialMedias()->delete();
-
-                $social = [];
-                foreach ($request->input('social_medias') as $socialMedia) {
-                    $social[] = [
-                        'type' => $socialMedia['type'],
-                        'url' => $socialMedia['url'],
-                    ];
-                }
-                $organisation->socialMedias()->createMany($social);
+                $socialMedias = $socialMediaNormaliser->normaliseMultiple(
+                    $request->input('social_medias')
+                );
+                $organisation->socialMedias()->createMany($socialMedias);
             }
 
             if ($request->filled('logo_file_id')) {
