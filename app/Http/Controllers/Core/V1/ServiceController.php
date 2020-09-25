@@ -92,11 +92,26 @@ class ServiceController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \App\Http\Requests\Service\StoreRequest $request
+     * @param \App\Normalisers\UsefulInfoNormaliser $usefulInfoNormaliser
+     * @param \App\Normalisers\OfferingNormaliser $offeringNormaliser
+     * @param \App\Normalisers\SocialMediaNormaliser $socialMediaNormaliser
+     * @param \App\Normalisers\GalleryItemNormaliser $galleryItemNormaliser
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRequest $request)
-    {
-        return DB::transaction(function () use ($request) {
+    public function store(
+        StoreRequest $request,
+        UsefulInfoNormaliser $usefulInfoNormaliser,
+        OfferingNormaliser $offeringNormaliser,
+        SocialMediaNormaliser $socialMediaNormaliser,
+        GalleryItemNormaliser $galleryItemNormaliser
+    ) {
+        return DB::transaction(function () use (
+            $request,
+            $usefulInfoNormaliser,
+            $offeringNormaliser,
+            $socialMediaNormaliser,
+            $galleryItemNormaliser
+        ) {
             // Create the service record.
             /** @var \App\Models\Service $service */
             $service = Service::create([
@@ -161,36 +176,20 @@ class ServiceController extends Controller
             ]);
 
             // Create the useful info records.
-            foreach ($request->useful_infos as $usefulInfo) {
-                $service->usefulInfos()->create([
-                    'title' => $usefulInfo['title'],
-                    'description' => sanitize_markdown($usefulInfo['description']),
-                    'order' => $usefulInfo['order'],
-                ]);
-            }
+            $usefulInfos = $usefulInfoNormaliser->normaliseMultiple($request->useful_infos);
+            $service->usefulInfos()->createMany($usefulInfos);
 
             // Create the offering records.
-            foreach ($request->offerings as $offering) {
-                $service->offerings()->create([
-                    'offering' => $offering['offering'],
-                    'order' => $offering['order'],
-                ]);
-            }
+            $offerings = $offeringNormaliser->normaliseMultiple($request->offerings);
+            $service->offerings()->createMany($offerings);
 
             // Create the social media records.
-            foreach ($request->social_medias as $socialMedia) {
-                $service->socialMedias()->create([
-                    'type' => $socialMedia['type'],
-                    'url' => $socialMedia['url'],
-                ]);
-            }
+            $socialMedias = $socialMediaNormaliser->normaliseMultiple($request->social_medias);
+            $service->socialMedias()->createMany($socialMedias);
 
             // Create the gallery item records.
-            foreach ($request->gallery_items as $galleryItem) {
-                $service->serviceGalleryItems()->create([
-                    'file_id' => $galleryItem['file_id'],
-                ]);
-            }
+            $galleryItems = $galleryItemNormaliser->normaliseMultiple($request->gallery_items);
+            $service->serviceGalleryItems()->createMany($galleryItems);
 
             // Create the category taxonomy records.
             $taxonomies = Taxonomy::whereIn('id', $request->category_taxonomies)->get();
