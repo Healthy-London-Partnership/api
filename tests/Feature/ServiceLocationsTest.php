@@ -28,7 +28,7 @@ class ServiceLocationsTest extends TestCase
     public function test_guest_can_list_them()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = $service->serviceLocations()->create(['location_id' => $location->id]);
 
         $response = $this->json('GET', '/core/v1/service-locations');
@@ -63,7 +63,7 @@ class ServiceLocationsTest extends TestCase
     public function test_guest_can_list_them_with_opening_hours()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = $service->serviceLocations()->create(['location_id' => $location->id]);
         $regularOpeningHour = factory(RegularOpeningHour::class)->create([
             'service_location_id' => $serviceLocation->id,
@@ -130,7 +130,7 @@ class ServiceLocationsTest extends TestCase
 
     public function test_service_worker_cannot_create_one()
     {
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $user = factory(User::class)->create()->makeServiceWorker($service);
 
         Passport::actingAs($user);
@@ -143,8 +143,8 @@ class ServiceLocationsTest extends TestCase
     public function test_service_admin_for_another_service_cannot_create_one()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
-        $anotherService = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
+        $anotherService = factory(Service::class)->create(['is_national' => false]);
         $user = factory(User::class)->create()->makeServiceAdmin($anotherService);
 
         Passport::actingAs($user);
@@ -163,7 +163,7 @@ class ServiceLocationsTest extends TestCase
     public function test_service_admin_can_create_one()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $user = factory(User::class)->create()->makeServiceAdmin($service);
 
         Passport::actingAs($user);
@@ -187,10 +187,31 @@ class ServiceLocationsTest extends TestCase
         ]);
     }
 
+    public function test_service_admin_cannot_create_one_on_a_national_service()
+    {
+        $location = factory(Location::class)->create();
+        $service = factory(Service::class)->create([
+            'is_national' => true,
+        ]);
+        $user = factory(User::class)->create()->makeServiceAdmin($service);
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', '/core/v1/service-locations', [
+            'service_id' => $service->id,
+            'location_id' => $location->id,
+            'name' => null,
+            'regular_opening_hours' => [],
+            'holiday_opening_hours' => [],
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public function test_service_admin_can_create_one_with_opening_hours()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $user = factory(User::class)->create()->makeServiceAdmin($service);
 
         Passport::actingAs($user);
@@ -249,7 +270,7 @@ class ServiceLocationsTest extends TestCase
         $this->fakeEvents();
 
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $user = factory(User::class)->create()->makeServiceAdmin($service);
 
         Passport::actingAs($user);
@@ -276,7 +297,7 @@ class ServiceLocationsTest extends TestCase
     public function test_guest_can_view_one()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = $service->serviceLocations()->create(['location_id' => $location->id]);
 
         $response = $this->json('GET', "/core/v1/service-locations/{$serviceLocation->id}");
@@ -298,7 +319,7 @@ class ServiceLocationsTest extends TestCase
     public function test_guest_can_view_one_with_opening_hours()
     {
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = $service->serviceLocations()->create(['location_id' => $location->id]);
         $regularOpeningHour = factory(RegularOpeningHour::class)->create([
             'service_location_id' => $serviceLocation->id,
@@ -346,7 +367,7 @@ class ServiceLocationsTest extends TestCase
         $this->fakeEvents();
 
         $location = factory(Location::class)->create();
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = $service->serviceLocations()->create(['location_id' => $location->id]);
 
         $this->json('GET', "/core/v1/service-locations/{$serviceLocation->id}");
@@ -598,7 +619,6 @@ class ServiceLocationsTest extends TestCase
      * Upload a specific service location's image.
      */
 
-
     public function test_organisation_admin_can_upload_image()
     {
         /** @var \App\Models\User $user */
@@ -614,7 +634,7 @@ class ServiceLocationsTest extends TestCase
         ]);
 
         $response = $this->json('POST', '/core/v1/service-locations', [
-            'service_id' => factory(Service::class)->create()->id,
+            'service_id' => factory(Service::class)->create(['is_national' => false])->id,
             'location_id' => factory(Location::class)->create()->id,
             'name' => null,
             'regular_opening_hours' => [],

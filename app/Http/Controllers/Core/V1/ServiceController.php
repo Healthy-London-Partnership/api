@@ -71,6 +71,7 @@ class ServiceController extends Controller
                 Filter::custom('organisation_name', OrganisationNameFilter::class),
                 Filter::exact('status'),
                 Filter::exact('referral_method'),
+                Filter::exact('is_national'),
                 Filter::custom('has_permission', HasPermissionFilter::class),
             ])
             ->allowedIncludes(['organisation'])
@@ -120,6 +121,7 @@ class ServiceController extends Controller
                 'name' => $request->name,
                 'type' => $request->type,
                 'status' => $request->status,
+                'is_national' => $request->is_national,
                 'intro' => $request->intro,
                 'description' => sanitize_markdown($request->description),
                 'wait_time' => $request->wait_time,
@@ -268,6 +270,7 @@ class ServiceController extends Controller
                 'name' => $request->input('name', $service->name),
                 'type' => $request->input('type', $service->type),
                 'status' => $request->input('status', $service->status),
+                'is_national' => $request->missing('is_national'),
                 'intro' => $request->input('intro', $service->intro),
                 'description' => sanitize_markdown(
                     $request->input('description', $service->description)
