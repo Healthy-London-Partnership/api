@@ -8,7 +8,6 @@ use App\Http\Requests\Service\Logo\ShowRequest;
 use App\Models\File;
 use App\Models\Service;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 
 class GalleryItemController extends Controller
 {

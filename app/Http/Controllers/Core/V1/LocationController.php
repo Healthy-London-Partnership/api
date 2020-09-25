@@ -11,7 +11,6 @@ use App\Http\Requests\Location\StoreRequest;
 use App\Http\Requests\Location\UpdateRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Responses\ResourceDeleted;
-use App\Http\Responses\UpdateRequestReceived;
 use App\Models\File;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;

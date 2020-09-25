@@ -12,7 +12,6 @@ use App\Http\Requests\Organisation\StoreRequest;
 use App\Http\Requests\Organisation\UpdateRequest;
 use App\Http\Resources\OrganisationResource;
 use App\Http\Responses\ResourceDeleted;
-use App\Http\Responses\UpdateRequestReceived;
 use App\Models\File;
 use App\Models\Organisation;
 use App\Normalisers\SocialMediaNormaliser;

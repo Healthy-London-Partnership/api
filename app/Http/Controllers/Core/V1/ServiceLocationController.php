@@ -11,7 +11,6 @@ use App\Http\Requests\ServiceLocation\StoreRequest;
 use App\Http\Requests\ServiceLocation\UpdateRequest;
 use App\Http\Resources\ServiceLocationResource;
 use App\Http\Responses\ResourceDeleted;
-use App\Http\Responses\UpdateRequestReceived;
 use App\Models\File;
 use App\Models\RegularOpeningHour;
 use App\Models\ServiceLocation;
