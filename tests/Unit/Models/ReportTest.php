@@ -14,7 +14,6 @@ use App\Models\Role;
 use App\Models\SearchHistory;
 use App\Models\Service;
 use App\Models\ServiceLocation;
-use App\Models\UpdateRequest;
 use App\Models\User;
 use App\Support\Coordinate;
 use Carbon\CarbonImmutable;
