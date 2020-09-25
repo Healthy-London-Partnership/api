@@ -15,6 +15,7 @@ use App\Models\Service;
 use App\Models\ServiceLocation;
 use App\Models\ServiceTaxonomy;
 use App\Models\Taxonomy;
+use App\Models\User;
 use App\Observers\CollectionObserver;
 use App\Observers\CollectionTaxonomyObserver;
 use App\Observers\FileObserver;
@@ -55,6 +56,8 @@ class ModelServiceProvider extends ServiceProvider
         Relation::morphMap([
             'services' => Service::class,
             'organisations' => Organisation::class,
+            'referrals' => Referral::class,
+            'users' => User::class,
         ]);
     }
 
