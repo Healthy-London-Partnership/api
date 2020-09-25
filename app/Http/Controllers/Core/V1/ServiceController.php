@@ -23,7 +23,6 @@ use App\Normalisers\GalleryItemNormaliser;
 use App\Normalisers\OfferingNormaliser;
 use App\Normalisers\SocialMediaNormaliser;
 use App\Normalisers\UsefulInfoNormaliser;
-use App\Support\MissingValue;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -270,7 +269,7 @@ class ServiceController extends Controller
                 'name' => $request->input('name', $service->name),
                 'type' => $request->input('type', $service->type),
                 'status' => $request->input('status', $service->status),
-                'is_national' => $request->missing('is_national'),
+                'is_national' => $request->input('is_national'),
                 'intro' => $request->input('intro', $service->intro),
                 'description' => sanitize_markdown(
                     $request->input('description', $service->description)
