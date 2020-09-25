@@ -142,28 +142,6 @@ class ServiceController extends Controller
                 'last_modified_at' => Date::now(),
             ]);
 
-            if ($request->filled('gallery_items')) {
-                foreach ($request->gallery_items as $galleryItem) {
-                    /** @var \App\Models\File $file */
-                    $file = File::findOrFail($galleryItem['file_id'])->assigned();
-
-                    // Create resized version for common dimensions.
-                    foreach (config('hlp.cached_image_dimensions') as $maxDimension) {
-                        $file->resizedVersion($maxDimension);
-                    }
-                }
-            }
-
-            if ($request->filled('logo_file_id')) {
-                /** @var \App\Models\File $file */
-                $file = File::findOrFail($request->logo_file_id)->assigned();
-
-                // Create resized version for common dimensions.
-                foreach (config('hlp.cached_image_dimensions') as $maxDimension) {
-                    $file->resizedVersion($maxDimension);
-                }
-            }
-
             // Create the service criterion record.
             $service->serviceCriterion()->create([
                 'age_group' => $request->criteria['age_group'],
@@ -198,6 +176,28 @@ class ServiceController extends Controller
 
             // Ensure conditional fields are reset if needed.
             $service->resetConditionalFields();
+
+            if ($request->filled('gallery_items')) {
+                foreach ($request->gallery_items as $galleryItem) {
+                    /** @var \App\Models\File $file */
+                    $file = File::findOrFail($galleryItem['file_id'])->assigned();
+
+                    // Create resized version for common dimensions.
+                    foreach (config('hlp.cached_image_dimensions') as $maxDimension) {
+                        $file->resizedVersion($maxDimension);
+                    }
+                }
+            }
+
+            if ($request->filled('logo_file_id')) {
+                /** @var \App\Models\File $file */
+                $file = File::findOrFail($request->logo_file_id)->assigned();
+
+                // Create resized version for common dimensions.
+                foreach (config('hlp.cached_image_dimensions') as $maxDimension) {
+                    $file->resizedVersion($maxDimension);
+                }
+            }
 
             event(EndpointHit::onCreate($request, "Created service [{$service->id}]", $service));
 
@@ -269,7 +269,7 @@ class ServiceController extends Controller
                 'name' => $request->input('name', $service->name),
                 'type' => $request->input('type', $service->type),
                 'status' => $request->input('status', $service->status),
-                'is_national' => $request->input('is_national'),
+                'is_national' => $request->input('is_national', $service->is_national),
                 'intro' => $request->input('intro', $service->intro),
                 'description' => sanitize_markdown(
                     $request->input('description', $service->description)
@@ -340,6 +340,9 @@ class ServiceController extends Controller
                 );
                 $service->serviceGalleryItems()->createMany($galleryItems);
             }
+
+            // Ensure conditional fields are reset if needed.
+            $service->resetConditionalFields();
 
             if ($request->filled('gallery_items')) {
                 foreach ($request->gallery_items as $galleryItem) {
