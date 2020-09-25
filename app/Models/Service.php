@@ -62,6 +62,7 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
      * @var array
      */
     protected $casts = [
+        'is_national' => 'boolean',
         'is_free' => 'boolean',
         'show_referral_disclaimer' => 'boolean',
         'last_modified_at' => 'datetime',
@@ -104,6 +105,7 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
             'description' => ['type' => 'text'],
             'wait_time' => ['type' => 'keyword'],
             'is_free' => ['type' => 'boolean'],
+            'is_national' => ['type' => 'boolean'],
             'status' => ['type' => 'keyword'],
             'organisation_name' => [
                 'type' => 'text',
@@ -152,6 +154,7 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
             'description' => $this->description,
             'wait_time' => $this->wait_time,
             'is_free' => $this->is_free,
+            'is_national' => $this->is_national,
             'status' => $this->status,
             'organisation_name' => $this->organisation->name,
             'taxonomy_categories' => $this->taxonomies()->pluck('name')->toArray(),
@@ -223,6 +226,7 @@ class Service extends Model implements AppliesUpdateRequests, Notifiable
             'intro' => $data['intro'] ?? $this->intro,
             'description' => sanitize_markdown($data['description'] ?? $this->description),
             'wait_time' => $data['wait_time'] ?? $this->wait_time,
+            'is_national' => $data['is_national'] ?? $this->is_national,
             'is_free' => $data['is_free'] ?? $this->is_free,
             'fees_text' => $data['fees_text'] ?? $this->fees_text,
             'fees_url' => $data['fees_url'] ?? $this->fees_url,

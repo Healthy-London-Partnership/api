@@ -17,6 +17,7 @@ use App\Rules\MarkdownMaxLength;
 use App\Rules\MarkdownMinLength;
 use App\Rules\NullableIf;
 use App\Rules\RootTaxonomyIs;
+use App\Rules\ServiceCanBeNational;
 use App\Rules\Slug;
 use App\Rules\UserHasRole;
 use App\Rules\VideoEmbed;
@@ -102,6 +103,7 @@ class UpdateRequest extends FormRequest
                     $this->service->status
                 ),
             ],
+            'is_national' => ['boolean', new ServiceCanBeNational($this->service->id)],
             'intro' => ['string', 'min:1', 'max:300'],
             'description' => ['string', new MarkdownMinLength(1), new MarkdownMaxLength(1600)],
             'wait_time' => [
