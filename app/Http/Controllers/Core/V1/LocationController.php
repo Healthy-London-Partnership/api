@@ -98,6 +98,9 @@ class LocationController extends Controller
                 'image_file_id' => $request->image_file_id,
             ]);
 
+            // Persist the record to the database.
+            $location->updateCoordinate()->save();
+
             if ($request->filled('image_file_id')) {
                 /** @var \App\Models\File $file */
                 $file = File::findOrFail($request->image_file_id)->assigned();
@@ -107,9 +110,6 @@ class LocationController extends Controller
                     $file->resizedVersion($maxDimension);
                 }
             }
-
-            // Persist the record to the database.
-            $location->updateCoordinate()->save();
 
             event(EndpointHit::onCreate($request, "Created location [{$location->id}]", $location));
 
@@ -160,6 +160,9 @@ class LocationController extends Controller
                 'has_induction_loop' => $request->input('has_induction_loop', $location->has_induction_loop),
                 'image_file_id' => $request->input('image_file_id', $location->image_file_id),
             ]);
+
+            // Persist the record to the database.
+            $location->updateCoordinate()->save();
 
             if ($request->filled('image_file_id')) {
                 /** @var \App\Models\File $file */
