@@ -19,8 +19,11 @@ class UpdateServicesAddAdviceToTypesEnum extends Migration
      */
     public function down()
     {
-        DB::statement(
-            "ALTER TABLE `services` MODIFY COLUMN `type` ENUM('service', 'activity', 'club', 'group', 'helpline', 'information', 'app') NOT NULL"
-        );
+        \DB::transaction(function () {
+            \DB::update('update services set type = ? where type = advice', ['service']);
+            \DB::statement(
+                "ALTER TABLE `services` MODIFY COLUMN `type` ENUM('service', 'activity', 'club', 'group', 'helpline', 'information', 'app') NOT NULL"
+            );
+        });
     }
 }
