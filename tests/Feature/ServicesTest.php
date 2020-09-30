@@ -15,12 +15,10 @@ use App\Models\ServiceRefreshToken;
 use App\Models\ServiceTaxonomy;
 use App\Models\SocialMedia;
 use App\Models\Taxonomy;
-use App\Models\UpdateRequest;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -186,6 +184,22 @@ class ServicesTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment(['id' => $service->id]);
         $response->assertJsonMissing(['id' => $anotherService->id]);
+    }
+
+    public function test_guest_can_filter_by_has_category_taxonomies()
+    {
+        $service = factory(Service::class)->create();
+        $service->serviceTaxonomies()->create([
+            'taxonomy_id' => Taxonomy::category()->children()->first()->id,
+        ]);
+
+        factory(Service::class)->create();
+
+        $response = $this->json('GET', '/core/v1/services?filter[has_category_taxonomies]=true');
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonFragment(['id' => $service->id]);
     }
 
     public function test_audit_created_when_listed()
@@ -1297,7 +1311,21 @@ class ServicesTest extends TestCase
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['data' => $payload]);
+        $response->assertJsonFragment(array_merge(
+            $payload,
+            [
+                'category_taxonomies' => [
+                    [
+                        'id' => $taxonomy->id,
+                        'parent_id' => $taxonomy->parent_id,
+                        'slug' => $taxonomy->slug,
+                        'name' => $taxonomy->name,
+                        'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
+                        'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
+                    ]
+                ]
+            ]
+        ));
     }
 
     public function test_service_admin_can_update_one_with_single_form_of_contact()
@@ -1371,7 +1399,21 @@ class ServicesTest extends TestCase
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['data' => $payload]);
+        $response->assertJsonFragment(array_merge(
+            $payload,
+            [
+                'category_taxonomies' => [
+                    [
+                        'id' => $taxonomy->id,
+                        'parent_id' => $taxonomy->parent_id,
+                        'slug' => $taxonomy->slug,
+                        'name' => $taxonomy->name,
+                        'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
+                        'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
+                    ]
+                ]
+            ]
+        ));
     }
 
     public function test_global_admin_can_update_most_fields_for_one()
@@ -1446,7 +1488,21 @@ class ServicesTest extends TestCase
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['data' => $payload]);
+        $response->assertJsonFragment(array_merge(
+            $payload,
+            [
+                'category_taxonomies' => [
+                    [
+                        'id' => $taxonomy->id,
+                        'parent_id' => $taxonomy->parent_id,
+                        'slug' => $taxonomy->slug,
+                        'name' => $taxonomy->name,
+                        'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
+                        'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
+                    ]
+                ]
+            ]
+        ));
     }
 
     public function test_global_admin_cannot_update_show_referral_disclaimer_for_one()
@@ -1461,7 +1517,7 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'test-service',
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
@@ -1516,8 +1572,7 @@ class ServicesTest extends TestCase
             'category_taxonomies' => [
                 $taxonomy->id,
             ],
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -1688,7 +1743,7 @@ class ServicesTest extends TestCase
             ->children()
             ->where('id', '!=', $taxonomy->id)
             ->firstOrFail();
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'test-service',
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
@@ -1744,8 +1799,7 @@ class ServicesTest extends TestCase
                 $taxonomy->id,
                 $newTaxonomy->id,
             ],
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -1762,7 +1816,7 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'test-service',
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
@@ -1801,8 +1855,7 @@ class ServicesTest extends TestCase
             'category_taxonomies' => [
                 $taxonomy->id,
             ],
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -1819,7 +1872,7 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'new-slug',
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
@@ -1858,8 +1911,7 @@ class ServicesTest extends TestCase
             'category_taxonomies' => [
                 $taxonomy->id,
             ],
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -2172,7 +2224,7 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'test-service',
             'name' => 'Test Service',
             'type' => Service::TYPE_SERVICE,
@@ -2211,8 +2263,7 @@ class ServicesTest extends TestCase
             'category_taxonomies' => [
                 $taxonomy->id,
             ],
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -2262,66 +2313,14 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => 'random-slug',
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['data' => $payload]);
-    }
-
-    public function test_fields_removed_for_existing_update_requests()
-    {
-        $service = factory(Service::class)->create([
-            'slug' => 'test-service',
-            'status' => Service::STATUS_ACTIVE,
+        $response->assertJsonFragment([
+            'slug' => 'random-slug',
         ]);
-        $taxonomy = Taxonomy::category()->children()->firstOrFail();
-        $service->syncServiceTaxonomies(new Collection([$taxonomy]));
-        $user = factory(User::class)->create()->makeGlobalAdmin();
-
-        Passport::actingAs($user);
-
-        $responseOne = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'useful_infos' => [
-                [
-                    'title' => 'Title 1',
-                    'description' => 'Description 1',
-                    'order' => 1,
-                ],
-            ],
-        ]);
-        $responseOne->assertStatus(Response::HTTP_OK);
-
-        $responseTwo = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'useful_infos' => [
-                [
-                    'title' => 'Title 1',
-                    'description' => 'Description 1',
-                    'order' => 1,
-                ],
-                [
-                    'title' => 'Title 2',
-                    'description' => 'Description 2',
-                    'order' => 2,
-                ],
-            ],
-        ]);
-        $responseTwo->assertStatus(Response::HTTP_OK);
-
-        $updateRequestOne = UpdateRequest::withTrashed()->findOrFail($this->getResponseContent($responseOne)['id']);
-        $updateRequestTwo = UpdateRequest::findOrFail($this->getResponseContent($responseTwo)['id']);
-
-        $this->assertArrayNotHasKey('useful_infos', $updateRequestOne->data);
-        $this->assertArrayHasKey('useful_infos', $updateRequestTwo->data);
-        $this->assertArrayHasKey('useful_infos.0.title', Arr::dot($updateRequestTwo->data));
-        $this->assertArrayHasKey('useful_infos.0.description', Arr::dot($updateRequestTwo->data));
-        $this->assertArrayHasKey('useful_infos.0.order', Arr::dot($updateRequestTwo->data));
-        $this->assertArrayHasKey('useful_infos.1.title', Arr::dot($updateRequestTwo->data));
-        $this->assertArrayHasKey('useful_infos.1.description', Arr::dot($updateRequestTwo->data));
-        $this->assertArrayHasKey('useful_infos.1.order', Arr::dot($updateRequestTwo->data));
-        $this->assertSoftDeleted($updateRequestOne->getTable(), ['id' => $updateRequestOne->id]);
     }
 
     public function test_referral_url_required_when_referral_method_not_updated_with_it()
@@ -2374,41 +2373,18 @@ class ServicesTest extends TestCase
         $taxonomy = Taxonomy::category()->children()->firstOrFail();
         $service->syncServiceTaxonomies(new Collection([$taxonomy]));
         $user = factory(User::class)->create()->makeGlobalAdmin();
+        $organisation = factory(Organisation::class)->create();
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => factory(Organisation::class)->create()->id,
-        ];
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
-
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['data' => $payload]);
-    }
-
-    public function test_global_admin_can_update_organisation_id_with_preview_only()
-    {
-        $service = factory(Service::class)->create([
-            'slug' => 'test-service',
-            'status' => Service::STATUS_ACTIVE,
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
+            'organisation_id' => $organisation->id,
         ]);
-        $taxonomy = Taxonomy::category()->children()->firstOrFail();
-        $service->syncServiceTaxonomies(new Collection([$taxonomy]));
-        $user = factory(User::class)->create()->makeGlobalAdmin();
-
-        Passport::actingAs($user);
-
-        $payload = [
-            'organisation_id' => factory(Organisation::class)->create()->id,
-        ];
-
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", array_merge(
-            $payload,
-            ['preview' => true]
-        ));
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => null, 'data' => $payload]);
+        $response->assertJsonFragment([
+            'organisation_id' => $organisation->id,
+        ]);
     }
 
     /*
@@ -2820,7 +2796,10 @@ class ServicesTest extends TestCase
         $service = factory(Service::class)->create([
             'logo_file_id' => factory(File::class)->create()->id,
         ]);
-        $payload = [
+
+        Passport::actingAs($user);
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
             'slug' => $service->slug,
             'name' => $service->name,
             'status' => $service->status,
@@ -2856,16 +2835,12 @@ class ServicesTest extends TestCase
             'social_medias' => [],
             'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
             'logo_file_id' => null,
-        ];
-
-        Passport::actingAs($user);
-
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
+        ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $this->assertDatabaseHas(table(UpdateRequest::class), ['updateable_id' => $service->id]);
-        $updateRequest = UpdateRequest::where('updateable_id', $service->id)->firstOrFail();
-        $this->assertEquals(null, $updateRequest->data['logo_file_id']);
+        $response->assertJsonFragment([
+            'has_logo' => false,
+        ]);
     }
 
     /*
