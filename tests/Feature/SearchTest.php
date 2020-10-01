@@ -467,6 +467,8 @@ class SearchTest extends TestCase implements UsesElasticsearch
 
         $response = $this->json('POST', '/core/v1/search', [
             'query' => 'Testing Service',
+            'view' => 'grid',
+            'order' => 'relevance',
             'is_national' => true,
         ]);
 

@@ -50,7 +50,7 @@ class SearchController extends Controller
         }
 
         // If location was passed, then parse the location.
-        if ($request->has('location')) {
+        if ($request->has('location') && !$request->is_national) {
             $location = new Coordinate(
                 $request->input('location.lat'),
                 $request->input('location.lon')
@@ -62,6 +62,8 @@ class SearchController extends Controller
 
         // Apply order.
         $search->applyOrder($request->order ?? 'relevance', $location ?? null);
+
+        // dd($search->getQuery());
 
         // Perform the search.
         return $search->paginate($request->page, $request->per_page);
