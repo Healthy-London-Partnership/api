@@ -30,7 +30,8 @@ class StoreSearchSchema extends Schema
                     Service::TYPE_GROUP,
                     Service::TYPE_HELPLINE,
                     Service::TYPE_INFORMATION,
-                    Service::TYPE_APP
+                    Service::TYPE_APP,
+                    Service::TYPE_ADVICE
                 ),
                 Schema::string('category'),
                 Schema::string('persona'),
@@ -43,6 +44,7 @@ class StoreSearchSchema extends Schema
                         Service::WAIT_TIME_LONGER
                     ),
                 Schema::boolean('is_free'),
+                Schema::boolean('is_national'),
                 Schema::string('order')
                     ->enum(Search::ORDER_RELEVANCE, Search::ORDER_DISTANCE)
                     ->default('relevance'),
