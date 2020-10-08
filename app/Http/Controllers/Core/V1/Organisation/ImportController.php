@@ -115,7 +115,7 @@ class ImportController extends Controller
             $globalAdminIds = Role::globalAdmin()->users()->pluck('users.id');
             $organisationRowBatch = $adminRowBatch = [];
             foreach ($spreadsheetParser->readRows() as $organisationRow) {
-                $organisationRow['id'] = (string) Str::uuid();
+                $organisationRow['id'] = (string)Str::uuid();
                 $organisationRow['slug'] = Str::slug($organisationRow['name'] . ' ' . uniqid(), '-');
                 $organisationRow['created_at'] = Date::now();
                 $organisationRow['updated_at'] = Date::now();
@@ -123,7 +123,7 @@ class ImportController extends Controller
 
                 foreach ($globalAdminIds as $globalAdminId) {
                     $adminRowBatch[] = [
-                        'id' => (string) Str::uuid(),
+                        'id' => (string)Str::uuid(),
                         'user_id' => $globalAdminId,
                         'role_id' => $organisationAdminRoleId,
                         'organisation_id' => $organisationRow['id'],
