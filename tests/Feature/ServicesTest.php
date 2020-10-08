@@ -29,11 +29,12 @@ class ServicesTest extends TestCase
 {
 
     /**
-     * Return base Service payload
+     * Base payload to create a Service
+     * @param Organisation $organisation
      *
      * @return Array
      **/
-    public function baseServicePayload(Organisation $organisation)
+    public function createServicePayload(Organisation $organisation)
     {
         return [
             'organisation_id' => $organisation->id,
@@ -51,8 +52,8 @@ class ServicesTest extends TestCase
             'testimonial' => null,
             'video_embed' => null,
             'url' => $this->faker->url,
-            'ios_app_url' => $this->faker->url,
-            'android_app_url' => $this->faker->url,
+            'ios_app_url' => null,
+            'android_app_url' => null,
             'contact_name' => $this->faker->name,
             'contact_phone' => random_uk_phone(),
             'contact_email' => $this->faker->safeEmail,
@@ -94,6 +95,56 @@ class ServicesTest extends TestCase
             'category_taxonomies' => [],
         ];
     }
+
+    /**
+     * Base payload to update a Service
+     *
+     * @param Service $service
+     * @return Array
+     **/
+    public function updateServicePayload(Service $service)
+    {
+        return [
+            'slug' => $service->slug,
+            'name' => $service->name,
+            'status' => $service->status,
+            'is_national' => $service->is_national,
+            'intro' => $service->intro,
+            'description' => $service->description,
+            'wait_time' => $service->wait_time,
+            'is_free' => $service->is_free,
+            'fees_text' => $service->fees_text,
+            'fees_url' => $service->fees_url,
+            'testimonial' => $service->testimonial,
+            'video_embed' => $service->video_embed,
+            'url' => $service->url,
+            'ios_app_url' => $service->ios_app_url,
+            'android_app_url' => $service->android_app_url,
+            'contact_name' => $service->contact_name,
+            'contact_phone' => $service->contact_phone,
+            'contact_email' => $service->contact_email,
+            'show_referral_disclaimer' => $service->show_referral_disclaimer,
+            'referral_method' => $service->referral_method,
+            'referral_button_text' => $service->referral_button_text,
+            'referral_email' => $service->referral_email,
+            'referral_url' => $service->referral_url,
+            'criteria' => [
+                'age_group' => $service->serviceCriterion->age_group,
+                'disability' => $service->serviceCriterion->disability,
+                'employment' => $service->serviceCriterion->employment,
+                'gender' => $service->serviceCriterion->gender,
+                'housing' => $service->serviceCriterion->housing,
+                'income' => $service->serviceCriterion->income,
+                'language' => $service->serviceCriterion->language,
+                'other' => $service->serviceCriterion->other,
+            ],
+            'useful_infos' => [],
+            'social_medias' => [],
+            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
+            'logo_file_id' => null,
+        ];
+    }
+
     /*
      * List all the services.
      */
@@ -354,63 +405,7 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        // $payload = [
-        //     'organisation_id' => $organisation->id,
-        //     'slug' => 'test-service',
-        //     'name' => 'Test Service',
-        //     'type' => Service::TYPE_SERVICE,
-        //     'status' => Service::STATUS_INACTIVE,
-        //     'is_national' => false,
-        //     'intro' => 'This is a test intro',
-        //     'description' => 'Lorem ipsum',
-        //     'wait_time' => null,
-        //     'is_free' => true,
-        //     'fees_text' => null,
-        //     'fees_url' => null,
-        //     'testimonial' => null,
-        //     'video_embed' => null,
-        //     'url' => $this->faker->url,
-        //     'contact_name' => $this->faker->name,
-        //     'contact_phone' => random_uk_phone(),
-        //     'contact_email' => $this->faker->safeEmail,
-        //     'show_referral_disclaimer' => false,
-        //     'referral_method' => Service::REFERRAL_METHOD_NONE,
-        //     'referral_button_text' => null,
-        //     'referral_email' => null,
-        //     'referral_url' => null,
-        //     'criteria' => [
-        //         'age_group' => '18+',
-        //         'disability' => null,
-        //         'employment' => null,
-        //         'gender' => null,
-        //         'housing' => null,
-        //         'income' => null,
-        //         'language' => null,
-        //         'other' => null,
-        //     ],
-        //     'useful_infos' => [
-        //         [
-        //             'title' => 'Did you know?',
-        //             'description' => 'Lorem ipsum',
-        //             'order' => 1,
-        //         ],
-        //     ],
-        //     'offerings' => [
-        //         [
-        //             'offering' => 'Weekly club',
-        //             'order' => 1,
-        //         ],
-        //     ],
-        //     'social_medias' => [
-        //         [
-        //             'type' => SocialMedia::TYPE_INSTAGRAM,
-        //             'url' => 'https://www.instagram.com/ayupdigital',
-        //         ],
-        //     ],
-        //     'gallery_items' => [],
-        //     'category_taxonomies' => [],
-        // ];
-        $payload = $this->baseServicePayload($organisation);
+        $payload = $this->createServicePayload($organisation);
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -424,62 +419,8 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => null,
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['contact_phone'] = null;
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -493,62 +434,8 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['status'] = Service::STATUS_ACTIVE;
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -563,62 +450,8 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [$taxonomy->id],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['category_taxonomies'] = [$taxonomy->id];
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -641,46 +474,8 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $anotherOrganisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'gallery_items' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-        ];
+        $payload = $this->createServicePayload($anotherOrganisation);
+        $payload['category_taxonomies'] = [Taxonomy::category()->children()->firstOrFail()->id];
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -695,62 +490,9 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('POST', '/core/v1/services', [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-        ]);
+        $payload = $this->createServicePayload($organisation);
+        $payload['category_taxonomies'] = [Taxonomy::category()->children()->firstOrFail()->id];
+        $response = $this->json('POST', '/core/v1/services', $payload);
 
         Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) use ($user, $response) {
             return ($event->getAction() === Audit::ACTION_CREATE) &&
@@ -766,62 +508,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['status'] = Service::STATUS_ACTIVE;
+        $payload['category_taxonomies'] = [Taxonomy::category()->children()->firstOrFail()->id];
+
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -846,62 +536,13 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['status'] = Service::STATUS_ACTIVE;
+        $payload['show_referral_disclaimer'] = true;
+        $payload['referral_method'] = Service::REFERRAL_METHOD_INTERNAL;
+        $payload['referral_email'] = $this->faker->safeEmail;
+        $payload['category_taxonomies'] = [Taxonomy::category()->children()->firstOrFail()->id];
+
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -926,62 +567,9 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['show_referral_disclaimer'] = true;
+
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -998,64 +586,10 @@ class ServicesTest extends TestCase
             ->children()
             ->firstOrFail();
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->createServicePayload($organisation);
+        $payload['show_referral_disclaimer'] = true;
+        $payload['category_taxonomies'] = [$taxonomy->id];
+
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -1106,6 +640,8 @@ class ServicesTest extends TestCase
             'testimonial' => $service->testimonial,
             'video_embed' => $service->video_embed,
             'url' => $service->url,
+            'ios_app_url' => $service->ios_app_url,
+            'android_app_url' => $service->android_app_url,
             'contact_name' => $service->contact_name,
             'contact_phone' => $service->contact_phone,
             'contact_email' => $service->contact_email,
@@ -1200,6 +736,8 @@ class ServicesTest extends TestCase
             'testimonial' => $service->testimonial,
             'video_embed' => $service->video_embed,
             'url' => $service->url,
+            'ios_app_url' => $service->ios_app_url,
+            'android_app_url' => $service->android_app_url,
             'contact_name' => $service->contact_name,
             'contact_phone' => $service->contact_phone,
             'contact_email' => $service->contact_email,
@@ -1320,67 +858,14 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => true,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['intro'] = 'New intro';
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment(array_merge(
-            $payload,
+            ['intro' => 'New intro'],
             [
                 'category_taxonomies' => [
                     [
@@ -1408,67 +893,14 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => null,
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['contact_phone'] = null;
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment(array_merge(
-            $payload,
+            ['contact_phone' => null],
             [
                 'category_taxonomies' => [
                     [
@@ -1553,6 +985,7 @@ class ServicesTest extends TestCase
                 $taxonomy->id,
             ],
         ];
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
@@ -1585,62 +1018,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => $service->referral_method,
-            'referral_button_text' => $service->referral_button_text,
-            'referral_email' => $service->referral_email,
-            'referral_url' => $service->referral_url,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['show_referral_disclaimer'] = true;
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -1659,62 +1040,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => $service->show_referral_disclaimer,
-            'referral_method' => $service->referral_method,
-            'referral_button_text' => $service->referral_button_text,
-            'referral_email' => $service->referral_email,
-            'referral_url' => $service->referral_url,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['intro'] = 'New intro';
+
+        $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         Event::assertDispatched(EndpointHit::class, function (EndpointHit $event) use ($user, $service) {
             return ($event->getAction() === Audit::ACTION_UPDATE) &&
@@ -1736,63 +1065,13 @@ class ServicesTest extends TestCase
             ->children()
             ->where('id', '!=', $taxonomy->id)
             ->firstOrFail();
-        $payload = [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-                $newTaxonomy->id,
-            ],
+
+        $payload = $this->updateServicePayload($service);
+        $payload['category_taxonomies'] = [
+            $taxonomy->id,
+            $newTaxonomy->id,
         ];
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -1811,63 +1090,14 @@ class ServicesTest extends TestCase
             ->children()
             ->where('id', '!=', $taxonomy->id)
             ->firstOrFail();
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'category_taxonomies' => [
-                $taxonomy->id,
-                $newTaxonomy->id,
-            ],
-        ]);
+
+        $payload = $this->updateServicePayload($service);
+        $payload['category_taxonomies'] = [
+            $taxonomy->id,
+            $newTaxonomy->id,
+        ];
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -1884,46 +1114,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['status'] = Service::STATUS_INACTIVE;
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -1940,46 +1134,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'new-slug',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['slug'] = 'new-slug';
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -1996,46 +1154,9 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['status'] = Service::STATUS_INACTIVE;
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
@@ -2053,46 +1174,9 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'new-slug',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['slug'] = 'new-slug';
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
@@ -2113,46 +1197,9 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'new-slug',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => true,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['is_national'] = true;
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -2170,46 +1217,17 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'new-slug',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
+        $payload = $this->updateServicePayload($service);
+        $payload['status'] = Service::STATUS_ACTIVE;
+        $payload['show_referral_disclaimer'] = true;
+        $payload['referral_method'] = Service::REFERRAL_METHOD_INTERNAL;
+        $payload['referral_button_text'] = null;
+        $payload['referral_email'] = null;
+        $payload['referral_url'] = null;
+        $payload['category_taxonomies'] = [
+            $taxonomy->id,
         ];
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -2230,46 +1248,12 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ];
+        $payload = $this->updateServicePayload($service);
+        $payload['referral_method'] = Service::REFERRAL_METHOD_NONE;
+        $payload['referral_button_text'] = null;
+        $payload['referral_email'] = null;
+        $payload['referral_url'] = null;
+
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -2292,46 +1276,13 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => $service->show_referral_disclaimer,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [],
-            'offerings' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [
-                $taxonomy->id,
-            ],
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['referral_method'] = Service::REFERRAL_METHOD_NONE;
+        $payload['referral_button_text'] = null;
+        $payload['referral_email'] = null;
+        $payload['referral_url'] = null;
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
     }
@@ -2781,63 +1732,18 @@ class ServicesTest extends TestCase
             'file' => 'data:image/png;base64,' . base64_encode($image),
         ]);
 
-        $response = $this->json('POST', '/core/v1/services', [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_ACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => true,
-            'referral_method' => Service::REFERRAL_METHOD_INTERNAL,
-            'referral_button_text' => null,
-            'referral_email' => $this->faker->safeEmail,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-            'logo_file_id' => $this->getResponseContent($imageResponse, 'data.id'),
-        ]);
+        $payload = $this->createServicePayload($organisation);
+        $payload['status'] = Service::STATUS_ACTIVE;
+        $payload['is_national'] = true;
+        $payload['show_referral_disclaimer'] = true;
+        $payload['referral_method'] = Service::REFERRAL_METHOD_INTERNAL;
+        $payload['referral_email'] = $this->faker->safeEmail;
+        $payload['category_taxonomies'] = [
+            Taxonomy::category()->children()->firstOrFail()->id,
+        ];
+        $payload['logo_file_id'] = $this->getResponseContent($imageResponse, 'data.id');
+
+        $response = $this->json('POST', '/core/v1/services', $payload);
         $serviceId = $this->getResponseContent($response, 'data.id');
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -2867,43 +1773,10 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => $service->slug,
-            'name' => $service->name,
-            'status' => $service->status,
-            'is_national' => $service->is_national,
-            'intro' => $service->intro,
-            'description' => $service->description,
-            'wait_time' => $service->wait_time,
-            'is_free' => $service->is_free,
-            'fees_text' => $service->fees_text,
-            'fees_url' => $service->fees_url,
-            'testimonial' => $service->testimonial,
-            'video_embed' => $service->video_embed,
-            'url' => $service->url,
-            'contact_name' => $service->contact_name,
-            'contact_phone' => $service->contact_phone,
-            'contact_email' => $service->contact_email,
-            'show_referral_disclaimer' => $service->show_referral_disclaimer,
-            'referral_method' => $service->referral_method,
-            'referral_button_text' => $service->referral_button_text,
-            'referral_email' => $service->referral_email,
-            'referral_url' => $service->referral_url,
-            'criteria' => [
-                'age_group' => $service->serviceCriterion->age_group,
-                'disability' => $service->serviceCriterion->disability,
-                'employment' => $service->serviceCriterion->employment,
-                'gender' => $service->serviceCriterion->gender,
-                'housing' => $service->serviceCriterion->housing,
-                'income' => $service->serviceCriterion->income,
-                'language' => $service->serviceCriterion->language,
-                'other' => $service->serviceCriterion->other,
-            ],
-            'useful_infos' => [],
-            'social_medias' => [],
-            'category_taxonomies' => [Taxonomy::category()->children()->firstOrFail()->id],
-            'logo_file_id' => null,
-        ]);
+        $payload = $this->updateServicePayload($service);
+        $payload['logo_file_id'] = null;
+
+        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment([
@@ -2937,5 +1810,52 @@ class ServicesTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function test_organisation_admin_can_create_an_app_service_with_one_app_store_url()
+    {
+        $organisation = factory(Organisation::class)->create();
+        $user = factory(User::class)->create()->makeOrganisationAdmin($organisation);
+
+        Passport::actingAs($user);
+
+        $payload = $this->createServicePayload($organisation);
+        $payload['type'] = Service::TYPE_APP;
+        $payload['ios_app_url'] = $this->faker->url;
+
+        $response = $this->json('POST', '/core/v1/services', $payload);
+        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertJsonFragment($payload);
+    }
+
+    public function test_organisation_admin_cannot_create_an_app_service_without_an_app_store_url()
+    {
+        $organisation = factory(Organisation::class)->create();
+        $user = factory(User::class)->create()->makeOrganisationAdmin($organisation);
+
+        Passport::actingAs($user);
+
+        $payload = $this->createServicePayload($organisation);
+        $payload['type'] = Service::TYPE_APP;
+
+        $response = $this->json('POST', '/core/v1/services', $payload);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function test_organisation_admin_cannot_create_an_app_service_without_a_valid_app_store_url()
+    {
+        $organisation = factory(Organisation::class)->create();
+        $user = factory(User::class)->create()->makeOrganisationAdmin($organisation);
+
+        Passport::actingAs($user);
+
+        $payload = $this->createServicePayload($organisation);
+        $payload['type'] = Service::TYPE_APP;
+        $payload['ios_app_url'] = 'www.example.com';
+
+        $response = $this->json('POST', '/core/v1/services', $payload);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
