@@ -64,11 +64,6 @@ class ImportController extends Controller
         $this->user = $request->user('api');
         $this->organisation = Organisation::findOrFail($request->input('organisation_id'));
 
-        // if (!(new IsOrganisationAdmin($this->user))->passes('id', $this->organisation)) {
-        //     throw ValidationException::withMessages([
-        //         'organisation_id' => 'The organisation_id field must contain an ID for an organisation you are an organisation admin for',
-        //     ]);
-        // }
         list('rejected' => $rejected, 'imported' => $imported) = $this->processSpreadsheet($request->input('spreadsheet'));
 
         $responseStatus = 201;
