@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Core\V1\Organisation;
 
 use App\BatchUpload\SpreadsheetParser;
 use App\BatchUpload\StoresSpreadsheets;
-use App\Contracts\SpreadsheetController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Organisation\ImportRequest;
 use App\Models\Role;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class ImportController extends Controller implements SpreadsheetController
+class ImportController extends Controller
 {
     use StoresSpreadsheets;
 
@@ -116,7 +115,7 @@ class ImportController extends Controller implements SpreadsheetController
             $globalAdminIds = Role::globalAdmin()->users()->pluck('users.id');
             $organisationRowBatch = $adminRowBatch = [];
             foreach ($spreadsheetParser->readRows() as $organisationRow) {
-                $organisationRow['id'] = (string)Str::uuid();
+                $organisationRow['id'] = (string) Str::uuid();
                 $organisationRow['slug'] = Str::slug($organisationRow['name'] . ' ' . uniqid(), '-');
                 $organisationRow['created_at'] = Date::now();
                 $organisationRow['updated_at'] = Date::now();
@@ -124,7 +123,7 @@ class ImportController extends Controller implements SpreadsheetController
 
                 foreach ($globalAdminIds as $globalAdminId) {
                     $adminRowBatch[] = [
-                        'id' => (string)Str::uuid(),
+                        'id' => (string) Str::uuid(),
                         'user_id' => $globalAdminId,
                         'role_id' => $organisationAdminRoleId,
                         'organisation_id' => $organisationRow['id'],

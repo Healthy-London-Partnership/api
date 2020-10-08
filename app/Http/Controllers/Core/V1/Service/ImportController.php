@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Core\V1\Service;
 
 use App\BatchUpload\SpreadsheetParser;
 use App\BatchUpload\StoresSpreadsheets;
-use App\Contracts\SpreadsheetController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Service\ImportRequest;
 use App\Models\Organisation;
@@ -21,9 +20,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
-class ImportController extends Controller implements SpreadsheetController
+class ImportController extends Controller
 {
     use StoresSpreadsheets;
 
@@ -117,9 +115,9 @@ class ImportController extends Controller implements SpreadsheetController
             /**
              * Cast Boolean rows to boolean value.
              */
-            $row['is_free'] = null === $row['is_free'] ? null : (bool)$row['is_free'];
-            $row['is_national'] = null === $row['is_national'] ? null : (bool)$row['is_national'];
-            $row['show_referral_disclaimer'] = null === $row['show_referral_disclaimer'] ? null : (bool)$row['show_referral_disclaimer'];
+            $row['is_free'] = null === $row['is_free'] ? null : (bool) $row['is_free'];
+            $row['is_national'] = null === $row['is_national'] ? null : (bool) $row['is_national'];
+            $row['show_referral_disclaimer'] = null === $row['show_referral_disclaimer'] ? null : (bool) $row['show_referral_disclaimer'];
 
             $validator = Validator::make($row, [
                 'name' => ['required', 'string', 'min:1', 'max:255'],
@@ -280,14 +278,14 @@ class ImportController extends Controller implements SpreadsheetController
                 /**
                  * Generate a new Service ID.
                  */
-                $serviceRow['id'] = (string)Str::uuid();
+                $serviceRow['id'] = (string) Str::uuid();
 
                 /**
                  * Cast Boolean rows to boolean value.
                  */
-                $serviceRow['is_free'] = (bool)$serviceRow['is_free'];
-                $serviceRow['is_national'] = (bool)$serviceRow['is_national'];
-                $serviceRow['show_referral_disclaimer'] = (bool)$serviceRow['show_referral_disclaimer'];
+                $serviceRow['is_free'] = (bool) $serviceRow['is_free'];
+                $serviceRow['is_national'] = (bool) $serviceRow['is_national'];
+                $serviceRow['show_referral_disclaimer'] = (bool) $serviceRow['show_referral_disclaimer'];
 
                 /**
                  * Check for Criteria fields.
@@ -295,7 +293,7 @@ class ImportController extends Controller implements SpreadsheetController
                  * Remove Criteria fields from the Service row.
                  */
                 $criteriaRow = [
-                    'id' => (string)Str::uuid(),
+                    'id' => (string) Str::uuid(),
                     'service_id' => $serviceRow['id'],
                     'created_at' => Date::now(),
                     'updated_at' => Date::now(),
@@ -327,7 +325,7 @@ class ImportController extends Controller implements SpreadsheetController
                  */
                 foreach ($organisationAdminIds as $organisationAdminId) {
                     $adminRowBatch[] = [
-                        'id' => (string)Str::uuid(),
+                        'id' => (string) Str::uuid(),
                         'user_id' => $organisationAdminId,
                         'role_id' => $serviceAdminRoleId,
                         'service_id' => $serviceRow['id'],
@@ -335,7 +333,7 @@ class ImportController extends Controller implements SpreadsheetController
                         'updated_at' => Date::now(),
                     ];
                     $adminRowBatch[] = [
-                        'id' => (string)Str::uuid(),
+                        'id' => (string) Str::uuid(),
                         'user_id' => $organisationAdminId,
                         'role_id' => $serviceWorkerRoleId,
                         'service_id' => $serviceRow['id'],
