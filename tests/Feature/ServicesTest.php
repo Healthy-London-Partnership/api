@@ -27,6 +27,73 @@ use Tests\TestCase;
 
 class ServicesTest extends TestCase
 {
+
+    /**
+     * Return base Service payload
+     *
+     * @return Array
+     **/
+    public function baseServicePayload(Organisation $organisation)
+    {
+        return [
+            'organisation_id' => $organisation->id,
+            'slug' => 'test-service',
+            'name' => 'Test Service',
+            'type' => Service::TYPE_SERVICE,
+            'status' => Service::STATUS_INACTIVE,
+            'is_national' => false,
+            'intro' => 'This is a test intro',
+            'description' => 'Lorem ipsum',
+            'wait_time' => null,
+            'is_free' => true,
+            'fees_text' => null,
+            'fees_url' => null,
+            'testimonial' => null,
+            'video_embed' => null,
+            'url' => $this->faker->url,
+            'ios_app_url' => $this->faker->url,
+            'android_app_url' => $this->faker->url,
+            'contact_name' => $this->faker->name,
+            'contact_phone' => random_uk_phone(),
+            'contact_email' => $this->faker->safeEmail,
+            'show_referral_disclaimer' => false,
+            'referral_method' => Service::REFERRAL_METHOD_NONE,
+            'referral_button_text' => null,
+            'referral_email' => null,
+            'referral_url' => null,
+            'criteria' => [
+                'age_group' => '18+',
+                'disability' => null,
+                'employment' => null,
+                'gender' => null,
+                'housing' => null,
+                'income' => null,
+                'language' => null,
+                'other' => null,
+            ],
+            'useful_infos' => [
+                [
+                    'title' => 'Did you know?',
+                    'description' => 'Lorem ipsum',
+                    'order' => 1,
+                ],
+            ],
+            'offerings' => [
+                [
+                    'offering' => 'Weekly club',
+                    'order' => 1,
+                ],
+            ],
+            'social_medias' => [
+                [
+                    'type' => SocialMedia::TYPE_INSTAGRAM,
+                    'url' => 'https://www.instagram.com/ayupdigital',
+                ],
+            ],
+            'gallery_items' => [],
+            'category_taxonomies' => [],
+        ];
+    }
     /*
      * List all the services.
      */
@@ -287,62 +354,63 @@ class ServicesTest extends TestCase
 
         Passport::actingAs($user);
 
-        $payload = [
-            'organisation_id' => $organisation->id,
-            'slug' => 'test-service',
-            'name' => 'Test Service',
-            'type' => Service::TYPE_SERVICE,
-            'status' => Service::STATUS_INACTIVE,
-            'is_national' => false,
-            'intro' => 'This is a test intro',
-            'description' => 'Lorem ipsum',
-            'wait_time' => null,
-            'is_free' => true,
-            'fees_text' => null,
-            'fees_url' => null,
-            'testimonial' => null,
-            'video_embed' => null,
-            'url' => $this->faker->url,
-            'contact_name' => $this->faker->name,
-            'contact_phone' => random_uk_phone(),
-            'contact_email' => $this->faker->safeEmail,
-            'show_referral_disclaimer' => false,
-            'referral_method' => Service::REFERRAL_METHOD_NONE,
-            'referral_button_text' => null,
-            'referral_email' => null,
-            'referral_url' => null,
-            'criteria' => [
-                'age_group' => '18+',
-                'disability' => null,
-                'employment' => null,
-                'gender' => null,
-                'housing' => null,
-                'income' => null,
-                'language' => null,
-                'other' => null,
-            ],
-            'useful_infos' => [
-                [
-                    'title' => 'Did you know?',
-                    'description' => 'Lorem ipsum',
-                    'order' => 1,
-                ],
-            ],
-            'offerings' => [
-                [
-                    'offering' => 'Weekly club',
-                    'order' => 1,
-                ],
-            ],
-            'social_medias' => [
-                [
-                    'type' => SocialMedia::TYPE_INSTAGRAM,
-                    'url' => 'https://www.instagram.com/ayupdigital',
-                ],
-            ],
-            'gallery_items' => [],
-            'category_taxonomies' => [],
-        ];
+        // $payload = [
+        //     'organisation_id' => $organisation->id,
+        //     'slug' => 'test-service',
+        //     'name' => 'Test Service',
+        //     'type' => Service::TYPE_SERVICE,
+        //     'status' => Service::STATUS_INACTIVE,
+        //     'is_national' => false,
+        //     'intro' => 'This is a test intro',
+        //     'description' => 'Lorem ipsum',
+        //     'wait_time' => null,
+        //     'is_free' => true,
+        //     'fees_text' => null,
+        //     'fees_url' => null,
+        //     'testimonial' => null,
+        //     'video_embed' => null,
+        //     'url' => $this->faker->url,
+        //     'contact_name' => $this->faker->name,
+        //     'contact_phone' => random_uk_phone(),
+        //     'contact_email' => $this->faker->safeEmail,
+        //     'show_referral_disclaimer' => false,
+        //     'referral_method' => Service::REFERRAL_METHOD_NONE,
+        //     'referral_button_text' => null,
+        //     'referral_email' => null,
+        //     'referral_url' => null,
+        //     'criteria' => [
+        //         'age_group' => '18+',
+        //         'disability' => null,
+        //         'employment' => null,
+        //         'gender' => null,
+        //         'housing' => null,
+        //         'income' => null,
+        //         'language' => null,
+        //         'other' => null,
+        //     ],
+        //     'useful_infos' => [
+        //         [
+        //             'title' => 'Did you know?',
+        //             'description' => 'Lorem ipsum',
+        //             'order' => 1,
+        //         ],
+        //     ],
+        //     'offerings' => [
+        //         [
+        //             'offering' => 'Weekly club',
+        //             'order' => 1,
+        //         ],
+        //     ],
+        //     'social_medias' => [
+        //         [
+        //             'type' => SocialMedia::TYPE_INSTAGRAM,
+        //             'url' => 'https://www.instagram.com/ayupdigital',
+        //         ],
+        //     ],
+        //     'gallery_items' => [],
+        //     'category_taxonomies' => [],
+        // ];
+        $payload = $this->baseServicePayload($organisation);
         $response = $this->json('POST', '/core/v1/services', $payload);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -1322,8 +1390,8 @@ class ServicesTest extends TestCase
                         'name' => $taxonomy->name,
                         'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
                         'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
-                    ]
-                ]
+                    ],
+                ],
             ]
         ));
     }
@@ -1410,8 +1478,8 @@ class ServicesTest extends TestCase
                         'name' => $taxonomy->name,
                         'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
                         'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
-                    ]
-                ]
+                    ],
+                ],
             ]
         ));
     }
@@ -1499,8 +1567,8 @@ class ServicesTest extends TestCase
                         'name' => $taxonomy->name,
                         'created_at' => $taxonomy->created_at->format(CarbonImmutable::ISO8601),
                         'updated_at' => $taxonomy->updated_at->format(CarbonImmutable::ISO8601),
-                    ]
-                ]
+                    ],
+                ],
             ]
         ));
     }
