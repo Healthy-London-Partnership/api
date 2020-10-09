@@ -19,7 +19,6 @@ class UpdateServiceSchema extends Schema
             ->type(static::TYPE_OBJECT)
             ->required(
                 'name',
-                'slug',
                 'type',
                 'status',
                 'intro',
@@ -48,7 +47,6 @@ class UpdateServiceSchema extends Schema
             )
             ->properties(
                 Schema::string('name'),
-                Schema::string('slug'),
                 Schema::string('type')
                     ->enum(
                         Service::TYPE_SERVICE,
@@ -83,6 +81,10 @@ class UpdateServiceSchema extends Schema
                 Schema::string('video_embed')
                     ->nullable(),
                 Schema::string('url')
+                    ->nullable(),
+                Schema::string('ios_app_url')
+                    ->nullable(),
+                Schema::string('android_app_url')
                     ->nullable(),
                 Schema::string('contact_name'),
                 Schema::string('contact_phone'),

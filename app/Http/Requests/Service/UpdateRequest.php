@@ -17,7 +17,6 @@ use App\Rules\MarkdownMinLength;
 use App\Rules\NullableIf;
 use App\Rules\RootTaxonomyIs;
 use App\Rules\ServiceCanBeNational;
-use App\Rules\Slug;
 use App\Rules\UserHasRole;
 use App\Rules\VideoEmbed;
 use Illuminate\Foundation\Http\FormRequest;
@@ -56,21 +55,6 @@ class UpdateRequest extends FormRequest
                         'role_id' => Role::globalAdmin()->id,
                     ]),
                     $this->service->organisation_id
-                ),
-            ],
-            'slug' => [
-                'string',
-                'min:1',
-                'max:255',
-                Rule::unique(table(Service::class), 'slug')->ignoreModel($this->service),
-                new Slug(),
-                new UserHasRole(
-                    $this->user('api'),
-                    new UserRole([
-                        'user_id' => $this->user('api')->id,
-                        'role_id' => Role::globalAdmin()->id,
-                    ]),
-                    $this->service->slug
                 ),
             ],
             'name' => ['string', 'min:1', 'max:255'],
@@ -119,6 +103,12 @@ class UpdateRequest extends FormRequest
             'testimonial' => ['nullable', 'string', 'min:1', 'max:255'],
             'video_embed' => ['nullable', 'string', 'url', 'max:255', new VideoEmbed()],
             'url' => ['url', 'max:255'],
+            'ios_app_url' => [
+                Rule::requiredIf(($this->service->type === Service::TYPE_APP || $this->type === Service::TYPE_APP) && (!$this->android_app_url && !$this->service->ios_app_url && !$this->service->android_app_url)),
+                'nullable', 'url', 'max:255', ],
+            'android_app_url' => [
+                Rule::requiredIf(($this->service->type === Service::TYPE_APP || $this->type === Service::TYPE_APP) && (!$this->ios_app_url && !$this->service->ios_app_url && !$this->service->android_app_url)),
+                'nullable', 'url', 'max:255', ],
             'contact_name' => ['nullable', 'string', 'min:1', 'max:255'],
             'contact_phone' => ['nullable', 'string', 'min:1', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],

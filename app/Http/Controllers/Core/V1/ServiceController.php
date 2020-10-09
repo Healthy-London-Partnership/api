@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Core\V1;
 
 use App\Events\EndpointHit;
+use App\Generators\UniqueSlugGenerator;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Service\HasCategoryTaxonomiesFilter;
 use App\Http\Filters\Service\HasPermissionFilter;
@@ -96,6 +97,7 @@ class ServiceController extends Controller
      * @param \App\Normalisers\OfferingNormaliser $offeringNormaliser
      * @param \App\Normalisers\SocialMediaNormaliser $socialMediaNormaliser
      * @param \App\Normalisers\GalleryItemNormaliser $galleryItemNormaliser
+     * @param \App\Generators\UniqueSlugGenerator $slugGenerator
      * @return \Illuminate\Http\Response
      */
     public function store(
@@ -103,20 +105,22 @@ class ServiceController extends Controller
         UsefulInfoNormaliser $usefulInfoNormaliser,
         OfferingNormaliser $offeringNormaliser,
         SocialMediaNormaliser $socialMediaNormaliser,
-        GalleryItemNormaliser $galleryItemNormaliser
+        GalleryItemNormaliser $galleryItemNormaliser,
+        UniqueSlugGenerator $slugGenerator
     ) {
         return DB::transaction(function () use (
             $request,
             $usefulInfoNormaliser,
             $offeringNormaliser,
             $socialMediaNormaliser,
-            $galleryItemNormaliser
+            $galleryItemNormaliser,
+            $slugGenerator
         ) {
             // Create the service record.
             /** @var \App\Models\Service $service */
             $service = Service::create([
                 'organisation_id' => $request->organisation_id,
-                'slug' => $request->slug,
+                'slug' => $slugGenerator->generate($request->name, table(Service::class)),
                 'name' => $request->name,
                 'type' => $request->type,
                 'status' => $request->status,
@@ -130,6 +134,8 @@ class ServiceController extends Controller
                 'testimonial' => $request->testimonial,
                 'video_embed' => $request->video_embed,
                 'url' => $request->url,
+                'ios_app_url' => $request->ios_app_url,
+                'android_app_url' => $request->android_app_url,
                 'contact_name' => $request->contact_name,
                 'contact_phone' => $request->contact_phone,
                 'contact_email' => $request->contact_email,
@@ -265,7 +271,6 @@ class ServiceController extends Controller
         ) {
             $service->update([
                 'organisation_id' => $request->input('organisation_id', $service->organisation_id),
-                'slug' => $request->input('slug', $service->slug),
                 'name' => $request->input('name', $service->name),
                 'type' => $request->input('type', $service->type),
                 'status' => $request->input('status', $service->status),
@@ -281,6 +286,8 @@ class ServiceController extends Controller
                 'testimonial' => $request->input('testimonial', $service->testimonial),
                 'video_embed' => $request->input('video_embed', $service->video_embed),
                 'url' => $request->input('url', $service->url),
+                'ios_app_url' => $request->input('ios_app_url', $service->ios_app_url),
+                'android_app_url' => $request->input('android_app_url', $service->android_app_url),
                 'contact_name' => $request->input('contact_name', $service->contact_name),
                 'contact_phone' => $request->input('contact_phone', $service->contact_phone),
                 'contact_email' => $request->input('contact_email', $service->contact_email),
