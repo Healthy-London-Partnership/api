@@ -19,7 +19,6 @@ class UpdateServiceSchema extends Schema
             ->type(static::TYPE_OBJECT)
             ->required(
                 'name',
-                'slug',
                 'type',
                 'status',
                 'intro',
@@ -48,7 +47,6 @@ class UpdateServiceSchema extends Schema
             )
             ->properties(
                 Schema::string('name'),
-                Schema::string('slug'),
                 Schema::string('type')
                     ->enum(
                         Service::TYPE_SERVICE,
