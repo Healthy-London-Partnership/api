@@ -2394,4 +2394,67 @@ class ServicesTest extends TestCase
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
+
+    public function test_slug_clash_on_create_generates_auto_increment_slug()
+    {
+        $organisation = factory(Organisation::class)->create();
+
+        $service = factory(Service::class)->create([
+            'slug' => 'test-service',
+            'status' => Service::STATUS_ACTIVE,
+        ]);
+
+        $taxonomy = Taxonomy::category()->children()->firstOrFail();
+        $service->syncServiceTaxonomies(new Collection([$taxonomy]));
+        $user = factory(User::class)->create()->makeGlobalAdmin();
+
+        Passport::actingAs($user);
+
+        $payload = $this->createServicePayload($organisation);
+        $payload['slug'] = 'test-service';
+
+        $response = $this->json('POST', '/core/v1/services', $payload);
+
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        $response->assertJsonFragment([
+            'slug' => 'test-service-1',
+        ]);
+
+        $this->assertDatabaseHas('services', [
+            'slug' => 'test-service-1',
+        ]);
+    }
+
+    public function test_slug_clash_on_update_generates_auto_increment_slug()
+    {
+        $service1 = factory(Service::class)->create([
+            'slug' => 'test-service',
+            'status' => Service::STATUS_ACTIVE,
+        ]);
+        $service2 = factory(Service::class)->create([
+            'status' => Service::STATUS_ACTIVE,
+        ]);
+        $taxonomy = Taxonomy::category()->children()->firstOrFail();
+        $service1->syncServiceTaxonomies(new Collection([$taxonomy]));
+        $service2->syncServiceTaxonomies(new Collection([$taxonomy]));
+        $user = factory(User::class)->create()->makeGlobalAdmin();
+
+        Passport::actingAs($user);
+
+        $payload = $this->updateServicePayload($service2);
+        $payload['slug'] = 'test-service';
+
+        $response = $this->json('PUT', "/core/v1/services/{$service2->id}", $payload);
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        $response->assertJsonFragment([
+            'slug' => 'test-service-1',
+        ]);
+
+        $this->assertDatabaseHas('services', [
+            'slug' => 'test-service-1',
+        ]);
+    }
 }
