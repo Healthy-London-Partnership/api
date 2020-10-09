@@ -12,8 +12,8 @@ class AddAppStoreLinksToServicesTable extends Migration
     public function up()
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->string('ios_app_url', 255)->nullable();
-            $table->string('android_app_url', 255)->nullable();
+            $table->string('ios_app_url', 255)->after('url')->nullable();
+            $table->string('android_app_url', 255)->after('ios_app_url')->nullable();
         });
     }
 
