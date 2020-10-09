@@ -1124,26 +1124,6 @@ class ServicesTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function test_service_admin_cannot_update_slug()
-    {
-        $service = factory(Service::class)->create([
-            'slug' => 'test-service',
-            'status' => Service::STATUS_ACTIVE,
-        ]);
-        $taxonomy = Taxonomy::category()->children()->firstOrFail();
-        $service->syncServiceTaxonomies(new Collection([$taxonomy]));
-        $user = factory(User::class)->create()->makeServiceAdmin($service);
-
-        Passport::actingAs($user);
-
-        $payload = $this->updateServicePayload($service);
-        $payload['slug'] = 'new-slug';
-
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
-
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
-
     public function test_global_admin_cannot_update_status()
     {
         $service = factory(Service::class)->create([
@@ -1158,26 +1138,6 @@ class ServicesTest extends TestCase
 
         $payload = $this->updateServicePayload($service);
         $payload['status'] = Service::STATUS_INACTIVE;
-
-        $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
-
-        $response->assertStatus(Response::HTTP_OK);
-    }
-
-    public function test_global_admin_cannot_update_slug()
-    {
-        $service = factory(Service::class)->create([
-            'slug' => 'test-service',
-            'status' => Service::STATUS_ACTIVE,
-        ]);
-        $taxonomy = Taxonomy::category()->children()->firstOrFail();
-        $service->syncServiceTaxonomies(new Collection([$taxonomy]));
-        $user = factory(User::class)->create()->makeGlobalAdmin();
-
-        Passport::actingAs($user);
-
-        $payload = $this->updateServicePayload($service);
-        $payload['slug'] = 'new-slug';
 
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", $payload);
 
@@ -1325,7 +1285,7 @@ class ServicesTest extends TestCase
     public function test_only_partial_fields_can_be_updated()
     {
         $service = factory(Service::class)->create([
-            'slug' => 'test-service',
+            'intro' => 'Service intro',
             'status' => Service::STATUS_ACTIVE,
         ]);
         $taxonomy = Taxonomy::category()->children()->firstOrFail();
@@ -1335,12 +1295,12 @@ class ServicesTest extends TestCase
         Passport::actingAs($user);
 
         $response = $this->json('PUT', "/core/v1/services/{$service->id}", [
-            'slug' => 'random-slug',
+            'intro' => 'New intro',
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonFragment([
-            'slug' => 'random-slug',
+            'intro' => 'New intro',
         ]);
     }
 
