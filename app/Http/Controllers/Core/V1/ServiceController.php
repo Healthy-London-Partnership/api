@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Core\V1;
 
 use App\Events\EndpointHit;
+use App\Generators\UniqueSlugGenerator;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Service\HasCategoryTaxonomiesFilter;
 use App\Http\Filters\Service\HasPermissionFilter;
@@ -96,6 +97,7 @@ class ServiceController extends Controller
      * @param \App\Normalisers\OfferingNormaliser $offeringNormaliser
      * @param \App\Normalisers\SocialMediaNormaliser $socialMediaNormaliser
      * @param \App\Normalisers\GalleryItemNormaliser $galleryItemNormaliser
+     * @param \App\Generators\UniqueSlugGenerator $slugGenerator
      * @return \Illuminate\Http\Response
      */
     public function store(
@@ -103,20 +105,22 @@ class ServiceController extends Controller
         UsefulInfoNormaliser $usefulInfoNormaliser,
         OfferingNormaliser $offeringNormaliser,
         SocialMediaNormaliser $socialMediaNormaliser,
-        GalleryItemNormaliser $galleryItemNormaliser
+        GalleryItemNormaliser $galleryItemNormaliser,
+        UniqueSlugGenerator $slugGenerator
     ) {
         return DB::transaction(function () use (
             $request,
             $usefulInfoNormaliser,
             $offeringNormaliser,
             $socialMediaNormaliser,
-            $galleryItemNormaliser
+            $galleryItemNormaliser,
+            $slugGenerator
         ) {
             // Create the service record.
             /** @var \App\Models\Service $service */
             $service = Service::create([
                 'organisation_id' => $request->organisation_id,
-                'slug' => $request->slug,
+                'slug' => $slugGenerator->generate($request->name, table(Service::class)),
                 'name' => $request->name,
                 'type' => $request->type,
                 'status' => $request->status,
@@ -267,7 +271,6 @@ class ServiceController extends Controller
         ) {
             $service->update([
                 'organisation_id' => $request->input('organisation_id', $service->organisation_id),
-                'slug' => $request->input('slug', $service->slug),
                 'name' => $request->input('name', $service->name),
                 'type' => $request->input('type', $service->type),
                 'status' => $request->input('status', $service->status),

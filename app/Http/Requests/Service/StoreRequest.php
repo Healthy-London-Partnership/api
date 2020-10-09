@@ -15,7 +15,6 @@ use App\Rules\IsOrganisationAdmin;
 use App\Rules\MarkdownMaxLength;
 use App\Rules\MarkdownMinLength;
 use App\Rules\RootTaxonomyIs;
-use App\Rules\Slug;
 use App\Rules\UserHasRole;
 use App\Rules\VideoEmbed;
 use Illuminate\Foundation\Http\FormRequest;
@@ -46,7 +45,6 @@ class StoreRequest extends FormRequest
     {
         return [
             'organisation_id' => ['required', 'exists:organisations,id', new IsOrganisationAdmin($this->user())],
-            'slug' => ['required', 'string', 'min:1', 'max:255', 'unique:' . table(Service::class) . ',slug', new Slug()],
             'name' => ['required', 'string', 'min:1', 'max:255'],
             'type' => [
                 'required',
