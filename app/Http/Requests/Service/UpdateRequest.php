@@ -119,6 +119,12 @@ class UpdateRequest extends FormRequest
             'testimonial' => ['nullable', 'string', 'min:1', 'max:255'],
             'video_embed' => ['nullable', 'string', 'url', 'max:255', new VideoEmbed()],
             'url' => ['url', 'max:255'],
+            'ios_app_url' => [
+                Rule::requiredIf(($this->service->type === Service::TYPE_APP || $this->type === Service::TYPE_APP) && (!$this->android_app_url && !$this->service->ios_app_url && !$this->service->android_app_url)),
+                'nullable', 'url', 'max:255', ],
+            'android_app_url' => [
+                Rule::requiredIf(($this->service->type === Service::TYPE_APP || $this->type === Service::TYPE_APP) && (!$this->ios_app_url && !$this->service->ios_app_url && !$this->service->android_app_url)),
+                'nullable', 'url', 'max:255', ],
             'contact_name' => ['nullable', 'string', 'min:1', 'max:255'],
             'contact_phone' => ['nullable', 'string', 'min:1', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
