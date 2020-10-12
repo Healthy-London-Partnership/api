@@ -55,16 +55,23 @@ class SettingsTest extends TestCase
                             'title',
                             'content',
                         ],
-                        'about' => [
+                        'about_connect' => [
                             'title',
                             'content',
-                            'video_url',
+                        ],
+                        'providers' => [
+                            'title',
+                            'content',
+                        ],
+                        'supporters' => [
+                            'title',
+                            'content',
+                        ],
+                        'funders' => [
+                            'title',
+                            'content',
                         ],
                         'contact' => [
-                            'title',
-                            'content',
-                        ],
-                        'get_involved' => [
                             'title',
                             'content',
                         ],
@@ -108,16 +115,23 @@ class SettingsTest extends TestCase
                             'title' => 'Title',
                             'content' => 'Content',
                         ],
-                        'about' => [
+                        'about_connect' => [
                             'title' => 'Title',
                             'content' => 'Content',
-                            'video_url' => 'Video URL',
+                        ],
+                        'providers' => [
+                            'title' => 'Title',
+                            'content' => 'Content',
+                        ],
+                        'supporters' => [
+                            'title' => 'Title',
+                            'content' => 'Content',
+                        ],
+                        'funders' => [
+                            'title' => 'Title',
+                            'content' => 'Content',
                         ],
                         'contact' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'get_involved' => [
                             'title' => 'Title',
                             'content' => 'Content',
                         ],
@@ -223,18 +237,25 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about' => [
+                    'about_connect' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
-                        'video_url' => 'https://www.youtube.com/random-video-slug',
+                    ],
+                    'providers' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'supporters' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'funders' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'contact' => [
                         'title' => 'data/cms/frontend/contact/title',
                         'content' => 'data/cms/frontend/contact/content',
-                    ],
-                    'get_involved' => [
-                        'title' => 'data/cms/frontend/get_involved/title',
-                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'favourites' => [
                         'title' => 'data/cms/frontend/favourites/title',
@@ -278,18 +299,25 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about' => [
-                        'title' => 'data/cms/frontend/about/title',
-                        'content' => 'data/cms/frontend/about/content',
-                        'video_url' => 'https://www.youtube.com/random-video-slug',
+                    'about_connect' => [
+                        'title' => 'data/cms/frontend/about_connect/title',
+                        'content' => 'data/cms/frontend/about_connect/content',
+                    ],
+                    'providers' => [
+                        'title' => 'data/cms/frontend/providers/title',
+                        'content' => 'data/cms/frontend/providers/content',
+                    ],
+                    'supporters' => [
+                        'title' => 'data/cms/frontend/supporters/title',
+                        'content' => 'data/cms/frontend/supporters/content',
+                    ],
+                    'funders' => [
+                        'title' => 'data/cms/frontend/funders/title',
+                        'content' => 'data/cms/frontend/funders/content',
                     ],
                     'contact' => [
                         'title' => 'data/cms/frontend/contact/title',
                         'content' => 'data/cms/frontend/contact/content',
-                    ],
-                    'get_involved' => [
-                        'title' => 'data/cms/frontend/get_involved/title',
-                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'favourites' => [
                         'title' => 'data/cms/frontend/favourites/title',
@@ -325,16 +353,23 @@ class SettingsTest extends TestCase
                             'title',
                             'content',
                         ],
-                        'about' => [
+                        'about_connect' => [
                             'title',
                             'content',
-                            'video_url',
+                        ],
+                        'providers' => [
+                            'title',
+                            'content',
+                        ],
+                        'supporters' => [
+                            'title',
+                            'content',
+                        ],
+                        'funders' => [
+                            'title',
+                            'content',
                         ],
                         'contact' => [
-                            'title',
-                            'content',
-                        ],
-                        'get_involved' => [
                             'title',
                             'content',
                         ],
@@ -379,18 +414,25 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about' => [
+                    'about_connect' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
-                        'video_url' => 'https://www.youtube.com/random-video-slug',
+                    ],
+                    'providers' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'supporters' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'funders' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'contact' => [
                         'title' => 'data/cms/frontend/contact/title',
                         'content' => 'data/cms/frontend/contact/content',
-                    ],
-                    'get_involved' => [
-                        'title' => 'data/cms/frontend/get_involved/title',
-                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'favourites' => [
                         'title' => 'data/cms/frontend/favourites/title',
@@ -426,18 +468,25 @@ class SettingsTest extends TestCase
                             'title' => 'data/cms/frontend/privacy_policy/title',
                             'content' => 'data/cms/frontend/privacy_policy/content',
                         ],
-                        'about' => [
+                        'about_connect' => [
                             'title' => 'data/cms/frontend/about/title',
                             'content' => 'data/cms/frontend/about/content',
-                            'video_url' => 'https://www.youtube.com/random-video-slug',
+                        ],
+                        'providers' => [
+                            'title' => 'data/cms/frontend/get_involved/title',
+                            'content' => 'data/cms/frontend/get_involved/content',
+                        ],
+                        'supporters' => [
+                            'title' => 'data/cms/frontend/get_involved/title',
+                            'content' => 'data/cms/frontend/get_involved/content',
+                        ],
+                        'funders' => [
+                            'title' => 'data/cms/frontend/get_involved/title',
+                            'content' => 'data/cms/frontend/get_involved/content',
                         ],
                         'contact' => [
                             'title' => 'data/cms/frontend/contact/title',
                             'content' => 'data/cms/frontend/contact/content',
-                        ],
-                        'get_involved' => [
-                            'title' => 'data/cms/frontend/get_involved/title',
-                            'content' => 'data/cms/frontend/get_involved/content',
                         ],
                         'favourites' => [
                             'title' => 'data/cms/frontend/favourites/title',
@@ -482,18 +531,25 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about' => [
+                    'about_connect' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
-                        'video_url' => 'https://www.youtube.com/random-video-slug',
+                    ],
+                    'providers' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'supporters' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
+                    ],
+                    'funders' => [
+                        'title' => 'data/cms/frontend/get_involved/title',
+                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'contact' => [
                         'title' => 'data/cms/frontend/contact/title',
                         'content' => 'data/cms/frontend/contact/content',
-                    ],
-                    'get_involved' => [
-                        'title' => 'data/cms/frontend/get_involved/title',
-                        'content' => 'data/cms/frontend/get_involved/content',
                     ],
                     'favourites' => [
                         'title' => 'data/cms/frontend/favourites/title',
