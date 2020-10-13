@@ -11,7 +11,7 @@ class UpdateSettingsTableCmsDefaultValue extends Migration
     public function up()
     {
         DB::table('settings')
-            ->where('key', 'cms')
+            ->where('key', '=', 'cms')
             ->update([
                 'value' => DB::raw(
                     <<<'EOT'
@@ -25,7 +25,7 @@ EOT
                 ),
             ]);
         DB::table('settings')
-            ->where('key', 'cms')
+            ->where('key', '=', 'cms')
             ->update([
                 'value' => DB::raw('JSON_REMOVE(`value`,"$.frontend.get_involved", "$.frontend.about.video_url")'),
             ]);
@@ -37,7 +37,7 @@ EOT
     public function down()
     {
         DB::table('settings')
-            ->where('key', 'cms')
+            ->where('key', '=', 'cms')
             ->update([
                 'value' => DB::raw(
                     <<<'EOT'
@@ -51,7 +51,7 @@ EOT
             ]);
 
         DB::table('settings')
-            ->where('key', 'cms')
+            ->where('key', '=', 'cms')
             ->update([
                 'value' => DB::raw('JSON_REMOVE(`value`,"$.frontend.providers", "$.frontend.supporters","$.frontend.funders")'),
             ]);
