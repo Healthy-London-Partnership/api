@@ -55,7 +55,7 @@ class SettingsTest extends TestCase
                             'title',
                             'content',
                         ],
-                        'about_connect' => [
+                        'about' => [
                             'title',
                             'content',
                         ],
@@ -115,7 +115,7 @@ class SettingsTest extends TestCase
                             'title' => 'Title',
                             'content' => 'Content',
                         ],
-                        'about_connect' => [
+                        'about' => [
                             'title' => 'Title',
                             'content' => 'Content',
                         ],
@@ -237,7 +237,7 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about_connect' => [
+                    'about' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
                     ],
@@ -299,9 +299,9 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about_connect' => [
-                        'title' => 'data/cms/frontend/about_connect/title',
-                        'content' => 'data/cms/frontend/about_connect/content',
+                    'about' => [
+                        'title' => 'data/cms/frontend/about/title',
+                        'content' => 'data/cms/frontend/about/content',
                     ],
                     'providers' => [
                         'title' => 'data/cms/frontend/providers/title',
@@ -353,7 +353,7 @@ class SettingsTest extends TestCase
                             'title',
                             'content',
                         ],
-                        'about_connect' => [
+                        'about' => [
                             'title',
                             'content',
                         ],
@@ -414,7 +414,7 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about_connect' => [
+                    'about' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
                     ],
@@ -468,7 +468,7 @@ class SettingsTest extends TestCase
                             'title' => 'data/cms/frontend/privacy_policy/title',
                             'content' => 'data/cms/frontend/privacy_policy/content',
                         ],
-                        'about_connect' => [
+                        'about' => [
                             'title' => 'data/cms/frontend/about/title',
                             'content' => 'data/cms/frontend/about/content',
                         ],
@@ -531,7 +531,7 @@ class SettingsTest extends TestCase
                         'title' => 'data/cms/frontend/privacy_policy/title',
                         'content' => 'data/cms/frontend/privacy_policy/content',
                     ],
-                    'about_connect' => [
+                    'about' => [
                         'title' => 'data/cms/frontend/about/title',
                         'content' => 'data/cms/frontend/about/content',
                     ],

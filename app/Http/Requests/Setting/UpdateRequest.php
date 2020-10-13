@@ -50,9 +50,9 @@ class UpdateRequest extends FormRequest
             'cms.frontend.privacy_policy.title' => ['required', 'string'],
             'cms.frontend.privacy_policy.content' => ['required', 'string'],
 
-            'cms.frontend.about_connect' => ['required', 'array'],
-            'cms.frontend.about_connect.title' => ['required', 'string'],
-            'cms.frontend.about_connect.content' => ['required', 'string'],
+            'cms.frontend.about' => ['required', 'array'],
+            'cms.frontend.about.title' => ['required', 'string'],
+            'cms.frontend.about.content' => ['required', 'string'],
 
             'cms.frontend.providers' => ['required', 'array'],
             'cms.frontend.providers.title' => ['required', 'string'],

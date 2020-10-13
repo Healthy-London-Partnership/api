@@ -13,56 +13,21 @@ class UpdateSettingsTableCmsDefaultValue extends Migration
         DB::table('settings')
             ->where('key', 'cms')
             ->update([
-                'value' => json_encode([
-                    'frontend' => [
-                        'global' => [
-                            'footer_title' => 'Footer title',
-                            'footer_content' => 'Footer content',
-                            'contact_phone' => 'Contact phone',
-                            'contact_email' => 'Contact email',
-                            'facebook_handle' => 'Facebook handle',
-                            'twitter_handle' => 'Twitter handle',
-                        ],
-                        'home' => [
-                            'search_title' => 'Search title',
-                            'categories_title' => 'Categories title',
-                            'personas_title' => 'Personas title',
-                            'personas_content' => 'Personas content',
-                        ],
-                        'terms_and_conditions' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'privacy_policy' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'about_connect' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'providers' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'supporters' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'funders' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'contact' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'favourites' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                    ],
-                ]),
+                'value' => DB::raw(
+                    <<<'EOT'
+JSON_SET(
+    `value`,
+    "$.frontend.providers",JSON_OBJECT("title",`value`->>"$.frontend.get_involved.title","content",`value`->>"$.frontend.get_involved.content"),
+    "$.frontend.supporters",JSON_OBJECT("title","Title","content","Content"),
+    "$.frontend.funders",JSON_OBJECT("title","Title","content","Content")
+)
+EOT
+                ),
+            ]);
+        DB::table('settings')
+            ->where('key', 'cms')
+            ->update([
+                'value' => DB::raw('JSON_REMOVE(`value`,"$.frontend.get_involved", "$.frontend.about.video_url")'),
             ]);
     }
 
@@ -74,49 +39,21 @@ class UpdateSettingsTableCmsDefaultValue extends Migration
         DB::table('settings')
             ->where('key', 'cms')
             ->update([
-                'value' => json_encode([
-                    'frontend' => [
-                        'global' => [
-                            'footer_title' => 'Footer title',
-                            'footer_content' => 'Footer content',
-                            'contact_phone' => 'Contact phone',
-                            'contact_email' => 'Contact email',
-                            'facebook_handle' => 'Facebook handle',
-                            'twitter_handle' => 'Twitter handle',
-                        ],
-                        'home' => [
-                            'search_title' => 'Search title',
-                            'categories_title' => 'Categories title',
-                            'personas_title' => 'Personas title',
-                            'personas_content' => 'Personas content',
-                        ],
-                        'terms_and_conditions' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'privacy_policy' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'about' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                            'video_url' => 'Video URL',
-                        ],
-                        'contact' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'get_involved' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                        'favourites' => [
-                            'title' => 'Title',
-                            'content' => 'Content',
-                        ],
-                    ],
-                ]),
+                'value' => DB::raw(
+                    <<<'EOT'
+JSON_SET(
+    `value`,
+    "$.frontend.get_involved",JSON_OBJECT("title",`value`->>"$.frontend.providers.title","content",`value`->>"$.frontend.providers.content"),
+    "$.frontend.about.video_url","Video URL")
+)
+EOT
+                ),
+            ]);
+
+        DB::table('settings')
+            ->where('key', 'cms')
+            ->update([
+                'value' => DB::raw('JSON_REMOVE(`value`,"$.frontend.providers", "$.frontend.supporters","$.frontend.funders")'),
             ]);
     }
 }

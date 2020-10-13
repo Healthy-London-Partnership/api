@@ -63,9 +63,9 @@ class SettingController extends Controller
                                 'title' => $request->input('cms.frontend.privacy_policy.title'),
                                 'content' => sanitize_markdown($request->input('cms.frontend.privacy_policy.content')),
                             ],
-                            'about_connect' => [
-                                'title' => $request->input('cms.frontend.about_connect.title'),
-                                'content' => sanitize_markdown($request->input('cms.frontend.about_connect.content')),
+                            'about' => [
+                                'title' => $request->input('cms.frontend.about.title'),
+                                'content' => sanitize_markdown($request->input('cms.frontend.about.content')),
                             ],
                             'providers' => [
                                 'title' => $request->input('cms.frontend.providers.title'),
