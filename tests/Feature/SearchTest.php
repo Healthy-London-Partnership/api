@@ -197,58 +197,110 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonFragment(['id' => $service->id]);
     }
 
-    public function test_filter_by_category_works()
+    public function test_filter_by_categories_works()
     {
-        $service = factory(Service::class)->create();
-        $collection = Collection::create([
+        $service1 = factory(Service::class)->create();
+        $service2 = factory(Service::class)->create();
+        $collection1 = Collection::create([
             'type' => Collection::TYPE_CATEGORY,
             'slug' => 'self-help',
             'name' => 'Self Help',
             'meta' => [],
             'order' => 1,
         ]);
-        $taxonomy = Taxonomy::category()->children()->create([
-            'slug' => 'phpunit-taxonomy',
-            'name' => 'PHPUnit Taxonomy',
+        $collection2 = Collection::create([
+            'type' => Collection::TYPE_CATEGORY,
+            'slug' => 'addiction',
+            'name' => 'Addiction',
+            'meta' => [],
+            'order' => 2,
+        ]);
+        $taxonomy1 = Taxonomy::category()->children()->create([
+            'slug' => 'test-taxonomy-1',
+            'name' => 'Test Taxonomy 1',
             'order' => 1,
         ]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $service->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $service->save();
+        $taxonomy2 = Taxonomy::category()->children()->create([
+            'slug' => 'test-taxonomy-2',
+            'name' => 'Test Taxonomy 2',
+            'order' => 2,
+        ]);
+        $collection1->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
+        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
+        $service1->save();
+
+        $collection2->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
+        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
+        $service2->save();
 
         $response = $this->json('POST', '/core/v1/search', [
-            'category' => $collection->name,
+            'categories' => [$collection1->name],
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $service->id]);
+        $response->assertJsonFragment(['id' => $service1->id]);
+        $response->assertJsonMissing(['id' => $service2->id]);
+
+        $response = $this->json('POST', '/core/v1/search', [
+            'categories' => [$collection1->name, $collection2->name],
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['id' => $service1->id]);
+        $response->assertJsonFragment(['id' => $service2->id]);
     }
 
-    public function test_filter_by_persona_works()
+    public function test_filter_by_personas_works()
     {
-        $service = factory(Service::class)->create();
-        $collection = Collection::create([
+        $service1 = factory(Service::class)->create();
+        $service2 = factory(Service::class)->create();
+        $collection1 = Collection::create([
             'type' => Collection::TYPE_PERSONA,
             'slug' => 'refugees',
             'name' => 'Refugees',
             'meta' => [],
             'order' => 1,
         ]);
-        $taxonomy = Taxonomy::category()->children()->create([
-            'slug' => 'phpunit-taxonomy',
-            'name' => 'PHPUnit Taxonomy',
+        $collection2 = Collection::create([
+            'type' => Collection::TYPE_PERSONA,
+            'slug' => 'homeless',
+            'name' => 'Homeless',
+            'meta' => [],
+            'order' => 2,
+        ]);
+        $taxonomy1 = Taxonomy::category()->children()->create([
+            'slug' => 'test-taxonomy-1',
+            'name' => 'Test Taxonomy 1',
             'order' => 1,
         ]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $service->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $service->save();
+        $taxonomy2 = Taxonomy::category()->children()->create([
+            'slug' => 'test-taxonomy-2',
+            'name' => 'Test Taxonomy 2',
+            'order' => 2,
+        ]);
+        $collection1->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
+        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
+        $service1->save();
+
+        $collection2->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
+        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
+        $service2->save();
 
         $response = $this->json('POST', '/core/v1/search', [
-            'persona' => $collection->name,
+            'personas' => [$collection1->name],
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $service->id]);
+        $response->assertJsonFragment(['id' => $service1->id]);
+        $response->assertJsonMissing(['id' => $service2->id]);
+
+        $response = $this->json('POST', '/core/v1/search', [
+            'personas' => [$collection1->name, $collection2->name],
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['id' => $service1->id]);
+        $response->assertJsonFragment(['id' => $service2->id]);
     }
 
     public function test_filter_by_wait_time_works()
