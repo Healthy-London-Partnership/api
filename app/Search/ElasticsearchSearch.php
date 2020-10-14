@@ -137,12 +137,12 @@ class ElasticsearchSearch implements Search
     /**
      * @inheritDoc
      */
-    public function applyCategory(string $category): Search
+    public function applyCategory(string $categorySlug): Search
     {
         $categoryModel = CollectionModel::query()
             ->with('taxonomies')
             ->categories()
-            ->where('name', $category)
+            ->where('slug', $categorySlug)
             ->firstOrFail();
 
         $should = &$this->query['query']['bool']['must']['bool']['should'];
@@ -151,9 +151,17 @@ class ElasticsearchSearch implements Search
             $should[] = $this->match('taxonomy_categories', $taxonomy->name);
         }
 
+        foreach ($this->query['query']['bool']['filter']['bool']['must'] as &$filter) {
+            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists('collection_categories', $filter['terms'])) {
+                $filter['terms']['collection_categories'][] = $categoryModel->name;
+
+                return $this;
+            }
+        }
+
         $this->query['query']['bool']['filter']['bool']['must'][] = [
-            'term' => [
-                'collection_categories' => $category,
+            'terms' => [
+                'collection_categories' => [$categoryModel->name],
             ],
         ];
 
@@ -163,12 +171,12 @@ class ElasticsearchSearch implements Search
     /**
      * @inheritDoc
      */
-    public function applyPersona(string $persona): Search
+    public function applyPersona(string $personaSlug): Search
     {
         $categoryModel = CollectionModel::query()
             ->with('taxonomies')
             ->personas()
-            ->where('name', $persona)
+            ->where('slug', $personaSlug)
             ->firstOrFail();
 
         $should = &$this->query['query']['bool']['must']['bool']['should'];
@@ -177,9 +185,17 @@ class ElasticsearchSearch implements Search
             $should[] = $this->match('taxonomy_categories', $taxonomy->name);
         }
 
+        foreach ($this->query['query']['bool']['filter']['bool']['must'] as &$filter) {
+            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists('collection_personas', $filter['terms'])) {
+                $filter['terms']['collection_personas'][] = $categoryModel->name;
+
+                return $this;
+            }
+        }
+
         $this->query['query']['bool']['filter']['bool']['must'][] = [
-            'term' => [
-                'collection_personas' => $persona,
+            'terms' => [
+                'collection_personas' => [$categoryModel->name],
             ],
         ];
 
