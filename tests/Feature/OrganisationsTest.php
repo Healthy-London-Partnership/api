@@ -1343,6 +1343,7 @@ class OrganisationsTest extends TestCase
         $organisations = collect([
             factory(Organisation::class)->states('web', 'email', 'phone')->make(['name' => 'Current Organisation']),
             factory(Organisation::class)->states('web', 'email', 'phone')->make(['name' => 'New Organisation']),
+            factory(Organisation::class)->states('web', 'email', 'phone')->make(['name' => 'New Organisation']),
         ]);
 
         $this->createOrganisationSpreadsheets($organisations);
@@ -1350,6 +1351,7 @@ class OrganisationsTest extends TestCase
         $response = $this->json('POST', "/core/v1/organisations/import", [
             'spreadsheet' => 'data:application/vnd.ms-excel;base64,' . base64_encode(file_get_contents(Storage::disk('local')->path('test.xls'))),
         ]);
+
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $headers = [
@@ -1362,7 +1364,16 @@ class OrganisationsTest extends TestCase
         $headersWithId = array_merge($headers, ['id']);
 
         $response->assertJsonFragment([
+            collect($organisation1->getAttributes())->only($headersWithId)->all(),
+        ]);
+        $response->assertJsonFragment([
             'row' => collect($organisations->get(0)->getAttributes())->only($headers)->put('index', 2)->all(),
+        ]);
+        $response->assertJsonFragment([
+            'email' => $organisations->get(2)->email,
+        ]);
+        $response->assertJsonFragment([
+            'row' => collect($organisations->get(1)->getAttributes())->only($headers)->put('index', 3)->all(),
         ]);
         $response->assertJsonStructure([
             'data' => [
