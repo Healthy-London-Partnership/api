@@ -24,15 +24,10 @@ interface Search
 
     /**
      * @param string $category
+     * @param string $type
      * @return \App\Contracts\Search
      */
-    public function applyCategory(string $category): Search;
-
-    /**
-     * @param string $persona
-     * @return \App\Contracts\Search
-     */
-    public function applyPersona(string $persona): Search;
+    public function applyCollection(string $category, string $type): Search;
 
     /**
      * @param string $waitTime

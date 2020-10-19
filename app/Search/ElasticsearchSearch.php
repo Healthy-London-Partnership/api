@@ -137,23 +137,33 @@ class ElasticsearchSearch implements Search
     /**
      * @inheritDoc
      */
-    public function applyCategory(string $categorySlug): Search
+    public function applyCollection(string $slug, string $type): Search
     {
-        $categoryModel = CollectionModel::query()
+        $query = CollectionModel::query()
             ->with('taxonomies')
-            ->categories()
-            ->where('slug', $categorySlug)
-            ->firstOrFail();
+            ->where('slug', $slug);
+
+        if ($type === 'category') {
+            $query->categories();
+        } elseif ($type === 'persona') {
+            $query->personas();
+        } else {
+            throw new \Exception('Invalid Collection Type');
+        }
+
+        $collectionModel = $query->firstOrFail();
+
+        $term = $type === 'category' ? 'collection_categories' : 'collection_personas';
 
         $should = &$this->query['query']['bool']['must']['bool']['should'];
 
-        foreach ($categoryModel->taxonomies as $taxonomy) {
+        foreach ($collectionModel->taxonomies as $taxonomy) {
             $should[] = $this->match('taxonomy_categories', $taxonomy->name);
         }
 
         foreach ($this->query['query']['bool']['filter']['bool']['must'] as &$filter) {
-            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists('collection_categories', $filter['terms'])) {
-                $filter['terms']['collection_categories'][] = $categoryModel->name;
+            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists($term, $filter['terms'])) {
+                $filter['terms'][$term][] = $collectionModel->name;
 
                 return $this;
             }
@@ -161,41 +171,7 @@ class ElasticsearchSearch implements Search
 
         $this->query['query']['bool']['filter']['bool']['must'][] = [
             'terms' => [
-                'collection_categories' => [$categoryModel->name],
-            ],
-        ];
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function applyPersona(string $personaSlug): Search
-    {
-        $categoryModel = CollectionModel::query()
-            ->with('taxonomies')
-            ->personas()
-            ->where('slug', $personaSlug)
-            ->firstOrFail();
-
-        $should = &$this->query['query']['bool']['must']['bool']['should'];
-
-        foreach ($categoryModel->taxonomies as $taxonomy) {
-            $should[] = $this->match('taxonomy_categories', $taxonomy->name);
-        }
-
-        foreach ($this->query['query']['bool']['filter']['bool']['must'] as &$filter) {
-            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists('collection_personas', $filter['terms'])) {
-                $filter['terms']['collection_personas'][] = $categoryModel->name;
-
-                return $this;
-            }
-        }
-
-        $this->query['query']['bool']['filter']['bool']['must'][] = [
-            'terms' => [
-                'collection_personas' => [$categoryModel->name],
+                $term => [$collectionModel->name],
             ],
         ];
 
