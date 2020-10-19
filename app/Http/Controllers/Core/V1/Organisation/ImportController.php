@@ -196,6 +196,19 @@ class ImportController extends Controller
                 ->get();
 
             /**
+             * Strip out IDs from duplicates that were created during this process.
+             * i.e If duplicate rows were in the spreadsheet, the duplicate row willbe in $organisationIds
+             * but it will exist only in the transaction and will be unavailable for use in $this->ignoreDuplicateIds.
+             */
+            $originalRows = $originalRows->map(function ($row) use ($nameIndex) {
+                if (array_search($row->id, array_column($nameIndex, 'id'))) {
+                    $row->id = null;
+                }
+
+                return $row;
+            });
+
+            /**
              * Add the result to the duplicates array.
              */
             $this->duplicates[] = [

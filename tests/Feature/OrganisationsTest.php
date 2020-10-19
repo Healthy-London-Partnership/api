@@ -1454,6 +1454,62 @@ class OrganisationsTest extends TestCase
         ]);
     }
 
+    public function test_duplicate_rows_in_import_are_detected()
+    {
+        Storage::fake('local');
+
+        $user = factory(User::class)->create()->makeSuperAdmin();
+
+        Passport::actingAs($user);
+
+        $organisation = factory(Organisation::class)->states('web', 'email', 'phone')->create([
+            'name' => 'Current Organisation',
+            'description' => 'Original Organisation',
+        ]);
+
+        $organisations = collect([
+            factory(Organisation::class)->states('web', 'email', 'phone')->make([
+                'name' => 'Current Organisation',
+                'description' => 'Import Organisation 1',
+            ]),
+            factory(Organisation::class)->states('web', 'email', 'phone')->make([
+                'name' => 'Current Organisation',
+                'description' => 'Import Organisation 2',
+            ]),
+        ]);
+
+        $this->createOrganisationSpreadsheets($organisations);
+
+        $response = $this->json('POST', "/core/v1/organisations/import", [
+            'spreadsheet' => 'data:application/vnd.ms-excel;base64,' . base64_encode(file_get_contents(Storage::disk('local')->path('test.xls'))),
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $headers = [
+            'name',
+            'description',
+            'url',
+            'email',
+            'phone',
+        ];
+
+        $response->assertJson([
+            'data' => [
+                'imported_row_count' => 0,
+                'duplicates' => [
+                    [
+                        'row' => collect($organisations->get(0)->getAttributes())->only($headers)->put('index', 2)->all(),
+                        'originals' => [
+                            collect($organisations->get(1)->getAttributes())->only($headers)->put('id', null)->all(),
+                            collect($organisation->getAttributes())->only(array_merge($headers, ['id']))->all(),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function test_filter_organisations_by_is_admin()
     {
         $organisations = factory(Organisation::class, 5)->create();
