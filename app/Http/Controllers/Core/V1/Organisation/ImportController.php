@@ -24,6 +24,13 @@ class ImportController extends Controller
     const ROW_IMPORT_BATCH_SIZE = 100;
 
     /**
+     * Characters which will be replaced with empty string to normalise name field.
+     *
+     * @var string
+     */
+    protected $normalisedCharacters = '-, _.\'"';
+
+    /**
      * OrganisationController constructor.
      */
     public function __construct()
@@ -104,12 +111,17 @@ class ImportController extends Controller
     /**
      * Find exisiting Orgaisations that match rows in the spreadsheet.
      *
+     * @param array $importNormlisedNames
+     *
      * @return array
      */
-    public function rowsExist()
+    public function rowsExist(array $importNormalisedNames)
     {
-        $normaliseCharacters = mb_str_split('-, _.\'"');
+        $normaliseCharacters = mb_str_split($this->normalisedCharacters);
 
+        /**
+         * Concatenate with ';' ids and name columns and count grouped rows.
+         */
         $sql = [
             implode(',', [
                 'select group_concat(distinct id order by id separator ";") as ids',
@@ -119,10 +131,21 @@ class ImportController extends Controller
             ]),
         ];
         $sql[] = 'FROM organisations';
+
+        /**
+         * Ignore those organisations where the user has flagged the duplicate as allowed.
+         */
         if (count($this->ignoreDuplicateIds)) {
             $sql[] = 'where id NOT IN ("' . implode('","', $this->ignoreDuplicateIds) . '")';
         }
-        $sql[] = 'group by normalised_col having count(name) > 1';
+
+        $sql[] = 'group by normalised_col';
+
+        /**
+         * Filter to only take organisations that match with imported rows, or all existing duplicate named organisations are included.
+         */
+        $sql[] = 'having normalised_col IN ("' . implode('","', $importNormalisedNames) . '")';
+        $sql[] = 'and row_count > 1';
 
         return DB::select(implode(' ', $sql));
     }
@@ -159,6 +182,7 @@ class ImportController extends Controller
     public function formatDuplicates(array $duplicates, array $headers, array $nameIndex)
     {
         foreach ($duplicates as $duplicate) {
+
             /**
              * Get the IDs of the duplicate Organisations.
              */
@@ -260,6 +284,7 @@ class ImportController extends Controller
                 $nameIndex[$i + 2] = [
                     'id' => $organisationRow['id'],
                     'name' => $organisationRow['name'],
+                    'normalisedName' => str_replace(mb_str_split($this->normalisedCharacters), '', mb_strtolower(trim($organisationRow['name']))),
                     'index' => $i + 2,
                 ];
 
@@ -305,7 +330,10 @@ class ImportController extends Controller
             /**
              * Look for duplicates in the database.
              */
-            $duplicates = $this->rowsExist();
+            $normalisedNames = array_map(function ($row) {
+                return $row['normalisedName'];
+            }, $nameIndex);
+            $duplicates = $this->rowsExist($normalisedNames);
 
             if (count($duplicates)) {
                 /**
@@ -314,7 +342,7 @@ class ImportController extends Controller
                  */
                 if (count($this->ignoreDuplicateIds)) {
                     $this->ignoreDuplicateIds = [];
-                    $duplicates = $this->rowsExist();
+                    $duplicates = $this->rowsExist($normalisedNames);
                 }
                 /**
                  * Throws an exception which will be caught in self::processSpreadsheet.
