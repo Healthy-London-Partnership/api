@@ -1497,17 +1497,14 @@ class OrganisationsTest extends TestCase
         $response->assertJson([
             'data' => [
                 'imported_row_count' => 0,
-                'duplicates' => [
-                    [
-                        'row' => collect($organisations->get(0)->getAttributes())->only($headers)->put('index', 2)->all(),
-                        'originals' => [
-                            collect($organisations->get(1)->getAttributes())->only($headers)->put('id', null)->all(),
-                            collect($organisation->getAttributes())->only(array_merge($headers, ['id']))->all(),
-                        ],
-                    ],
-                ],
             ],
         ]);
+        $response->assertJsonFragment([
+            'row' => collect($organisations->get(0)->getAttributes())->only($headers)->put('index', 2)->all(),
+        ]);
+        $response->assertJsonCount(2, 'data.duplicates.*.originals.*');
+        $response->assertJsonFragment(collect($organisations->get(1)->getAttributes())->only($headers)->put('id', null)->all());
+        $response->assertJsonFragment(collect($organisation->getAttributes())->only(array_merge($headers, ['id']))->all());
     }
 
     public function test_filter_organisations_by_is_admin()
