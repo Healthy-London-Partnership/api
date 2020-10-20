@@ -29,12 +29,12 @@ class SearchController extends Controller
         if ($request->has('category')) {
             // If category given then filter by category.
             foreach (explode(',', $request->category) as $category) {
-                $search->applyCollection($category, 'category');
+                $search->applyCategory($category);
             }
         } elseif ($request->has('persona')) {
             // Otherwise, if persona given then filter by persona.
             foreach (explode(',', $request->persona) as $persona) {
-                $search->applyCollection($persona, 'persona');
+                $search->applyPersona($persona);
             }
         }
 
@@ -64,6 +64,8 @@ class SearchController extends Controller
 
         // Apply order.
         $search->applyOrder($request->order ?? 'relevance', $location ?? null);
+
+        // dd($search->getQuery());
 
         // Perform the search.
         return $search->paginate($request->page, $request->per_page);
