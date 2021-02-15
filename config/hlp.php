@@ -82,6 +82,13 @@ return [
     ],
 
     /*
+     * The NSH API credentials.
+     */
+    'nhs' => [
+        'subscription_key' => env('NHS_API_KEY'),
+    ],
+
+    /*
      * Used for GOV.UK Notify.
      */
     'notifications_template_ids' => [
