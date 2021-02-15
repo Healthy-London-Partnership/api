@@ -97,7 +97,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(NhsConditionsRepository::class, function (Container $app) {
             return new NhsConditionsRepository(
                 $app->make(Client::class),
-                'https://api.nhs.uk',
+                config('hlp.nhs.domain'),
                 config('hlp.nhs.subscription_key'),
                 3
             );

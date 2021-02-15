@@ -85,6 +85,7 @@ return [
      * The NSH API credentials.
      */
     'nhs' => [
+        'domain' => 'https://api.nhs.uk',
         'subscription_key' => env('NHS_API_KEY'),
     ],
 
