@@ -687,6 +687,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(3, 'data');
 
         $content = $this->getResponseContent($response)['data'];
         $this->assertEquals($service1->id, $content[0]['id']);
@@ -751,6 +752,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(3, 'data');
 
         $content = $this->getResponseContent($response)['data'];
         $this->assertEquals($service1->id, $content[0]['id']);

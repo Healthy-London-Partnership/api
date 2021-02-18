@@ -440,11 +440,13 @@ class ElasticsearchSearch implements Search
 
         $term = $type === 'category' ? 'collection_categories' : 'collection_personas';
 
-        $this->query['query']['function_score']['query']['bool']['must']['bool']['should'][] = [
-            'terms' => [
-                'taxonomy_categories.keyword' => $collectionModel->taxonomies->unique('name')->map->name->all(),
-            ],
-        ];
+        foreach ($collectionModel->taxonomies as $taxonomy) {
+            $this->query['query']['function_score']['query']['bool']['must']['bool']['should'][] = [
+                'term' => [
+                    'taxonomy_categories.keyword' => $taxonomy->name,
+                ],
+            ];
+        }
 
         foreach ($this->query['query']['function_score']['query']['bool']['filter']['bool']['must'] as &$filter) {
             if (Arr::get($filter, "terms.{$term}") !== null) {
