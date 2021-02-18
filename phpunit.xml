@@ -29,8 +29,6 @@
 
         <server name="APP_ENV" value="testing"/>
 
-        <server name="LOG_CHANNEL" value="testing"/>
-
         <server name="DB_HOST" value="mysql-testing"/>
         <server name="DB_PORT" value="3306"/>
         <server name="DB_DATABASE" value="healthy_london_partnership"/>
