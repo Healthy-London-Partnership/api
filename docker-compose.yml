@@ -82,6 +82,11 @@ services:
     ports:
       - "${ELASTICSEARCH_PORT}:9200"
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.2
+    ports:
+      - "${KIBANA_PORT}:5601"
+
   troposphere:
     image: healthy-london-partnership/api/troposphere
     build:
