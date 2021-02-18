@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 class ElasticsearchSearch implements Search
@@ -42,7 +43,6 @@ class ElasticsearchSearch implements Search
             'size' => config('hlp.pagination_results'),
             'query' => [
                 'function_score' => [
-                    'boost_mode' => 'sum',
                     'query' => [
                         'bool' => [
                             'filter' => [
@@ -72,11 +72,20 @@ class ElasticsearchSearch implements Search
                         [
                             'field_value_factor' => [
                                 'field' => 'score',
-                                'modifier' => 'ln1p',
                                 'missing' => 1,
+                                'modifier' => 'ln1p',
                             ],
                         ],
+                        [
+                            'filter' => [
+                                'term' => [
+                                    'is_national' => false,
+                                ],
+                            ],
+                            'weight' => 1.2,
+                        ],
                     ],
+                    'boost_mode' => 'sum',
                 ],
             ],
         ];
@@ -89,11 +98,11 @@ class ElasticsearchSearch implements Search
     {
         $should = &$this->query['query']['function_score']['query']['bool']['must']['bool']['should'];
 
-        $should[] = $this->match('name', $term, 3);
-        $should[] = $this->match('intro', $term, 2);
+        $should[] = $this->matchPhrase('name', $term, 3);
+        $should[] = $this->matchPhrase('intro', $term, 2);
         $should[] = $this->matchPhrase('description', $term, 2);
-        $should[] = $this->match('taxonomy_categories', $term, 5);
-        $should[] = $this->match('organisation_name', $term);
+        $should[] = $this->matchPhrase('taxonomy_categories', $term);
+        $should[] = $this->matchPhrase('organisation_name', $term);
 
         return $this;
     }
@@ -112,25 +121,7 @@ class ElasticsearchSearch implements Search
         return $this;
     }
 
-    /**
-     * @param string $field
-     * @param string $term
-     * @param int $boost
-     * @return array
-     */
-    protected function match(string $field, string $term, int $boost = 1): array
-    {
-        return [
-            'match' => [
-                $field => [
-                    'query' => $term,
-                    'boost' => $boost,
-                ],
-            ],
-        ];
-    }
-
-    /**
+    /**match
      * @param string $field
      * @param string $term
      * @param int $boost
@@ -144,6 +135,20 @@ class ElasticsearchSearch implements Search
                     'query' => $term,
                     'boost' => $boost,
                 ],
+            ],
+        ];
+    }
+
+    /**match
+     * @param string $field
+     * @param string $term
+     * @return array
+     */
+    protected function term(string $field, string $term): array
+    {
+        return [
+            'term' => [
+                $field => $term,
             ],
         ];
     }
@@ -268,6 +273,15 @@ class ElasticsearchSearch implements Search
                         'distance' => $this->distance($radius),
                         'service_locations.location' => $location->toArray(),
                     ],
+                ],
+            ],
+        ];
+
+        $this->query['query']['function_score']['functions'][] = [
+            'gauss' => [
+                'service_locations.location' => [
+                    'origin' => $location->toArray(),
+                    'scale' => $this->distance($radius),
                 ],
             ],
         ];
@@ -405,6 +419,7 @@ class ElasticsearchSearch implements Search
     /**
      * @param string $slug
      * @param string $type
+     * @throws \Exception
      * @return \App\Search\ElasticsearchSearch
      */
     protected function applyCollection(string $slug, string $type): Search
@@ -425,16 +440,15 @@ class ElasticsearchSearch implements Search
 
         $term = $type === 'category' ? 'collection_categories' : 'collection_personas';
 
-        $should = &$this->query['query']['function_score']['query']['bool']['must']['bool']['should'];
-
-        foreach ($collectionModel->taxonomies as $taxonomy) {
-            $should[] = $this->match('taxonomy_categories', $taxonomy->name);
-        }
+        $this->query['query']['function_score']['query']['bool']['must']['bool']['should'][] = [
+            'terms' => [
+                'taxonomy_categories.keyword' => $collectionModel->taxonomies->unique('name')->map->name->all(),
+            ],
+        ];
 
         foreach ($this->query['query']['function_score']['query']['bool']['filter']['bool']['must'] as &$filter) {
-            if (is_array($filter) && array_key_exists('terms', $filter) && array_key_exists($term, $filter['terms'])) {
+            if (Arr::get($filter, "terms.{$term}") !== null) {
                 $filter['terms'][$term][] = $collectionModel->name;
-
                 return $this;
             }
         }
