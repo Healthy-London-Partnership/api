@@ -33,9 +33,6 @@ class ElasticsearchSearch implements Search
      */
     protected $query;
 
-    /**
-     * Search constructor.
-     */
     public function __construct()
     {
         $this->query = [
@@ -85,7 +82,8 @@ class ElasticsearchSearch implements Search
                             'weight' => 1.2,
                         ],
                     ],
-                    'boost_mode' => 'sum',
+                    'boost_mode' => 'multiply',
+                    'score_mode' => 'multiply',
                 ],
             ],
         ];
@@ -101,7 +99,7 @@ class ElasticsearchSearch implements Search
         $should[] = $this->matchPhrase('name', $term, 3);
         $should[] = $this->matchPhrase('intro', $term, 2);
         $should[] = $this->matchPhrase('description', $term, 2);
-        $should[] = $this->matchPhrase('taxonomy_categories', $term);
+        $should[] = $this->matchPhrase('taxonomy_categories', $term, 5);
         $should[] = $this->matchPhrase('organisation_name', $term);
 
         return $this;
@@ -266,12 +264,23 @@ class ElasticsearchSearch implements Search
     public function applyRadius(Coordinate $location, int $radius): Search
     {
         $this->query['query']['function_score']['query']['bool']['filter']['bool']['must'][] = [
-            'nested' => [
-                'path' => 'service_locations',
-                'query' => [
-                    'geo_distance' => [
-                        'distance' => $this->distance($radius),
-                        'service_locations.location' => $location->toArray(),
+            'bool' => [
+                'should' => [
+                    [
+                        'nested' => [
+                            'path' => 'service_locations',
+                            'query' => [
+                                'geo_distance' => [
+                                    'distance' => $this->distance($radius),
+                                    'service_locations.location' => $location->toArray(),
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'term' => [
+                            'is_national' => true,
+                        ],
                     ],
                 ],
             ],
@@ -281,7 +290,7 @@ class ElasticsearchSearch implements Search
             'gauss' => [
                 'service_locations.location' => [
                     'origin' => $location->toArray(),
-                    'scale' => $this->distance($radius),
+                    'scale' => $this->distance(1),
                 ],
             ],
         ];
@@ -310,7 +319,12 @@ class ElasticsearchSearch implements Search
     /**
      * @inheritDoc
      */
-    public function paginate(int $page = null, int $perPage = null): AnonymousResourceCollection
+    public function search(CriteriaQuery $query, int $page = null, int $perPage = null): AnonymousResourceCollection
+    {
+
+    }
+
+    protected function paginate(int $page = null, int $perPage = null): AnonymousResourceCollection
     {
         $page = page($page);
         $perPage = per_page($perPage);
@@ -323,19 +337,6 @@ class ElasticsearchSearch implements Search
         $this->logMetrics($response);
 
         return $this->toResource($response, true, $page);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get(int $perPage = null): AnonymousResourceCollection
-    {
-        $this->query['size'] = per_page($perPage);
-
-        $response = Service::searchRaw($this->query);
-        $this->logMetrics($response);
-
-        return $this->toResource($response, false);
     }
 
     /**
