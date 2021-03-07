@@ -886,8 +886,8 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $taxonomy = Taxonomy::category()->children()->create([
-            'slug' => 'phpunit-taxonomy',
-            'name' => 'PHPUnit Taxonomy',
+            'slug' => 'phpunit',
+            'name' => 'PHPUnit',
             'order' => 1,
         ]);
 
@@ -896,7 +896,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $localService4->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
 
         $response = $this->json('POST', '/core/v1/search', [
-            'query' => 'PHPUnit Taxonomy',
+            'query' => 'PHPUnit',
             'location' => [
                 'lat' => 45,
                 'lon' => 90,

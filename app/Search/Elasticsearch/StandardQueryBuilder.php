@@ -9,7 +9,7 @@ use App\Models\Service;
 use App\Search\CriteriaQuery;
 use App\Support\Coordinate;
 
-class WebsiteQueryBuilder implements QueryBuilderInterface
+class StandardQueryBuilder implements QueryBuilderInterface
 {
     /**
      * @var array
