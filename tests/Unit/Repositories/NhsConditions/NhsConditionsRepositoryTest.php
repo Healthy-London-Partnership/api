@@ -17,12 +17,15 @@ class NhsConditionsRepositoryTest extends TestCase
 
         $clientMock = $this->createMock(Client::class);
         $clientMock->expects($this->once())
-            ->method('get')
+            ->method('__call')
             ->with(
-                'http://example.com/conditions/depression',
+                'get',
                 [
-                    'headers' => ['subscription-key' => 'test_key'],
-                    'timeout' => 10,
+                    'http://example.com/conditions/depression',
+                    [
+                        'headers' => ['subscription-key' => 'test_key'],
+                        'timeout' => 10,
+                    ],
                 ]
             )
             ->willReturn($responseMock);
