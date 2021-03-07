@@ -119,6 +119,8 @@ Route::prefix('core/v1')
             // Search.
             Route::post('/search', 'SearchController')
                 ->name('search');
+            Route::post('/search/collections/categories', 'Search\\CollectionCategoryController')
+                ->name('search.collections.categories');
 
             // Service Locations.
             Route::match(['GET', 'POST'], '/service-locations/index', 'ServiceLocationController@index');
