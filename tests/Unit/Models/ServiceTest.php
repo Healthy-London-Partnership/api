@@ -21,6 +21,6 @@ class ServiceTest extends TestCase
     {
         $service = factory(Service::class)->create();
 
-        $this->assertEquals(0, $service->score);
+        $this->assertEquals(1, $service->score);
     }
 }
