@@ -95,7 +95,7 @@ class CollectionCategoryQueryBuilder implements QueryBuilderInterface
         $category->taxonomies->each(function (Taxonomy $taxonomy): void {
             $this->esQuery['query']['function_score']['query']['bool']['should'][] = [
                 'term' => [
-                    'taxonomy_categories' => $taxonomy->getAttribute('name'),
+                    'taxonomy_categories.keyword' => $taxonomy->getAttribute('name'),
                 ],
             ];
         });
