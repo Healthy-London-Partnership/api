@@ -8,6 +8,9 @@ use App\Support\Coordinate;
 
 class CriteriaQuery
 {
+    const ORDER_RELEVANCE = 'relevance';
+    const ORDER_DISTANCE = 'distance';
+
     /**
      * @var string|null
      */

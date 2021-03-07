@@ -2,8 +2,8 @@
 
 namespace App\Docs\Schemas\Search;
 
-use App\Contracts\Search;
 use App\Models\Service;
+use App\Search\CriteriaQuery;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 
@@ -46,7 +46,7 @@ class StoreSearchSchema extends Schema
                 Schema::boolean('is_free'),
                 Schema::boolean('is_national'),
                 Schema::string('order')
-                    ->enum(Search::ORDER_RELEVANCE, Search::ORDER_DISTANCE)
+                    ->enum(CriteriaQuery::ORDER_RELEVANCE, CriteriaQuery::ORDER_DISTANCE)
                     ->default('relevance'),
                 Schema::object('location')
                     ->required('lat', 'lon')

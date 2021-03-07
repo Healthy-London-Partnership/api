@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Models;
 
-use App\Contracts\Search;
 use App\Models\Audit;
 use App\Models\Location;
 use App\Models\Organisation;
@@ -15,6 +14,9 @@ use App\Models\SearchHistory;
 use App\Models\Service;
 use App\Models\ServiceLocation;
 use App\Models\User;
+use App\Search\CriteriaQuery;
+use App\Search\Elasticsearch\EloquentMapper;
+use App\Search\Elasticsearch\StandardQueryBuilder;
 use App\Support\Coordinate;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -634,12 +636,15 @@ class ReportTest extends TestCase
 
     public function test_search_histories_export_works()
     {
-        /** @var \App\Contracts\Search $search */
-        $search = resolve(Search::class)->applyQuery('Health and Social');
+        $criteria = new CriteriaQuery();
+        $criteria->setQuery('Health and Social');
+
+        $queryBuilder = new StandardQueryBuilder();
+        $esQuery = $queryBuilder->build($criteria);
 
         // Create a single search history.
         $searchHistory = SearchHistory::create([
-            'query' => $search->getQuery(),
+            'query' => $esQuery,
             'count' => 1,
         ]);
 
@@ -671,14 +676,17 @@ class ReportTest extends TestCase
 
     public function test_search_histories_export_works_with_location()
     {
-        /** @var \App\Contracts\Search $search */
-        $search = resolve(Search::class)
-            ->applyQuery('Health and Social')
-            ->applyOrder(Search::ORDER_DISTANCE, new Coordinate(0, 0));
+        $criteria = new CriteriaQuery();
+        $criteria->setQuery('Health and Social');
+        $criteria->setOrder(CriteriaQuery::ORDER_DISTANCE);
+        $criteria->setLocation(new Coordinate(0, 0));
+
+        $queryBuilder = new StandardQueryBuilder();
+        $esQuery = $queryBuilder->build($criteria);
 
         // Create a single search history.
         $searchHistory = SearchHistory::create([
-            'query' => $search->getQuery(),
+            'query' => $esQuery,
             'count' => 1,
         ]);
 
@@ -710,16 +718,19 @@ class ReportTest extends TestCase
 
     public function test_search_histories_export_works_with_date_range()
     {
-        /** @var \App\Contracts\Search $search */
-        $search = resolve(Search::class)->applyQuery('Health and Social');
+        $criteria = new CriteriaQuery();
+        $criteria->setQuery('Health and Social');
+
+        $queryBuilder = new StandardQueryBuilder();
+        $esQuery = $queryBuilder->build($criteria);
 
         // Create a single search history.
         $searchHistoryWithinRange = SearchHistory::create([
-            'query' => $search->getQuery(),
+            'query' => $esQuery,
             'count' => 1,
         ]);
         SearchHistory::create([
-            'query' => $search->getQuery(),
+            'query' => $esQuery,
             'count' => 1,
             'created_at' => Date::today()->subMonths(2),
         ]);
@@ -756,12 +767,15 @@ class ReportTest extends TestCase
 
     public function test_search_histories_without_query_are_omitted()
     {
-        /** @var \App\Contracts\Search $search */
-        $search = resolve(Search::class)->applyCategory('self-help');
+        $criteria = new CriteriaQuery();
+        $criteria->setCategories(['self-help']);
+
+        $queryBuilder = new StandardQueryBuilder();
+        $esQuery = $queryBuilder->build($criteria);
 
         // Create a single search history.
         SearchHistory::create([
-            'query' => $search->getQuery(),
+            'query' => $esQuery,
             'count' => 1,
         ]);
 
