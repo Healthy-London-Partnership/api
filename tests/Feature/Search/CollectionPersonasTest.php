@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Tests\TestCase;
 use Tests\UsesElasticsearch;
 
-class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
+class CollectionPersonasTest extends TestCase implements UsesElasticsearch
 {
     /**
      * Setup the test environment.
@@ -32,33 +32,33 @@ class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
     public function test_guest_can_search()
     {
         $collectionCategory = Collection::create([
-            'type' => Collection::TYPE_CATEGORY,
+            'type' => Collection::TYPE_PERSONA,
             'slug' => 'self-help',
             'name' => 'Self Help',
             'meta' => [],
             'order' => 1,
         ]);
 
-        $response = $this->json('POST', '/core/v1/search/collections/categories', [
-            'category' => $collectionCategory->getAttribute('slug'),
+        $response = $this->json('POST', '/core/v1/search/collections/personas', [
+            'persona' => $collectionCategory->getAttribute('slug'),
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
     }
 
-    public function test_filter_by_category_works()
+    public function test_filter_by_persona_works()
     {
         $service1 = factory(Service::class)->create();
         $service2 = factory(Service::class)->create();
         $collection1 = Collection::create([
-            'type' => Collection::TYPE_CATEGORY,
+            'type' => Collection::TYPE_PERSONA,
             'slug' => 'self-help',
             'name' => 'Self Help',
             'meta' => [],
             'order' => 1,
         ]);
         $collection2 = Collection::create([
-            'type' => Collection::TYPE_CATEGORY,
+            'type' => Collection::TYPE_PERSONA,
             'slug' => 'addiction',
             'name' => 'Addiction',
             'meta' => [],
@@ -82,8 +82,8 @@ class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
         $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $service2->save();
 
-        $response = $this->json('POST', '/core/v1/search/collections/categories', [
-            'category' => $collection1->slug,
+        $response = $this->json('POST', '/core/v1/search/collections/personas', [
+            'persona' => $collection1->slug,
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
@@ -92,7 +92,7 @@ class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $service2->id]);
     }
 
-    public function test_services_with_more_taxonomies_in_a_category_collection_are_more_relevant()
+    public function test_services_with_more_taxonomies_in_a_persona_collection_are_more_relevant()
     {
         // Create 3 taxonomies
         $taxonomy1 = Taxonomy::category()->children()->create([
@@ -113,7 +113,7 @@ class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
 
         // Create a collection
         $collection = Collection::create([
-            'type' => Collection::TYPE_CATEGORY,
+            'type' => Collection::TYPE_PERSONA,
             'slug' => 'self-help',
             'name' => 'Self Help',
             'meta' => [],
@@ -144,8 +144,8 @@ class CollectionCategoriesTest extends TestCase implements UsesElasticsearch
         $service3->save(); // Update the Elasticsearch index.
 
         // Assert that when searching by collection, the services with more taxonomies are ranked higher.
-        $response = $this->json('POST', '/core/v1/search/collections/categories', [
-            'category' => $collection->slug,
+        $response = $this->json('POST', '/core/v1/search/collections/personas', [
+            'persona' => $collection->slug,
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
