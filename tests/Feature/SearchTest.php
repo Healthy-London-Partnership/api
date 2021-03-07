@@ -485,7 +485,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $nationalService->id]);
     }
 
-    public function test_order_by_location_return_services_less_than_15_miles_away()
+    public function test_order_by_location_return_services_less_than_limited_miles_away()
     {
         $service1 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
@@ -516,7 +516,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $service3->id]);
     }
 
-    public function test_order_by_relevance_with_location_return_services_less_than_15_miles_away()
+    public function test_order_by_relevance_with_location_return_services_less_than_limited_miles_away()
     {
         $service1 = factory(Service::class)->create();
         $serviceLocation = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
@@ -859,14 +859,17 @@ class SearchTest extends TestCase implements UsesElasticsearch
     public function test_score_and_national_results_ordered_correctly()
     {
         $nationalService5 = factory(Service::class)->create([
+            'description' => 'PHPUnit',
             'is_national' => true,
             'score' => 5,
         ]);
         $localService5 = factory(Service::class)->create([
+            'description' => 'PHPUnit',
             'is_national' => false,
             'score' => 5,
         ]);
         $localService4 = factory(Service::class)->create([
+            'description' => 'PHPUnit',
             'is_national' => false,
             'score' => 4,
         ]);
@@ -884,16 +887,6 @@ class SearchTest extends TestCase implements UsesElasticsearch
             'service_id' => $localService4->id,
             'location_id' => $location->id,
         ]);
-
-        $taxonomy = Taxonomy::category()->children()->create([
-            'slug' => 'phpunit',
-            'name' => 'PHPUnit',
-            'order' => 1,
-        ]);
-
-        $nationalService5->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $localService5->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
-        $localService4->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy->id]);
 
         $response = $this->json('POST', '/core/v1/search', [
             'query' => 'PHPUnit',

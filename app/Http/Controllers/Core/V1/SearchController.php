@@ -54,10 +54,6 @@ class SearchController extends Controller
             );
         }
 
-        if ($request->has('radius')) {
-            $criteria->setRadius($request->input('radius'));
-        }
-
         if ($request->has('order')) {
             $criteria->setOrder($request->input('order'));
         }

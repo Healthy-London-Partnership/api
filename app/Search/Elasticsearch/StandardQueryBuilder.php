@@ -217,7 +217,7 @@ class StandardQueryBuilder implements QueryBuilderInterface
                             'path' => 'service_locations',
                             'query' => [
                                 'geo_distance' => [
-                                    'distance' => '15mi',
+                                    'distance' => config('hlp.search_distance') . 'mi',
                                     'service_locations.location' => $coordinate->toArray(),
                                 ],
                             ],

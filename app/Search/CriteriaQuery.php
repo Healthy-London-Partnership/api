@@ -47,11 +47,6 @@ class CriteriaQuery
     protected $location;
 
     /**
-     * @var float|null
-     */
-    protected $radius;
-
-    /**
      * @var bool|null
      */
     protected $isNational;
@@ -227,30 +222,6 @@ class CriteriaQuery
     public function setLocation(?Coordinate $location): void
     {
         $this->location = $location;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasRadius(): bool
-    {
-        return $this->radius !== null;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getRadius(): ?float
-    {
-        return $this->radius;
-    }
-
-    /**
-     * @param float|null $radius
-     */
-    public function setRadius(?float $radius): void
-    {
-        $this->radius = $radius;
     }
 
     /**

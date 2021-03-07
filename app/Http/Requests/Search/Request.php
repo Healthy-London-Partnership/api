@@ -68,10 +68,6 @@ class Request extends FormRequest
                 'min:-180',
                 'max:180',
             ],
-            'radius' => [
-                'integer',
-                'min:0',
-            ],
         ];
     }
 }
