@@ -859,17 +859,22 @@ class SearchTest extends TestCase implements UsesElasticsearch
     public function test_score_and_national_results_ordered_correctly()
     {
         $nationalService5 = factory(Service::class)->create([
-            'description' => 'PHPUnit',
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
             'is_national' => true,
             'score' => 5,
         ]);
         $localService5 = factory(Service::class)->create([
-            'description' => 'PHPUnit',
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
             'is_national' => false,
             'score' => 5,
         ]);
+        $nationalService4 = factory(Service::class)->create([
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
+            'is_national' => true,
+            'score' => 4,
+        ]);
         $localService4 = factory(Service::class)->create([
-            'description' => 'PHPUnit',
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
             'is_national' => false,
             'score' => 4,
         ]);
@@ -889,7 +894,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response = $this->json('POST', '/core/v1/search', [
-            'query' => 'PHPUnit',
+            'query' => 'abcdefghijklmnopqrstuvwxyz',
             'location' => [
                 'lat' => 45,
                 'lon' => 90,
@@ -897,18 +902,22 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(3, 'data');
+        $response->assertJsonCount(4, 'data');
         $this->assertEquals(
             $localService5->id,
             $this->getResponseContent($response, 'data.0.id')
         );
         $this->assertEquals(
             $nationalService5->id,
-            $this->getResponseContent($response, 'data.2.id')
+            $this->getResponseContent($response, 'data.1.id')
         );
         $this->assertEquals(
             $localService4->id,
-            $this->getResponseContent($response, 'data.1.id')
+            $this->getResponseContent($response, 'data.2.id')
+        );
+        $this->assertEquals(
+            $nationalService4->id,
+            $this->getResponseContent($response, 'data.3.id')
         );
     }
 }

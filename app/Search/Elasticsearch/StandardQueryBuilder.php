@@ -37,22 +37,21 @@ class StandardQueryBuilder implements QueryBuilderInterface
                     ],
                     'functions' => [
                         [
-                            'field_value_factor' => [
-                                'field' => 'score',
-                                'missing' => 1,
-                                'modifier' => 'ln1p',
-                            ],
-                        ],
-                        [
                             'filter' => [
                                 'term' => [
                                     'is_national' => false,
                                 ],
                             ],
-                            'weight' => 1.2,
+                            'weight' => 1.1,
+                        ],
+                        [
+                            'field_value_factor' => [
+                                'field' => 'score',
+                                'missing' => 1,
+                                'modifier' => 'ln1p'
+                            ],
                         ],
                     ],
-                    'boost_mode' => 'multiply',
                 ],
             ],
         ];
@@ -208,7 +207,7 @@ class StandardQueryBuilder implements QueryBuilderInterface
 
     protected function applyLocation(Coordinate $coordinate): void
     {
-        // Add filter for listings within a 15 miles radius, or national.
+        // Add filter for listings within a search distance miles radius, or national.
         $this->esQuery['query']['function_score']['query']['bool']['filter']['bool']['must'][] = [
             'bool' => [
                 'should' => [
