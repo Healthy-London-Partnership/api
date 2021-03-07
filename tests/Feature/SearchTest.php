@@ -300,6 +300,20 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $paidService->id]);
     }
 
+    public function test_filter_by_is_national_works()
+    {
+        $localService = factory(Service::class)->create(['is_national' => false]);
+        $nationalService = factory(Service::class)->create(['is_national' => true]);
+
+        $response = $this->json('POST', '/core/v1/search', [
+            'is_national' => false,
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['id' => $localService->id]);
+        $response->assertJsonMissing(['id' => $nationalService->id]);
+    }
+
     public function test_order_by_location_works()
     {
         $service = factory(Service::class)->create(['is_national' => false]);

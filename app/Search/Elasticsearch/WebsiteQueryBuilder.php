@@ -83,6 +83,10 @@ class WebsiteQueryBuilder implements QueryBuilderInterface
             $this->applyIsFree($query->getIsFree());
         }
 
+        if ($query->hasIsNational()) {
+            $this->applyIsNational($query->getIsNational());
+        }
+
         if ($query->hasLocation()) {
             $this->applyLocation($query->getLocation());
 
@@ -189,6 +193,15 @@ class WebsiteQueryBuilder implements QueryBuilderInterface
         $this->esQuery['query']['function_score']['query']['bool']['filter']['bool']['must'][] = [
             'term' => [
                 'is_free' => $isFree,
+            ],
+        ];
+    }
+
+    protected function applyIsNational(bool $isNational): void
+    {
+        $this->esQuery['query']['function_score']['query']['bool']['filter']['bool']['must'][] = [
+            'term' => [
+                'is_national' => $isNational,
             ],
         ];
     }

@@ -42,6 +42,10 @@ class SearchController extends Controller
             $criteria->setIsFree($request->input('is_free'));
         }
 
+        if ($request->has('is_national')) {
+            $criteria->setIsNational($request->input('is_national'));
+        }
+
         if ($request->has('location')) {
             $criteria->setLocation(
                 new Coordinate(
@@ -49,10 +53,10 @@ class SearchController extends Controller
                     $request->input('location.lon')
                 )
             );
+        }
 
-            if ($request->has('radius')) {
-                $criteria->setRadius($request->input('radius'));
-            }
+        if ($request->has('radius')) {
+            $criteria->setRadius($request->input('radius'));
         }
 
         if ($request->has('order')) {
