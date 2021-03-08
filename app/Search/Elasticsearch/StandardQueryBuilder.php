@@ -48,7 +48,7 @@ class StandardQueryBuilder implements QueryBuilderInterface
                             'field_value_factor' => [
                                 'field' => 'score',
                                 'missing' => 1,
-                                'modifier' => 'ln1p'
+                                'modifier' => 'ln1p',
                             ],
                         ],
                     ],
