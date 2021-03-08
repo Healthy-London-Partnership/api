@@ -2,7 +2,6 @@
 
 namespace App\Docs\Schemas\Search;
 
-use App\Models\Service;
 use App\Search\CriteriaQuery;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
@@ -23,26 +22,8 @@ class StoreSearchSchema extends Schema
                 Schema::integer('per_page')
                     ->default(config('hlp.pagination_results')),
                 Schema::string('query'),
-                Schema::string('type')->enum(
-                    Service::TYPE_SERVICE,
-                    Service::TYPE_ACTIVITY,
-                    Service::TYPE_CLUB,
-                    Service::TYPE_GROUP,
-                    Service::TYPE_HELPLINE,
-                    Service::TYPE_INFORMATION,
-                    Service::TYPE_APP,
-                    Service::TYPE_ADVICE
-                ),
                 Schema::string('category'),
                 Schema::string('persona'),
-                Schema::string('wait_time')
-                    ->enum(
-                        Service::WAIT_TIME_ONE_WEEK,
-                        Service::WAIT_TIME_TWO_WEEKS,
-                        Service::WAIT_TIME_THREE_WEEKS,
-                        Service::WAIT_TIME_MONTH,
-                        Service::WAIT_TIME_LONGER
-                    ),
                 Schema::boolean('is_free'),
                 Schema::boolean('is_national'),
                 Schema::string('order')
@@ -55,9 +36,7 @@ class StoreSearchSchema extends Schema
                             ->type(Schema::FORMAT_FLOAT),
                         Schema::number('lon')
                             ->type(Schema::FORMAT_FLOAT)
-                    ),
-                Schema::integer('distance')
-                    ->default(config('hlp.search_distance'))
+                    )
             );
     }
 }
