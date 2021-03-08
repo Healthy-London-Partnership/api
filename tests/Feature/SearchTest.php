@@ -785,12 +785,11 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(2, 'data');
         $response->assertJsonFragment(['id' => $service2->id]);
         $response->assertJsonFragment(['id' => $service4->id]);
         $response->assertJsonMissing(['id' => $service1->id]);
         $response->assertJsonMissing(['id' => $service3->id]);
-        $this->assertEquals($service4->id, $response->json('data')[0]['id']);
-        $this->assertEquals($service2->id, $response->json('data')[1]['id']);
     }
 
     public function test_services_with_a_higher_score_are_more_relevant()
