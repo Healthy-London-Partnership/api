@@ -498,8 +498,9 @@ class Report extends Model
                     /**
                      * Look for legacy non-function_score path and function_score path.
                      */
-                    $searchQuery = $query['query.bool.must.bool.should.0.match.name.query'] ??
-                    $query['query.function_score.query.bool.must.bool.should.0.match.name.query'] ??
+                    $searchQuery = $query['query.function_score.query.bool.must.bool.should.0.match_phrase.name.query'] ??
+                        $query['query.function_score.query.bool.must.bool.should.0.match.name.query'] ??
+                        $query['query.bool.must.bool.should.0.match.name.query'] ??
                         null;
                     $lat = $query['sort.0._geo_distance.service_locations.location.lat'] ?? null;
                     $lon = $query['sort.0._geo_distance.service_locations.location.lon'] ?? null;

@@ -38,6 +38,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 COPY etc/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY etc/nginx/sites-available/default /etc/nginx/sites-available/default
 COPY etc/php/7.2/fpm/php-fpm.conf /etc/php/7.2/fpm/php-fpm.conf
+COPY etc/php/7.2/fpm/pool.d/www.conf /etc/php/7.2/fpm/pool.d/www.conf
 COPY etc/php/7.2/fpm/conf.d/100-local.ini /etc/php/7.2/fpm/conf.d/100-local.ini
 COPY etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

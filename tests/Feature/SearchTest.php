@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Collection;
+use App\Models\Location;
 use App\Models\Organisation;
 use App\Models\Service;
 use App\Models\ServiceLocation;
@@ -179,24 +180,6 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonFragment(['id' => $service->id]);
     }
 
-    public function test_filter_by_type_works()
-    {
-        $service = factory(Service::class)->create([
-            'type' => Service::TYPE_SERVICE,
-        ]);
-        factory(Service::class)->create([
-            'type' => Service::TYPE_APP,
-        ]);
-
-        $response = $this->json('POST', '/core/v1/search', [
-            'type' => Service::TYPE_SERVICE,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(1, 'data');
-        $response->assertJsonFragment(['id' => $service->id]);
-    }
-
     public function test_filter_by_categories_works()
     {
         $service1 = factory(Service::class)->create();
@@ -303,22 +286,6 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonFragment(['id' => $service2->id]);
     }
 
-    public function test_filter_by_wait_time_works()
-    {
-        $oneMonthWaitTimeService = factory(Service::class)->create(['wait_time' => Service::WAIT_TIME_MONTH]);
-        $twoWeeksWaitTimeService = factory(Service::class)->create(['wait_time' => Service::WAIT_TIME_TWO_WEEKS]);
-        $oneWeekWaitTimeService = factory(Service::class)->create(['wait_time' => Service::WAIT_TIME_ONE_WEEK]);
-
-        $response = $this->json('POST', '/core/v1/search', [
-            'wait_time' => Service::WAIT_TIME_TWO_WEEKS,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $oneWeekWaitTimeService->id]);
-        $response->assertJsonFragment(['id' => $twoWeeksWaitTimeService->id]);
-        $response->assertJsonMissing(['id' => $oneMonthWaitTimeService->id]);
-    }
-
     public function test_filter_by_is_free_works()
     {
         $paidService = factory(Service::class)->create(['is_free' => false]);
@@ -333,24 +300,10 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $paidService->id]);
     }
 
-    public function test_filter_by_national_works()
+    public function test_filter_by_is_national_works()
     {
-        $nationalService = factory(Service::class)->create(['is_national' => true]);
         $localService = factory(Service::class)->create(['is_national' => false]);
-
-        $response = $this->json('POST', '/core/v1/search', [
-            'is_national' => true,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $nationalService->id]);
-        $response->assertJsonMissing(['id' => $localService->id]);
-    }
-
-    public function test_filter_by_not_national_works()
-    {
         $nationalService = factory(Service::class)->create(['is_national' => true]);
-        $localService = factory(Service::class)->create(['is_national' => false]);
 
         $response = $this->json('POST', '/core/v1/search', [
             'is_national' => false,
@@ -363,17 +316,17 @@ class SearchTest extends TestCase implements UsesElasticsearch
 
     public function test_order_by_location_works()
     {
-        $service = factory(Service::class)->create();
+        $service = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = factory(ServiceLocation::class)->create(['service_id' => $service->id]);
         DB::table('locations')->where('id', $serviceLocation->location->id)->update(['lat' => 19.9, 'lon' => 19.9]);
         $service->save();
 
-        $service2 = factory(Service::class)->create();
+        $service2 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation2 = factory(ServiceLocation::class)->create(['service_id' => $service2->id]);
         DB::table('locations')->where('id', $serviceLocation2->location->id)->update(['lat' => 20, 'lon' => 20]);
         $service2->save();
 
-        $service3 = factory(Service::class)->create();
+        $service3 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation3 = factory(ServiceLocation::class)->create(['service_id' => $service3->id]);
         DB::table('locations')->where('id', $serviceLocation3->location->id)->update(['lat' => 20.15, 'lon' => 20.15]);
         $service3->save();
@@ -482,8 +435,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $service->id]);
-        $response->assertJsonMissing(['id' => $differentService->id]);
+        $response->assertJsonCount(0, 'data');
     }
 
     public function test_only_active_services_returned()
@@ -506,29 +458,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $inactiveService->id]);
     }
 
-    public function test_only_national_services_returned()
-    {
-        $nationalService = factory(Service::class)->create([
-            'name' => 'Testing Service',
-            'is_national' => true,
-        ]);
-        $localService = factory(Service::class)->create([
-            'name' => 'Testing Service',
-            'is_national' => false,
-        ]);
-
-        $response = $this->json('POST', '/core/v1/search', [
-            'query' => 'Testing Service',
-            'order' => 'relevance',
-            'is_national' => true,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonFragment(['id' => $nationalService->id]);
-        $response->assertJsonMissing(['id' => $localService->id]);
-    }
-
-    public function test_national_service_not_returned_in_location_search()
+    public function test_national_service_not_returned_in_location_search_ordered_by_distance()
     {
         $nationalService = factory(Service::class)->create([
             'name' => 'Testing Service',
@@ -555,19 +485,19 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $nationalService->id]);
     }
 
-    public function test_order_by_location_return_services_less_than_15_miles_away()
+    public function test_order_by_location_return_services_less_than_limited_miles_away()
     {
-        $service1 = factory(Service::class)->create();
+        $service1 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
         DB::table('locations')->where('id', $serviceLocation->location->id)->update(['lat' => 0, 'lon' => 0]);
         $service1->save();
 
-        $service2 = factory(Service::class)->create();
+        $service2 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation2 = factory(ServiceLocation::class)->create(['service_id' => $service2->id]);
         DB::table('locations')->where('id', $serviceLocation2->location->id)->update(['lat' => 45, 'lon' => 90]);
         $service2->save();
 
-        $service3 = factory(Service::class)->create();
+        $service3 = factory(Service::class)->create(['is_national' => false]);
         $serviceLocation3 = factory(ServiceLocation::class)->create(['service_id' => $service3->id]);
         DB::table('locations')->where('id', $serviceLocation3->location->id)->update(['lat' => 90, 'lon' => 180]);
         $service3->save();
@@ -586,7 +516,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonMissing(['id' => $service3->id]);
     }
 
-    public function test_order_by_relevance_with_location_return_services_less_than_15_miles_away()
+    public function test_order_by_relevance_with_location_return_services_less_than_limited_miles_away()
     {
         $service1 = factory(Service::class)->create();
         $serviceLocation = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
@@ -628,134 +558,6 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $this->assertEquals(2, count($data));
         $this->assertEquals($service2->id, $data[0]['id']);
         $this->assertEquals($service3->id, $data[1]['id']);
-    }
-
-    public function test_services_with_more_taxonomies_in_a_category_collection_are_more_relevant()
-    {
-        // Create 3 taxonomies
-        $taxonomy1 = Taxonomy::category()->children()->create([
-            'slug' => 'red',
-            'name' => 'Red',
-            'order' => 1,
-        ]);
-        $taxonomy2 = Taxonomy::category()->children()->create([
-            'slug' => 'blue',
-            'name' => 'Blue',
-            'order' => 2,
-        ]);
-        $taxonomy3 = Taxonomy::category()->children()->create([
-            'slug' => 'green',
-            'name' => 'Green',
-            'order' => 3,
-        ]);
-
-        // Create a collection
-        $collection = Collection::create([
-            'type' => Collection::TYPE_CATEGORY,
-            'slug' => 'self-help',
-            'name' => 'Self Help',
-            'meta' => [],
-            'order' => 1,
-        ]);
-
-        // Link the taxonomies to the collection
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
-
-        // Create 3 services
-        $service1 = factory(Service::class)->create(['name' => 'Gold Co.']);
-        $service2 = factory(Service::class)->create(['name' => 'Silver Co.']);
-        $service3 = factory(Service::class)->create(['name' => 'Bronze Co.']);
-
-        // Link the services to 1, 2 and 3 taxonomies respectively.
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
-        $service1->save(); // Update the Elasticsearch index.
-
-        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $service2->save(); // Update the Elasticsearch index.
-
-        $service3->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service3->save(); // Update the Elasticsearch index.
-
-        // Assert that when searching by collection, the services with more taxonomies are ranked higher.
-        $response = $this->json('POST', '/core/v1/search', [
-            'category' => $collection->slug,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-
-        $content = $this->getResponseContent($response)['data'];
-        $this->assertEquals($service1->id, $content[0]['id']);
-        $this->assertEquals($service2->id, $content[1]['id']);
-        $this->assertEquals($service3->id, $content[2]['id']);
-    }
-
-    public function test_services_with_more_taxonomies_in_a_persona_collection_are_more_relevant()
-    {
-        // Create 3 taxonomies
-        $taxonomy1 = Taxonomy::category()->children()->create([
-            'slug' => 'red',
-            'name' => 'Red',
-            'order' => 1,
-        ]);
-        $taxonomy2 = Taxonomy::category()->children()->create([
-            'slug' => 'blue',
-            'name' => 'Blue',
-            'order' => 2,
-        ]);
-        $taxonomy3 = Taxonomy::category()->children()->create([
-            'slug' => 'green',
-            'name' => 'Green',
-            'order' => 3,
-        ]);
-
-        // Create a collection
-        $collection = Collection::create([
-            'type' => Collection::TYPE_PERSONA,
-            'slug' => 'self-help',
-            'name' => 'Self Help',
-            'meta' => [],
-            'order' => 1,
-        ]);
-
-        // Link the taxonomies to the collection
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $collection->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
-
-        // Create 3 services
-        $service1 = factory(Service::class)->create(['name' => 'Gold Co.']);
-        $service2 = factory(Service::class)->create(['name' => 'Silver Co.']);
-        $service3 = factory(Service::class)->create(['name' => 'Bronze Co.']);
-
-        // Link the services to 1, 2 and 3 taxonomies respectively.
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
-        $service1->save(); // Update the Elasticsearch index.
-
-        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
-        $service2->save(); // Update the Elasticsearch index.
-
-        $service3->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
-        $service3->save(); // Update the Elasticsearch index.
-
-        // Assert that when searching by collection, the services with more taxonomies are ranked higher.
-        $response = $this->json('POST', '/core/v1/search', [
-            'persona' => $collection->slug,
-        ]);
-
-        $response->assertStatus(Response::HTTP_OK);
-
-        $content = $this->getResponseContent($response)['data'];
-        $this->assertEquals($service1->id, $content[0]['id']);
-        $this->assertEquals($service2->id, $content[1]['id']);
-        $this->assertEquals($service3->id, $content[2]['id']);
     }
 
     public function test_searches_are_carried_out_in_specified_collections()
@@ -803,22 +605,22 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $collection3->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
 
         // Service 1 is in Collection 1
-        $service1 = factory(Service::class)->create(['name' => 'Bar']);
+        $service1 = factory(Service::class)->create(['name' => 'Foo Bar']);
         $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
         $service1->save();
 
         // Service 2 is in Collection 2
-        $service2 = factory(Service::class)->create(['name' => 'Bim']);
+        $service2 = factory(Service::class)->create(['name' => 'Foo Bim']);
         $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $service2->save();
 
         // Service 3 is in Collection 2
-        $service3 = factory(Service::class)->create(['name' => 'Foo']);
+        $service3 = factory(Service::class)->create(['name' => 'Foo Foo']);
         $service3->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $service3->save();
 
         // Service 4 is in Collection 3
-        $service4 = factory(Service::class)->create(['name' => 'Baz']);
+        $service4 = factory(Service::class)->create(['name' => 'Foo Baz']);
         $service4->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
         $service4->save();
 
@@ -832,7 +634,6 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $response->assertJsonFragment(['id' => $service3->id]);
         $response->assertJsonFragment(['id' => $service4->id]);
         $response->assertJsonMissing(['id' => $service1->id]);
-        $this->assertEquals($service3->id, $response->json('data')[0]['id']);
     }
 
     public function test_location_searches_are_carried_out_in_specified_collections()
@@ -866,21 +667,21 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $collection2->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
 
         // Service 1 is in Collection 1
-        $service1 = factory(Service::class)->create(['name' => 'Bar']);
+        $service1 = factory(Service::class)->create(['name' => 'Bar', 'is_national' => false]);
         $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
         $serviceLocation1 = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
         DB::table('locations')->where('id', $serviceLocation1->location->id)->update(['lat' => 041.9374814, 'lon' => -8.8643883]);
         $service1->save();
 
         // Service 2 is in Collection 2
-        $service2 = factory(Service::class)->create(['name' => 'Bim']);
+        $service2 = factory(Service::class)->create(['name' => 'Bim', 'is_national' => false]);
         $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $serviceLocation2 = factory(ServiceLocation::class)->create(['service_id' => $service2->id]);
         DB::table('locations')->where('id', $serviceLocation2->location->id)->update(['lat' => 041.9374814, 'lon' => -8.8643883]);
         $service2->save();
 
         // Service 3 is in Collection 2
-        $service3 = factory(Service::class)->create(['name' => 'Foo']);
+        $service3 = factory(Service::class)->create(['name' => 'Foo', 'is_national' => false]);
         $service3->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $serviceLocation3 = factory(ServiceLocation::class)->create(['service_id' => $service3->id]);
         DB::table('locations')->where('id', $serviceLocation3->location->id)->update(['lat' => 90, 'lon' => 90]);
@@ -946,14 +747,14 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $collection3->collectionTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
 
         // Service 1 is in Collection 1
-        $service1 = factory(Service::class)->create(['name' => 'Bar']);
+        $service1 = factory(Service::class)->create(['name' => 'Baz Bar', 'is_national' => false]);
         $service1->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy1->id]);
         $serviceLocation1 = factory(ServiceLocation::class)->create(['service_id' => $service1->id]);
         DB::table('locations')->where('id', $serviceLocation1->location->id)->update(['lat' => 041.9374814, 'lon' => -8.8643883]);
         $service1->save();
 
         // Service 2 is in Collection 2
-        $service2 = factory(Service::class)->create(['name' => 'Bim']);
+        $service2 = factory(Service::class)->create(['name' => 'Baz Bim', 'is_national' => false]);
         $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $service2->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
         $serviceLocation2 = factory(ServiceLocation::class)->create(['service_id' => $service2->id]);
@@ -961,14 +762,14 @@ class SearchTest extends TestCase implements UsesElasticsearch
         $service2->save();
 
         // Service 3 is in Collection 2
-        $service3 = factory(Service::class)->create(['name' => 'Foo']);
+        $service3 = factory(Service::class)->create(['name' => 'Baz Foo', 'is_national' => false]);
         $service3->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy2->id]);
         $serviceLocation3 = factory(ServiceLocation::class)->create(['service_id' => $service3->id]);
         DB::table('locations')->where('id', $serviceLocation3->location->id)->update(['lat' => 90, 'lon' => 90]);
         $service3->save();
 
         // Service 4 is in Collection 3
-        $service4 = factory(Service::class)->create(['name' => 'Baz']);
+        $service4 = factory(Service::class)->create(['name' => 'Baz Baz', 'is_national' => false]);
         $service4->serviceTaxonomies()->create(['taxonomy_id' => $taxonomy3->id]);
         $serviceLocation4 = factory(ServiceLocation::class)->create(['service_id' => $service4->id]);
         DB::table('locations')->where('id', $serviceLocation4->location->id)->update(['lat' => 041.9374814, 'lon' => -8.8643883]);
@@ -984,12 +785,11 @@ class SearchTest extends TestCase implements UsesElasticsearch
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(2, 'data');
         $response->assertJsonFragment(['id' => $service2->id]);
         $response->assertJsonFragment(['id' => $service4->id]);
         $response->assertJsonMissing(['id' => $service1->id]);
         $response->assertJsonMissing(['id' => $service3->id]);
-        $this->assertEquals($service4->id, $response->json('data')[0]['id']);
-        $this->assertEquals($service2->id, $response->json('data')[1]['id']);
     }
 
     public function test_services_with_a_higher_score_are_more_relevant()
@@ -1026,6 +826,7 @@ class SearchTest extends TestCase implements UsesElasticsearch
             'name' => 'Testing Service',
             'intro' => 'Service Intro',
             'description' => 'Service description',
+            'is_national' => false,
         ];
 
         $service5 = factory(Service::class)->create(array_merge($serviceParams, ['score' => 5]));
@@ -1052,5 +853,73 @@ class SearchTest extends TestCase implements UsesElasticsearch
 
         $this->assertEquals($service0->id, $data[0]['id']);
         $this->assertEquals($service5->id, $data[1]['id']);
+    }
+
+    public function test_score_and_national_results_ordered_correctly()
+    {
+        // TODO
+        $this->markTestSkipped('Logic not yet working as expected.');
+
+        $nationalService5 = factory(Service::class)->create([
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
+            'is_national' => true,
+            'score' => 5,
+        ]);
+        $localService5 = factory(Service::class)->create([
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
+            'is_national' => false,
+            'score' => 5,
+        ]);
+        $nationalService4 = factory(Service::class)->create([
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
+            'is_national' => true,
+            'score' => 4,
+        ]);
+        $localService4 = factory(Service::class)->create([
+            'name' => 'abcdefghijklmnopqrstuvwxyz',
+            'is_national' => false,
+            'score' => 4,
+        ]);
+
+        $location = factory(Location::class)->create([
+            'lat' => 45,
+            'lon' => 90,
+        ]);
+
+        factory(ServiceLocation::class)->create([
+            'service_id' => $localService5->id,
+            'location_id' => $location->id,
+        ]);
+        factory(ServiceLocation::class)->create([
+            'service_id' => $localService4->id,
+            'location_id' => $location->id,
+        ]);
+
+        $response = $this->json('POST', '/core/v1/search', [
+            'query' => 'abcdefghijklmnopqrstuvwxyz',
+            'location' => [
+                'lat' => 45,
+                'lon' => 90,
+            ],
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(4, 'data');
+        $this->assertEquals(
+            $localService5->id,
+            $this->getResponseContent($response, 'data.0.id')
+        );
+        $this->assertEquals(
+            $nationalService5->id,
+            $this->getResponseContent($response, 'data.1.id')
+        );
+        $this->assertEquals(
+            $localService4->id,
+            $this->getResponseContent($response, 'data.2.id')
+        );
+        $this->assertEquals(
+            $nationalService4->id,
+            $this->getResponseContent($response, 'data.3.id')
+        );
     }
 }

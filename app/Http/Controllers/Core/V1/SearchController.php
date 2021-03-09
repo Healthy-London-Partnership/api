@@ -2,70 +2,68 @@
 
 namespace App\Http\Controllers\Core\V1;
 
-use App\Contracts\Search;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Search\Request;
+use App\Search\CriteriaQuery;
+use App\Search\Elasticsearch\EloquentMapper;
+use App\Search\Elasticsearch\StandardQueryBuilder;
 use App\Support\Coordinate;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SearchController extends Controller
 {
     /**
-     * @param \App\Contracts\Search $search
      * @param \App\Http\Requests\Search\Request $request
+     * @param \App\Search\CriteriaQuery $criteria
+     * @param \App\Search\Elasticsearch\StandardQueryBuilder $builder
+     * @param \App\Search\Elasticsearch\EloquentMapper $mapper
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function __invoke(Search $search, Request $request)
-    {
-        // Apply query.
+    public function __invoke(
+        Request $request,
+        CriteriaQuery $criteria,
+        StandardQueryBuilder $builder,
+        EloquentMapper $mapper
+    ): AnonymousResourceCollection {
         if ($request->has('query')) {
-            $search->applyQuery($request->input('query'));
-        }
-
-        // Apply filter on `type` field.
-        if ($request->has('type')) {
-            $search->applyType($request->input('type'));
+            $criteria->setQuery($request->input('query'));
         }
 
         if ($request->has('category')) {
-            // If category given then filter by category.
-            foreach (explode(',', $request->category) as $category) {
-                $search->applyCategory($category);
-            }
-        } elseif ($request->has('persona')) {
-            // Otherwise, if persona given then filter by persona.
-            foreach (explode(',', $request->persona) as $persona) {
-                $search->applyPersona($persona);
-            }
+            $criteria->setCategories(explode(',', $request->input('category')));
         }
 
-        // Apply filter on `wait_time` field.
-        if ($request->has('wait_time')) {
-            $search->applyWaitTime($request->wait_time);
+        if ($request->has('persona')) {
+            $criteria->setPersonas(explode(',', $request->input('persona')));
         }
 
-        // Apply filter on `is_free` field.
         if ($request->has('is_free')) {
-            $search->applyIsFree($request->is_free);
+            $criteria->setIsFree($request->input('is_free'));
         }
 
-        // If location was passed, then parse the location.
+        if ($request->has('is_national')) {
+            $criteria->setIsNational($request->input('is_national'));
+        }
+
         if ($request->has('location')) {
-            $location = new Coordinate(
-                $request->input('location.lat'),
-                $request->input('location.lon')
+            $criteria->setLocation(
+                new Coordinate(
+                    $request->input('location.lat'),
+                    $request->input('location.lon')
+                )
             );
-
-            // Apply radius filtering.
-            $search->applyRadius($location, $request->radius ?? config('hlp.search_distance'));
-        } elseif ($request->has('is_national')) {
-            // Apply filter on `is_national` field.
-            $search->applyIsNational((bool)$request->is_national);
         }
 
-        // Apply order.
-        $search->applyOrder($request->order ?? 'relevance', $location ?? null);
+        if ($request->has('order')) {
+            $criteria->setOrder($request->input('order'));
+        }
 
-        // Perform the search.
-        return $search->paginate($request->page, $request->per_page);
+        $query = $builder->build(
+            $criteria,
+            $request->input('page'),
+            $request->input('per_page')
+        );
+
+        return $mapper->paginate($query);
     }
 }
